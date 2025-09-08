@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ProBoost Landing Page</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="logo">
+      <img src="Logo.png" alt="ProBoost Logo" class="logo-img">
+      <span>ProBoost</span>
+    </div>
+    <nav class="nav-buttons">
+      <a href="Login page.html" class="btn-outline">Login</a>
+      <a href="Sign up Page.html" class="btn">Sign Up</a>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-text">
+      <h1>Boost Your <span>Business Growth</span></h1>
+      <p>Take your business to the next level with smart tools, seamless integrations, and powerful analytics.</p>
+      
+      <!-- Signup Form -->
+      <form class="signup-form" onsubmit="goToSignup(event)">
+        <input type="email" id="landingEmail" placeholder="Enter your email" required>
+        <button type="submit" class="btn">Sign Up — It's Free</button>
+      </form>
+    </div>
+
+    <div class="hero-image">
+      <img src="https://cdn.elearningindustry.com/wp-content/uploads/2022/09/10-Ways-To-Improve-Employee-Productivity-In-The-Workplace.jpg" alt="Business Growth Illustration">
+    </div>
+  </section>
+
+  <!-- Script to pass email -->
+  <script>
+    function goToSignup(e) {
+      e.preventDefault();
+      const email = document.getElementById("landingEmail").value;
+      // Redirect to signup.html with email pre-filled
+      window.location.href = "Sign up Page.html?email=" + encodeURIComponent(email);
+    }
+  </script>
+</body>
+</html>

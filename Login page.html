@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ProBoost - Login</title>
+  <link rel="stylesheet" href="auth.css">
+  <style>
+    .password-wrapper {
+      position: relative;
+      width: 100%;
+    }
+    .password-wrapper input {
+      width: 100%;
+      padding-right: 40px;
+    }
+    .toggle-password {
+      position: absolute;
+      top: 50%;
+      right: 10px;
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-size: 18px;
+      color: #555;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">
+      <img src="Logo.png" alt="ProBoost Logo" class="logo-img">
+      <span>ProBoost</span>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-container">
+    <!-- Left Image -->
+    <div class="side-image">
+      <img src="https://i.pinimg.com/736x/12/e9/af/12e9aff1764df39b155fffd23af8fd7a.jpg" alt="Decorative Left">
+    </div>
+
+    <!-- Form Card -->
+    <div class="form-card">
+      <h2>Welcome Back</h2>
+      <form>
+        <input type="email" placeholder="Email" required>
+        
+        <div class="password-wrapper">
+          <input type="password" id="loginPassword" placeholder="Password" required>
+          <span class="toggle-password" onclick="togglePassword('loginPassword', this)">🙈</span>
+        </div>
+
+        <button type="submit">Login</button>
+      </form>
+      <p class="switch-text">Don’t have an account? <a href="Sign up Page.html">Sign Up</a></p>
+    </div>
+
+    <!-- Right Image -->
+    <div class="side-image">
+      <img src="https://i.pinimg.com/736x/8f/a8/78/8fa878e92dd17ba1c863adfb44f7c6a4.jpg" alt="Decorative Right">
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>© 2025 ProBoost. All rights reserved.</p>
+  </footer>
+
+  <!-- Toggle Script -->
+  <script>
+    function togglePassword(id, el) {
+      const input = document.getElementById(id);
+      if (input.type === "password") {
+        input.type = "text";
+        el.textContent = "👁️"; // visible
+      } else {
+        input.type = "password";
+        el.textContent = "🙈"; // hidden
+      }
+    }
+  </script>
+</body>
+</html>

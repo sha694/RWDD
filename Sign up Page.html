@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ProBoost - Sign Up</title>
+  <link rel="stylesheet" href="auth.css">
+  <style>
+    .password-wrapper {
+      position: relative;
+      width: 100%;
+    }
+    .password-wrapper input {
+      width: 100%;
+      padding-right: 40px; /* space for the icon */
+    }
+    .toggle-password {
+      position: absolute;
+      top: 50%;
+      right: 10px;
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-size: 18px;
+      color: #555;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">
+      <img src="Logo.png" alt="ProBoost Logo" class="logo-img">
+      <span>ProBoost</span>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-container">
+    <!-- Left Image -->
+    <div class="side-image">
+      <img src="https://i.pinimg.com/736x/12/e9/af/12e9aff1764df39b155fffd23af8fd7a.jpg" alt="Decorative Left">
+    </div>
+
+    <!-- Form Card -->
+    <div class="form-card">
+      <h2>Create Your Account</h2>
+      <form>
+        <input type="email" id="signupEmail" placeholder="Email" required>
+        
+        <div class="password-wrapper">
+          <input type="password" id="createPassword" placeholder="Create Password" required>
+          <span class="toggle-password" onclick="togglePassword('createPassword', this)">🙈</span>
+        </div>
+
+        <div class="password-wrapper">
+          <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+          <span class="toggle-password" onclick="togglePassword('confirmPassword', this)">🙈</span>
+        </div>
+
+        <button type="submit">Sign Up</button>
+      </form>
+      <p class="switch-text">Already have an account? <a href="Login page.html">Login</a></p>
+    </div>
+
+    <!-- Right Image -->
+    <div class="side-image">
+      <img src="https://i.pinimg.com/736x/8f/a8/78/8fa878e92dd17ba1c863adfb44f7c6a4.jpg" alt="Decorative Right">
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>© 2025 ProBoost. All rights reserved.</p>
+  </footer>
+
+  <!-- Autofill + Toggle Script -->
+  <script>
+    // Autofill email from landing page
+    window.addEventListener("DOMContentLoaded", () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const email = urlParams.get("email");
+      if (email) {
+        document.getElementById("signupEmail").value = email;
+      }
+    });
+
+    // Toggle password visibility
+    function togglePassword(id, el) {
+      const input = document.getElementById(id);
+      if (input.type === "password") {
+        input.type = "text";
+        el.textContent = "👁️"; // visible
+      } else {
+        input.type = "password";
+        el.textContent = "🙈"; // hidden
+      }
+    }
+  </script>
+</body>
+</html>

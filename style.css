@@ -1,0 +1,219 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 60px;
+  background: linear-gradient(135deg, #a8dadc, #457b9d); /* pastel blue gradient */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-img {
+  width: 60px;   /* increase size */
+  height: 60px;  /* increase size */
+  object-fit: contain; /* keeps proportions */
+}
+
+.logo span {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #fff;
+  letter-spacing: 1px;
+}
+
+/* Navbar buttons */
+.nav-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+.btn-outline {
+  padding: 10px 18px;
+  border: 2px solid #fff;
+  border-radius: 8px;
+  color: #fff;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.btn-outline:hover {
+  background: #fff;
+  color: #457b9d;
+}
+
+.btn {
+  padding: 10px 18px;
+  background: #1d3557;
+  color: #fff;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.btn:hover {
+  background: #0d223f;
+}
+
+/* Hero Section */
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 80px 60px;
+  background: linear-gradient(135deg, #fdfbfb, #d6e6f2); /* pastel gradient */
+  color: #333;
+}
+
+.hero-text {
+  max-width: 500px;
+}
+
+.hero-text h1 {
+  font-size: 3rem;
+  line-height: 1.2;
+  color: #1d3557;
+}
+
+.hero-text h1 span {
+  color: #457b9d;
+}
+
+.hero-text p {
+  font-size: 1.1rem;
+  margin: 20px 0;
+  color: #444;
+}
+
+/* Signup form */
+.signup-form {
+  margin-top: 25px;
+  display: flex;
+  gap: 10px;
+}
+
+.signup-form input {
+  padding: 12px 15px;
+  border: 2px solid #a8dadc;
+  border-radius: 8px;
+  outline: none;
+  flex: 1;
+}
+
+.signup-form button {
+  background: #457b9d;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.signup-form button:hover {
+  background: #1d3557;
+}
+
+/* Hero image */
+.hero-image img {
+  max-width: 450px;
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+}
+
+/* ===================== */
+/* RESPONSIVE DESIGN */
+/* ===================== */
+
+/* Tablet */
+@media (max-width: 992px) {
+  .hero {
+    flex-direction: column;
+    text-align: center;
+    padding: 60px 30px;
+  }
+
+  .hero-text h1 {
+    font-size: 2.5rem;
+  }
+
+  .hero-text p {
+    font-size: 1rem;
+    margin: 15px auto;
+  }
+
+  .signup-form {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .signup-form input {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .signup-form button {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .hero-image img {
+    max-width: 350px;
+    margin-top: 30px;
+  }
+
+  .navbar {
+    padding: 15px 30px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .hero {
+    padding: 40px 20px;
+  }
+
+  .hero-text h1 {
+    font-size: 2rem;
+  }
+
+  .hero-text p {
+    font-size: 0.95rem;
+  }
+
+  .signup-form input,
+  .signup-form button {
+    width: 100%;
+  }
+
+  .hero-image img {
+    max-width: 280px;
+  }
+
+  .navbar {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .nav-buttons {
+    display: flex;
+    gap: 10px;
+  }
+}

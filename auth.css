@@ -1,0 +1,161 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+body {
+  background: linear-gradient(135deg, #fdfbfb, #d6e6f2, #f9f1f0);
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  padding: 30px 20px;
+}
+
+.logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo-img {
+  width: 120px;
+  height: auto;
+  border-radius: 10px; /* rectangle with rounded edges */
+  object-fit: contain;
+  background: white;
+  padding: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.logo span {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #1d3557;
+}
+
+/* Main Layout */
+.main-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 60px;
+  padding: 40px 20px;
+}
+
+/* Side Images */
+.side-image img {
+  width: 280px;
+  height: 280px;
+  object-fit: cover;
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  transition: transform 0.3s ease;
+}
+
+.side-image img:hover {
+  transform: scale(1.05);
+}
+
+/* Form Card */
+.form-card {
+  background: white;
+  padding: 30px 40px 50px; /* smaller top padding */
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+  text-align: center;
+  width: 100%;
+  max-width: 420px;
+}
+
+.form-card h2 {
+  margin-bottom: 25px;
+  margin-top: 5px;
+  color: #1d3557;
+}
+
+.form-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form-card input {
+  padding: 14px 16px;
+  border: 2px solid #a8dadc;
+  border-radius: 10px;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.form-card input:focus {
+  border-color: #457b9d;
+}
+
+.form-card button {
+  background: #457b9d;
+  color: white;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.form-card button:hover {
+  background: #1d3557;
+}
+
+/* Error message */
+.error-message {
+  margin-top: 10px;
+  color: #e63946;
+  font-size: 0.9rem;
+}
+
+/* Switch text */
+.switch-text {
+  margin-top: 20px;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.switch-text a {
+  color: #457b9d;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 20px;
+  background: #f1f5f9;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+/* Responsive */
+@media (max-width: 1000px) {
+  .main-container {
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .side-image img {
+    width: 200px;
+    height: 200px;
+  }
+}
