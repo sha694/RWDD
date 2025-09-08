@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Dashboard - ProBoost</title>
+  <link rel="stylesheet" href="user.css">
+</head>
+<body>
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="logo">
+      <img src="Logo.png" alt="ProBoost Logo">
+      <span>ProBoost</span>
+    </div>
+    <nav class="nav-links">
+      <a href="#" class="active" onclick="showSection('home', this)">🏠 Home</a>
+      <a href="#" onclick="showSection('collab', this)">🤝 Collaboration</a>
+      <a href="#" onclick="showSection('time', this)">⏳ Time Tracking</a>
+      <a href="#" onclick="showSection('analytics', this)">📊 Analytics</a>
+      <a href="#" onclick="showSection('goals', this)">🎯 Goals</a>
+      <a href="#" onclick="showSection('tasks', this)">📝 Tasks</a>
+      <a href="#" onclick="showSection('countdown', this)">⏰ Countdown</a>
+    </nav>
+    <div class="logout">
+      <a href="Landing Page.html">🚪 Logout</a>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <main class="container">
+    <!-- Home -->
+    <section id="home" class="section active">
+      <h1>Welcome Back 🌟</h1>
+      <p class="subtitle">Your personal productivity hub ✨</p>
+      <div class="cards">
+        <div class="card"><h3>🤝 Collaboration</h3><p>Work with your team seamlessly.</p></div>
+        <div class="card"><h3>⏳ Time Tracking</h3><p>Log and monitor your hours.</p></div>
+        <div class="card"><h3>🎯 Goals</h3><p>Stay focused and motivated.</p></div>
+      </div>
+    </section>
+
+    <!-- Collaboration -->
+    <section id="collab" class="section">
+      <h1>Team Collaboration 🤝</h1>
+      <p>Chat, share files, and brainstorm with your team.</p>
+      <div class="collab-box">
+        <textarea placeholder="Write a message..."></textarea>
+        <button>Send</button>
+      </div>
+    </section>
+
+    <!-- Time Tracking -->
+    <section id="time" class="section">
+      <h1>Time Tracking ⏳</h1>
+      <table>
+        <tr><th>Date</th><th>Task</th><th>Hours</th></tr>
+        <tr><td>2025-09-06</td><td>Design UI</td><td>3h</td></tr>
+        <tr><td>2025-09-06</td><td>Meeting</td><td>2h</td></tr>
+      </table>
+    </section>
+
+    <!-- Analytics -->
+    <section id="analytics" class="section">
+      <h1>Productivity Analytics 📊</h1>
+      <div class="cards">
+        <div class="card"><h3>Focus Time</h3><p>28 hrs this week</p></div>
+        <div class="card"><h3>Tasks Done</h3><p>15 completed</p></div>
+        <div class="card"><h3>Streak</h3><p>🔥 5 days in a row</p></div>
+      </div>
+    </section>
+
+    <!-- Goals -->
+    <section id="goals" class="section">
+      <h1>Goal Setting 🎯</h1>
+      <ul class="goal-list">
+        <li>Finish sprint ✅</li>
+        <li>Read 10 pages/day 📚</li>
+        <li>Exercise 30 min daily 💪</li>
+      </ul>
+    </section>
+
+    <!-- Tasks -->
+    <section id="tasks" class="section">
+      <h1>Task Management 📝</h1>
+      <div class="task-list">
+        <div class="task">✔ Complete project proposal</div>
+        <div class="task">⏳ Fix login issue</div>
+        <div class="task">📌 Plan team meeting</div>
+      </div>
+    </section>
+
+    <!-- Countdown -->
+    <section id="countdown" class="section">
+      <h1>Memorial Countdown ⏰</h1>
+      <p>Counting down to New Year 2026:</p>
+      <div id="countdown-timer" class="countdown">Loading...</div>
+    </section>
+  </main>
+
+  <script>
+    function showSection(id, link) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+      link.classList.add('active');
+    }
+
+    // Countdown
+    const countdownDate = new Date("Jan 1, 2026 00:00:00").getTime();
+    setInterval(() => {
+      const now = new Date().getTime();
+      const diff = countdownDate - now;
+      const el = document.getElementById("countdown-timer");
+
+      if (diff < 0) {
+        el.innerHTML = "🎉 Event Started!";
+        return;
+      }
+      const d = Math.floor(diff / (1000*60*60*24));
+      const h = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+      const m = Math.floor((diff % (1000*60*60)) / (1000*60));
+      const s = Math.floor((diff % (1000*60)) / 1000);
+      el.innerHTML = `${d}d ${h}h ${m}m ${s}s`;
+    }, 1000);
+  </script>
+</body>
+</html>

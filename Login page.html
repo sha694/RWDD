@@ -24,6 +24,18 @@
       color: #555;
       user-select: none;
     }
+    .error-message {
+      font-size: 12px;
+      color: red;
+      margin-top: 4px;
+      display: none;
+    }
+    .success-message {
+      font-size: 14px;
+      color: green;
+      margin-top: 10px;
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -45,17 +57,20 @@
     <!-- Form Card -->
     <div class="form-card">
       <h2>Welcome Back</h2>
-      <form>
-        <input type="email" placeholder="Email" required>
-        
+      <form id="loginForm">
+        <input type="email" id="loginEmail" placeholder="Email" required>
+        <div class="error-message" id="loginEmailError">Invalid email format. Example: sha123@gmail.com</div>
+
         <div class="password-wrapper">
           <input type="password" id="loginPassword" placeholder="Password" required>
           <span class="toggle-password" onclick="togglePassword('loginPassword', this)">🙈</span>
         </div>
+        <div class="error-message" id="loginPasswordError">Password must include uppercase, lowercase, number, and symbol.</div>
 
         <button type="submit">Login</button>
+        <p class="success-message" id="loginSuccess">✅ Login is successful</p>
       </form>
-      <p class="switch-text">Don’t have an account? <a href="Sign up Page.html">Sign Up</a></p>
+      <p class="switch-text">Don't have an account? <a href="Sign up Page.html">Sign Up</a></p>
     </div>
 
     <!-- Right Image -->
@@ -69,18 +84,85 @@
     <p>© 2025 ProBoost. All rights reserved.</p>
   </footer>
 
-  <!-- Toggle Script -->
-  <script>
-    function togglePassword(id, el) {
-      const input = document.getElementById(id);
-      if (input.type === "password") {
-        input.type = "text";
-        el.textContent = "👁️"; // visible
-      } else {
-        input.type = "password";
-        el.textContent = "🙈"; // hidden
-      }
+  <!-- Scripts -->
+<script>
+  function togglePassword(id, el) {
+    const input = document.getElementById(id);
+    if (input.type === "password") {
+      input.type = "text";
+      el.textContent = "🙈";
+    } else {
+      input.type = "password";
+      el.textContent = "🙉";
     }
-  </script>
+  }
+
+  function validateEmail(email) {
+    return /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(email);
+  }
+
+  function validatePassword(password) {
+    // At least one lowercase, one uppercase, one number, one symbol
+    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/.test(password);
+  }
+
+  function showError(id, show = true, message = '') {
+    const el = document.getElementById(id);
+    el.textContent = message || el.textContent;
+    el.style.display = show ? 'block' : 'none';
+  }
+
+  function showSuccess(message) {
+    const el = document.getElementById('loginSuccess');
+    el.textContent = message;
+    el.style.display = 'block';
+  }
+
+  function hideSuccess() {
+    document.getElementById('loginSuccess').style.display = 'none';
+  }
+
+  document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+
+    showError('loginEmailError', false);
+    showError('loginPasswordError', false);
+    hideSuccess();
+
+    if (!validateEmail(email)) {
+      showError('loginEmailError', true, 'Invalid email format. Example: sha123@gmail.com');
+      return;
+    }
+
+    if (!validatePassword(password)) {
+      showError('loginPasswordError', true, 'Password must include uppercase, lowercase, number, and symbol.');
+      return;
+    }
+
+    // ✅ Special check for Admin (bypass localStorage)
+    if (email === "sha123@gmail.com" && password === "Admin123!") {
+      showSuccess('✅ Admin login successful! Redirecting...');
+      setTimeout(() => { window.location.href = "Admin.html"; }, 1500);
+      return;
+    }
+
+    // ✅ Otherwise check localStorage users
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+    const user = users.find(u => u.email === email && u.password === password);
+
+    if (user) {
+      showSuccess('✅ Login successful! Redirecting...');
+      setTimeout(() => { window.location.href = "User.html"; }, 1500);
+    } else {
+      showError('loginPasswordError', true, 'Invalid credentials!');
+    }
+  });
+  
+</script>
+
+</script>
 </body>
 </html>

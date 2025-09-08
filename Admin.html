@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ProBoost - Admin Dashboard</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="logo">
+      <img src="Logo.png" alt="ProBoost Logo">
+      <span>ProBoost Admin</span>
+    </div>
+    <nav class="nav-links">
+      <a href="#" class="active" onclick="showSection('home', this)">🏠 Home</a>
+      <a href="#" onclick="showSection('manage-users', this)">👤 Manage Users</a>
+      <a href="#" onclick="showSection('manage-workspaces', this)">💼 Manage Workspaces</a>
+      <a href="#" onclick="showSection('system-settings', this)">⚙️ System Settings</a>
+      <a href="#" onclick="showSection('view-reports', this)">📊 View Reports</a>
+      <a href="#" class="logout-btn" onclick="logout()">🚪 Logout</a>
+    </nav>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-container">
+    <!-- Home -->
+    <section id="home" class="section active">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div>
+          <h1>Welcome to ProBoost Admin Dashboard</h1>
+          <p class="subtitle">Quick overview of your system</p>
+        </div>
+        <div style="text-align: right;">
+          <p style="color: #666; font-size: 0.9rem;">Logged in as:</p>
+          <p style="font-weight: bold; color: #1565c0;" id="adminEmailDisplay">Loading...</p>
+        </div>
+      </div>
+      <div class="cards">
+        <div class="card">
+          <h3>👤 Users</h3>
+          <p id="userCount">2 Active Users</p>
+        </div>
+        <div class="card">
+          <h3>💼 Workspaces</h3>
+          <p id="workspaceCount">3 Workspaces</p>
+        </div>
+        <div class="card">
+          <h3>⚙️ Settings</h3>
+          <p>System Optimized</p>
+        </div>
+        <div class="card">
+          <h3>📊 Reports</h3>
+          <p>12 New Reports</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Manage Users -->
+    <section id="manage-users" class="section">
+      <h2>👤 Manage Users</h2>
+      <div class="actions">
+        <button onclick="openUserForm('add')">➕ Add User</button>
+        <button onclick="openUserForm('edit')">✏️ Edit User</button>
+        <button onclick="removeUser()">🗑 Remove User</button>
+      </div>
+      
+      <section id="manageUsers">
+  <h2>Manage Users</h2>
+  <table border="1" cellpadding="8" cellspacing="0">
+    <thead>
+      <tr>
+        <th>Email</th>
+        <th>Password</th>
+      </tr>
+    </thead>
+    <tbody id="userTableBody"></tbody>
+  </table>
+</section>
+
+      <table id="userTable">
+        <thead>
+          <tr>
+            <th>Select</th>
+            <th>User ID</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <!-- Permanent Admin -->
+            <td><input type="radio" disabled></td>
+            <td>U001</td>
+            <td>sha123@gmail.com</td>
+            <td>Admin</td>
+            <td>Active</td>
+          </tr>
+          <tr>
+            <td><input type="radio" name="selectedUser"></td>
+            <td>U002</td>
+            <td>john@example.com</td>
+            <td>User</td>
+            <td>Active</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- User Form Modal -->
+      <div id="userFormModal" class="modal" style="display:none;">
+        <div class="modal-content">
+          <span class="close" onclick="closeUserForm()">&times;</span>
+          <h3 id="formTitle">Add User</h3>
+          <form id="userForm" onsubmit="saveUser(event)">
+            <label>User ID</label>
+            <input type="text" id="userId" required>
+
+            <label>Email</label>
+            <input type="email" id="userEmail" required>
+
+            <label>Role</label>
+            <input type="text" id="userRole" value="User" readonly>
+
+            <label>Status</label>
+            <select id="userStatus">
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+
+            <button type="submit">💾 Save</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- Manage Workspaces -->
+    <section id="manage-workspaces" class="section">
+      <h2>💼 Manage Workspaces</h2>
+      <div class="actions">
+        <button onclick="openWorkspaceForm('create')">➕ Create Workspace</button>
+        <button onclick="viewWorkspaces()">📂 View Workspaces</button>
+        <button onclick="openDeleteWorkspace()">🗑 Delete Workspace</button>
+      </div>
+
+      <!-- Create Workspace Form -->
+      <div id="createWorkspaceForm" style="display:none;">
+        <h3>Create New Workspace</h3>
+        <form onsubmit="createWorkspace(event)">
+          <label>Workspace Name</label>
+          <input type="text" id="workspaceName" required>
+          
+          <label>Description</label>
+          <textarea id="workspaceDesc" rows="3"></textarea>
+          
+          <label>Type</label>
+          <select id="workspaceType">
+            <option value="Team">Team</option>
+            <option value="Private">Private</option>
+            <option value="Public">Public</option>
+          </select>
+          
+          <div style="margin-top: 15px;">
+            <button type="submit">💾 Create Workspace</button>
+            <button type="button" onclick="cancelWorkspaceForm()">❌ Cancel</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- View Workspaces -->
+      <div id="workspaceView" style="display:none;">
+        <h3>All Workspaces</h3>
+        <table id="workspaceTable">
+          <thead>
+            <tr>
+              <th>Select</th>
+              <th>Workspace ID</th>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Type</th>
+              <th>Members</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Workspaces will be populated here -->
+          </tbody>
+        </table>
+        <button onclick="hideWorkspaceView()">❌ Close</button>
+      </div>
+
+      <!-- Delete Workspace Form -->
+      <div id="deleteWorkspaceForm" style="display:none;">
+        <h3>Delete Workspace</h3>
+        <div style="background: #ffebee; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+          <p style="color: #c62828; margin: 0;">⚠️ Warning: This action cannot be undone!</p>
+        </div>
+        <form onsubmit="deleteWorkspace(event)">
+          <label>Select Workspace to Delete</label>
+          <select id="deleteWorkspaceSelect" required>
+            <option value="">Choose a workspace...</option>
+          </select>
+          
+          <label>Type "DELETE" to confirm</label>
+          <input type="text" id="confirmDelete" placeholder="Type DELETE" required>
+          
+          <div style="margin-top: 15px;">
+            <button type="submit" style="background: #f44336;">🗑 Delete Workspace</button>
+            <button type="button" onclick="cancelDeleteWorkspace()">❌ Cancel</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Default workspace cards -->
+      <div id="defaultWorkspaceCards" class="cards">
+        <div class="card">
+          <h3>Marketing Team</h3>
+          <p>12 Members</p>
+        </div>
+        <div class="card">
+          <h3>Development Team</h3>
+          <p>20 Members</p>
+        </div>
+        <div class="card">
+          <h3>Design Team</h3>
+          <p>8 Members</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- System Settings -->
+    <section id="system-settings" class="section">
+      <h2>⚙️ System Settings</h2>
+      <div class="settings-list">
+        <div class="setting-item">
+          <span>🔧 Update System</span>
+          <button>Update</button>
+        </div>
+        <div class="setting-item">
+          <span>🔒 Set Permissions</span>
+          <button>Manage</button>
+        </div>
+        <div class="setting-item">
+          <span>🚪 Logout</span>
+          <button onclick="logout()" style="background: #f44336; color: white;">Logout</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- View Reports -->
+    <section id="view-reports" class="section">
+      <h2>📊 View Reports</h2>
+      <div class="cards">
+        <div class="card">
+          <h3>📈 Analytics</h3>
+          <p>Track user and workspace growth trends.</p>
+        </div>
+        <div class="card">
+          <h3>📜 Logs</h3>
+          <p>View system activities and logs for security monitoring.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Logout Confirmation Modal -->
+  <div id="logoutModal" class="modal" style="display:none;">
+    <div class="modal-content" style="text-align: center; max-width: 400px;">
+      <h3>🚪 Confirm Logout</h3>
+      <p style="margin: 20px 0; color: #666;">Are you sure you want to logout?</p>
+      <div style="display: flex; gap: 15px; justify-content: center;">
+        <button onclick="confirmLogout()" style="background: #f44336;">Yes, Logout</button>
+        <button onclick="cancelLogout()" style="background: #666;">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Check authentication on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      checkAuthentication();
+      displayAdminInfo();
+    });
+
+    // Check if user is authenticated and is admin
+    function checkAuthentication() {
+      const isLoggedIn = localStorage.getItem('isLoggedIn');
+      const userType = localStorage.getItem('userType');
+      
+      if (isLoggedIn !== 'true' || userType !== 'admin') {
+        // Redirect to login if not authenticated as admin
+        alert('Access denied. Please login as admin.');
+        window.location.href = 'Login page.html';
+        return;
+      }
+    }
+
+    // Display admin information
+    function displayAdminInfo() {
+      const adminEmail = localStorage.getItem('userEmail');
+      if (adminEmail) {
+        document.getElementById('adminEmailDisplay').textContent = adminEmail;
+      }
+    }
+
+    // Logout function
+    function logout() {
+      document.getElementById('logoutModal').style.display = 'block';
+    }
+
+    // Confirm logout
+    function confirmLogout() {
+      // Clear all session data
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('userType');
+      localStorage.removeItem('userEmail');
+      localStorage.removeItem('loginTime');
+      
+      // Show logout message
+      alert('✅ Successfully logged out!');
+      
+      // Redirect to landing page
+      window.location.href = 'Landing Page.html';
+    }
+
+    // Cancel logout
+    function cancelLogout() {
+      document.getElementById('logoutModal').style.display = 'none';
+    }
+
+    // Existing functions...
+    function showSection(sectionId, link) {
+      document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+      document.getElementById(sectionId).classList.add('active');
+      document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+      link.classList.add('active');
+    }
+
+    // Manage Users Functions
+    let currentAction = "add";
+
+    function openUserForm(action) {
+      currentAction = action;
+      const modal = document.getElementById("userFormModal");
+      const formTitle = document.getElementById("formTitle");
+      const userId = document.getElementById("userId");
+      const userEmail = document.getElementById("userEmail");
+      const userStatus = document.getElementById("userStatus");
+
+      if (action === "add") {
+        formTitle.textContent = "Add User";
+        userId.value = "";
+        userEmail.value = "";
+        userStatus.value = "Active";
+      } else if (action === "edit") {
+        formTitle.textContent = "Edit User";
+        const selectedRow = document.querySelector("input[name='selectedUser']:checked");
+        if (!selectedRow) {
+          alert("Please select a user to edit (not the Admin).");
+          return;
+        }
+        const row = selectedRow.closest("tr");
+        userId.value = row.cells[1].textContent;
+        userEmail.value = row.cells[2].textContent;
+        userStatus.value = row.cells[4].textContent;
+      }
+      modal.style.display = "block";
+    }
+
+    function closeUserForm() {
+      document.getElementById("userFormModal").style.display = "none";
+    }
+
+    function saveUser(event) {
+      event.preventDefault();
+      const userId = document.getElementById("userId").value;
+      const userEmail = document.getElementById("userEmail").value;
+      const userStatus = document.getElementById("userStatus").value;
+      const table = document.getElementById("userTable").getElementsByTagName("tbody")[0];
+
+      if (currentAction === "add") {
+        const newRow = table.insertRow();
+        newRow.innerHTML = `
+          <td><input type="radio" name="selectedUser"></td>
+          <td>${userId}</td>
+          <td>${userEmail}</td>
+          <td>User</td>
+          <td>${userStatus}</td>
+        `;
+      } else if (currentAction === "edit") {
+        const selectedRow = document.querySelector("input[name='selectedUser']:checked").closest("tr");
+        selectedRow.cells[1].textContent = userId;
+        selectedRow.cells[2].textContent = userEmail;
+        selectedRow.cells[4].textContent = userStatus;
+      }
+      closeUserForm();
+      updateUserCount();
+    }
+
+    function removeUser() {
+      const selectedRow = document.querySelector("input[name='selectedUser']:checked");
+      if (!selectedRow) {
+        alert("Please select a user to remove (not the Admin).");
+        return;
+      }
+      selectedRow.closest("tr").remove();
+      updateUserCount();
+    }
+
+    function updateUserCount() {
+      const count = document.querySelectorAll("#userTable tbody tr").length;
+      document.getElementById("userCount").textContent = `${count} Active Users`;
+    }
+
+    // WORKSPACE MANAGEMENT FUNCTIONS
+    let workspaces = [
+      {id: 'W001', name: 'Marketing Team', description: 'Marketing campaigns and strategies', type: 'Team', members: 12},
+      {id: 'W002', name: 'Development Team', description: 'Software development projects', type: 'Team', members: 20},
+      {id: 'W003', name: 'Design Team', description: 'UI/UX design and creative work', type: 'Team', members: 8}
+    ];
+
+    let workspaceCounter = 4;
+
+    function openWorkspaceForm(action) {
+      hideAllWorkspaceForms();
+      document.getElementById('createWorkspaceForm').style.display = 'block';
+      // Clear form
+      document.getElementById('workspaceName').value = '';
+      document.getElementById('workspaceDesc').value = '';
+      document.getElementById('workspaceType').value = 'Team';
+    }
+
+    function createWorkspace(event) {
+      event.preventDefault();
+      const name = document.getElementById('workspaceName').value;
+      const desc = document.getElementById('workspaceDesc').value;
+      const type = document.getElementById('workspaceType').value;
+      
+      const newWorkspace = {
+        id: `W${String(workspaceCounter).padStart(3, '0')}`,
+        name: name,
+        description: desc,
+        type: type,
+        members: 0
+      };
+      
+      workspaces.push(newWorkspace);
+      workspaceCounter++;
+      
+      alert(`✅ Workspace "${name}" created successfully!`);
+      cancelWorkspaceForm();
+      updateWorkspaceCount();
+    }
+
+    function viewWorkspaces() {
+      hideAllWorkspaceForms();
+      document.getElementById('workspaceView').style.display = 'block';
+      
+      const tbody = document.querySelector('#workspaceTable tbody');
+      tbody.innerHTML = '';
+      
+      workspaces.forEach(ws => {
+        const row = tbody.insertRow();
+        row.innerHTML = `
+          <td><input type="radio" name="selectedWorkspace" value="${ws.id}"></td>
+          <td>${ws.id}</td>
+          <td>${ws.name}</td>
+          <td>${ws.description}</td>
+          <td>${ws.type}</td>
+          <td>${ws.members}</td>
+        `;
+      });
+    }
+
+    function hideWorkspaceView() {
+      document.getElementById('workspaceView').style.display = 'none';
+    }
+
+    function openDeleteWorkspace() {
+      hideAllWorkspaceForms();
+      document.getElementById('deleteWorkspaceForm').style.display = 'block';
+      
+      // Populate delete dropdown
+      const select = document.getElementById('deleteWorkspaceSelect');
+      select.innerHTML = '<option value="">Choose a workspace...</option>';
+      workspaces.forEach(ws => {
+        select.innerHTML += `<option value="${ws.id}">${ws.name}</option>`;
+      });
+      
+      // Clear confirm field
+      document.getElementById('confirmDelete').value = '';
+    }
+
+    function deleteWorkspace(event) {
+      event.preventDefault();
+      const workspaceId = document.getElementById('deleteWorkspaceSelect').value;
+      const confirmText = document.getElementById('confirmDelete').value;
+      
+      if (confirmText !== 'DELETE') {
+        alert('❌ Please type "DELETE" to confirm.');
+        return;
+      }
+      
+      const workspaceIndex = workspaces.findIndex(ws => ws.id === workspaceId);
+      if (workspaceIndex > -1) {
+        const deletedWorkspace = workspaces[workspaceIndex];
+        workspaces.splice(workspaceIndex, 1);
+        alert(`✅ Workspace "${deletedWorkspace.name}" has been deleted.`);
+        cancelDeleteWorkspace();
+        updateWorkspaceCount();
+      }
+    }
+
+    function cancelWorkspaceForm() {
+      hideAllWorkspaceForms();
+    }
+
+    function cancelDeleteWorkspace() {
+      hideAllWorkspaceForms();
+    }
+
+    function hideAllWorkspaceForms() {
+      document.getElementById('createWorkspaceForm').style.display = 'none';
+      document.getElementById('workspaceView').style.display = 'none';
+      document.getElementById('deleteWorkspaceForm').style.display = 'none';
+    }
+
+    function updateWorkspaceCount() {
+      document.getElementById('workspaceCount').textContent = `${workspaces.length} Workspaces`;
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      const userModal = document.getElementById("userFormModal");
+      const logoutModal = document.getElementById("logoutModal");
+      
+      if (event.target === userModal) {
+        closeUserForm();
+      }
+      if (event.target === logoutModal) {
+        cancelLogout();
+      }
+    }
+  </script>
+</body>
+</html>
