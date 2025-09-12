@@ -7,6 +7,41 @@
   <link rel="stylesheet" href="user.css">
 </head>
 <body>
+  <!-- Authentication Guard Script -->
+  <script>
+    // Block access if not logged in as user
+    document.addEventListener('DOMContentLoaded', function() {
+      checkUserAuthentication();
+      displayUserInfo();
+    });
+
+    function checkUserAuthentication() {
+      const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+      const userRole = localStorage.getItem('role');
+      const userEmail = localStorage.getItem('userEmail');
+      
+      // Check if user is properly authenticated
+      if (!isLoggedIn || userRole !== 'user' || !userEmail) {
+        alert('❌ Access Denied! Please login first.');
+        window.location.href = 'Login page.html';
+        return;
+      }
+
+      console.log('✅ User access granted for:', userEmail);
+    }
+
+    function displayUserInfo() {
+      const userEmail = localStorage.getItem('userEmail') || 'user@example.com';
+      const userName = userEmail.split('@')[0]; // Extract name from email
+      
+      // Update welcome message with user's name
+      const welcomeTitle = document.querySelector('#home h1');
+      if (welcomeTitle) {
+        welcomeTitle.textContent = `Welcome Back, ${userName}! 🌟`;
+      }
+    }
+  </script>
+
   <!-- Navbar -->
   <header class="navbar">
     <div class="logo">
@@ -23,7 +58,7 @@
       <a href="#" onclick="showSection('countdown', this)">⏰ Countdown</a>
     </nav>
     <div class="logout">
-      <a href="Landing Page.html">🚪 Logout</a>
+      <a href="#" onclick="logoutUser()">🚪 Logout</a>
     </div>
   </header>
 
@@ -31,8 +66,16 @@
   <main class="container">
     <!-- Home -->
     <section id="home" class="section active">
-      <h1>Welcome Back 🌟</h1>
-      <p class="subtitle">Your personal productivity hub ✨</p>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div>
+          <h1>Welcome Back 🌟</h1>
+          <p class="subtitle">Your personal productivity hub ✨</p>
+        </div>
+        <div style="text-align: right;">
+          <p style="color: #666; font-size: 0.9rem;">Logged in as:</p>
+          <p style="font-weight: bold; color: #1565c0;" id="userEmailDisplay">Loading...</p>
+        </div>
+      </div>
       <div class="cards">
         <div class="card"><h3>🤝 Collaboration</h3><p>Work with your team seamlessly.</p></div>
         <div class="card"><h3>⏳ Time Tracking</h3><p>Log and monitor your hours.</p></div>
@@ -45,18 +88,26 @@
       <h1>Team Collaboration 🤝</h1>
       <p>Chat, share files, and brainstorm with your team.</p>
       <div class="collab-box">
-        <textarea placeholder="Write a message..."></textarea>
-        <button>Send</button>
+        <textarea placeholder="Write a message..." id="collabMessage"></textarea>
+        <button onclick="sendMessage()">Send</button>
+      </div>
+      <div id="messageHistory" style="margin-top: 20px; padding: 15px; background: #f5f5f5; border-radius: 8px; max-height: 200px; overflow-y: auto;">
+        <p style="color: #666; font-style: italic;">No messages yet. Start the conversation!</p>
       </div>
     </section>
 
     <!-- Time Tracking -->
     <section id="time" class="section">
       <h1>Time Tracking ⏳</h1>
-      <table>
-        <tr><th>Date</th><th>Task</th><th>Hours</th></tr>
-        <tr><td>2025-09-06</td><td>Design UI</td><td>3h</td></tr>
-        <tr><td>2025-09-06</td><td>Meeting</td><td>2h</td></tr>
+      <div style="margin-bottom: 20px;">
+        <input type="text" id="taskName" placeholder="Task name" style="margin-right: 10px; padding: 8px;">
+        <input type="number" id="taskHours" placeholder="Hours" style="margin-right: 10px; padding: 8px; width: 80px;">
+        <button onclick="addTimeEntry()">Add Entry</button>
+      </div>
+      <table id="timeTable">
+        <tr><th>Date</th><th>Task</th><th>Hours</th><th>Action</th></tr>
+        <tr><td>2025-09-06</td><td>Design UI</td><td>3h</td><td><button onclick="removeTimeEntry(this)" style="background: #f44336; color: white; padding: 4px 8px; border: none; border-radius: 4px;">Remove</button></td></tr>
+        <tr><td>2025-09-06</td><td>Meeting</td><td>2h</td><td><button onclick="removeTimeEntry(this)" style="background: #f44336; color: white; padding: 4px 8px; border: none; border-radius: 4px;">Remove</button></td></tr>
       </table>
     </section>
 
@@ -64,8 +115,8 @@
     <section id="analytics" class="section">
       <h1>Productivity Analytics 📊</h1>
       <div class="cards">
-        <div class="card"><h3>Focus Time</h3><p>28 hrs this week</p></div>
-        <div class="card"><h3>Tasks Done</h3><p>15 completed</p></div>
+        <div class="card"><h3>Focus Time</h3><p id="totalHours">5 hrs this week</p></div>
+        <div class="card"><h3>Tasks Done</h3><p id="taskCount">15 completed</p></div>
         <div class="card"><h3>Streak</h3><p>🔥 5 days in a row</p></div>
       </div>
     </section>
@@ -73,20 +124,28 @@
     <!-- Goals -->
     <section id="goals" class="section">
       <h1>Goal Setting 🎯</h1>
-      <ul class="goal-list">
-        <li>Finish sprint ✅</li>
-        <li>Read 10 pages/day 📚</li>
-        <li>Exercise 30 min daily 💪</li>
+      <div style="margin-bottom: 20px;">
+        <input type="text" id="newGoal" placeholder="Add a new goal..." style="margin-right: 10px; padding: 8px; width: 250px;">
+        <button onclick="addGoal()">Add Goal</button>
+      </div>
+      <ul class="goal-list" id="goalList">
+        <li onclick="toggleGoal(this)">Finish sprint ✅</li>
+        <li onclick="toggleGoal(this)">Read 10 pages/day 📚</li>
+        <li onclick="toggleGoal(this)">Exercise 30 min daily 💪</li>
       </ul>
     </section>
 
     <!-- Tasks -->
     <section id="tasks" class="section">
       <h1>Task Management 📝</h1>
-      <div class="task-list">
-        <div class="task">✔ Complete project proposal</div>
-        <div class="task">⏳ Fix login issue</div>
-        <div class="task">📌 Plan team meeting</div>
+      <div style="margin-bottom: 20px;">
+        <input type="text" id="newTask" placeholder="Add a new task..." style="margin-right: 10px; padding: 8px; width: 250px;">
+        <button onclick="addTask()">Add Task</button>
+      </div>
+      <div class="task-list" id="taskList">
+        <div class="task" onclick="toggleTask(this)">✔ Complete project proposal</div>
+        <div class="task" onclick="toggleTask(this)">⏳ Fix login issue</div>
+        <div class="task" onclick="toggleTask(this)">📌 Plan team meeting</div>
       </div>
     </section>
 
@@ -98,7 +157,54 @@
     </section>
   </main>
 
+  <!-- Logout Confirmation Modal -->
+  <div id="logoutModal" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 10px; text-align: center; max-width: 400px;">
+      <h3>🚪 Confirm Logout</h3>
+      <p style="margin: 20px 0; color: #666;">Are you sure you want to logout?</p>
+      <div style="display: flex; gap: 15px; justify-content: center;">
+        <button onclick="confirmLogout()" style="background: #f44336; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">Yes, Logout</button>
+        <button onclick="cancelLogout()" style="background: #666; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <script>
+    // -------- AUTHENTICATION & USER INFO --------
+    function displayUserInfo() {
+      const userEmail = localStorage.getItem('userEmail') || 'user@example.com';
+      const userName = userEmail.split('@')[0];
+      
+      document.getElementById('userEmailDisplay').textContent = userEmail;
+      
+      // Update welcome message
+      const welcomeTitle = document.querySelector('#home h1');
+      if (welcomeTitle) {
+        welcomeTitle.textContent = `Welcome Back, ${userName}! 🌟`;
+      }
+    }
+
+    // -------- LOGOUT FUNCTIONALITY --------
+    function logoutUser() {
+      document.getElementById('logoutModal').style.display = 'block';
+    }
+
+    function confirmLogout() {
+      // Clear user session data
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('role');
+      localStorage.removeItem('userEmail');
+      localStorage.removeItem('loginTime');
+      
+      alert('✅ Successfully logged out!');
+      window.location.href = 'Landing Page.html';
+    }
+
+    function cancelLogout() {
+      document.getElementById('logoutModal').style.display = 'none';
+    }
+
+    // -------- NAVIGATION --------
     function showSection(id, link) {
       document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
       document.getElementById(id).classList.add('active');
@@ -106,7 +212,126 @@
       link.classList.add('active');
     }
 
-    // Countdown
+    // -------- COLLABORATION --------
+    function sendMessage() {
+      const messageInput = document.getElementById('collabMessage');
+      const messageHistory = document.getElementById('messageHistory');
+      const message = messageInput.value.trim();
+      
+      if (!message) return;
+      
+      const userEmail = localStorage.getItem('userEmail');
+      const userName = userEmail.split('@')[0];
+      const timestamp = new Date().toLocaleTimeString();
+      
+      messageHistory.innerHTML += `
+        <div style="margin-bottom: 10px; padding: 8px; background: white; border-radius: 5px;">
+          <strong>${userName}</strong> <small style="color: #888;">${timestamp}</small><br>
+          ${message}
+        </div>
+      `;
+      
+      messageInput.value = '';
+      messageHistory.scrollTop = messageHistory.scrollHeight;
+    }
+
+    // -------- TIME TRACKING --------
+    function addTimeEntry() {
+      const taskName = document.getElementById('taskName').value.trim();
+      const taskHours = document.getElementById('taskHours').value;
+      
+      if (!taskName || !taskHours) {
+        alert('Please enter both task name and hours.');
+        return;
+      }
+      
+      const today = new Date().toISOString().split('T')[0];
+      const table = document.getElementById('timeTable');
+      const newRow = table.insertRow();
+      
+      newRow.innerHTML = `
+        <td>${today}</td>
+        <td>${taskName}</td>
+        <td>${taskHours}h</td>
+        <td><button onclick="removeTimeEntry(this)" style="background: #f44336; color: white; padding: 4px 8px; border: none; border-radius: 4px;">Remove</button></td>
+      `;
+      
+      document.getElementById('taskName').value = '';
+      document.getElementById('taskHours').value = '';
+      updateTotalHours();
+    }
+
+    function removeTimeEntry(button) {
+      if (confirm('Remove this time entry?')) {
+        button.closest('tr').remove();
+        updateTotalHours();
+      }
+    }
+
+    function updateTotalHours() {
+      const rows = document.querySelectorAll('#timeTable tr:not(:first-child)');
+      let total = 0;
+      
+      rows.forEach(row => {
+        const hoursText = row.cells[2].textContent;
+        const hours = parseFloat(hoursText.replace('h', ''));
+        total += hours;
+      });
+      
+      document.getElementById('totalHours').textContent = `${total} hrs this week`;
+    }
+
+    // -------- GOALS --------
+    function addGoal() {
+      const goalInput = document.getElementById('newGoal');
+      const goalText = goalInput.value.trim();
+      
+      if (!goalText) return;
+      
+      const goalList = document.getElementById('goalList');
+      const newGoal = document.createElement('li');
+      newGoal.textContent = goalText + ' 📚';
+      newGoal.onclick = function() { toggleGoal(this); };
+      
+      goalList.appendChild(newGoal);
+      goalInput.value = '';
+    }
+
+    function toggleGoal(goal) {
+      if (goal.textContent.includes('✅')) {
+        goal.textContent = goal.textContent.replace('✅', '📚');
+      } else {
+        goal.textContent = goal.textContent.replace('📚', '✅');
+      }
+    }
+
+    // -------- TASKS --------
+    function addTask() {
+      const taskInput = document.getElementById('newTask');
+      const taskText = taskInput.value.trim();
+      
+      if (!taskText) return;
+      
+      const taskList = document.getElementById('taskList');
+      const newTask = document.createElement('div');
+      newTask.className = 'task';
+      newTask.textContent = '⏳ ' + taskText;
+      newTask.onclick = function() { toggleTask(this); };
+      
+      taskList.appendChild(newTask);
+      taskInput.value = '';
+    }
+
+    function toggleTask(task) {
+      if (task.textContent.startsWith('✔')) {
+        task.textContent = task.textContent.replace('✔', '⏳');
+      } else {
+        task.textContent = task.textContent.replace('⏳', '✔');
+        task.textContent = task.textContent.replace('📌', '✔');
+      }
+    }
+
+    // -------- COUNTDOWN --------
     const countdownDate = new Date("Jan 1, 2026 00:00:00").getTime();
     setInterval(() => {
       const now = new Date().getTime();
@@ -123,6 +348,19 @@
       const s = Math.floor((diff % (1000*60)) / 1000);
       el.innerHTML = `${d}d ${h}h ${m}m ${s}s`;
     }, 1000);
+
+    // -------- CLOSE MODAL ON OUTSIDE CLICK --------
+    window.onclick = function(event) {
+      const logoutModal = document.getElementById('logoutModal');
+      if (event.target === logoutModal) {
+        cancelLogout();
+      }
+    };
+
+    // -------- INITIALIZE ON PAGE LOAD --------
+    document.addEventListener('DOMContentLoaded', function() {
+      updateTotalHours();
+    });
   </script>
 </body>
 </html>

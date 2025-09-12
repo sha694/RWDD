@@ -5,38 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ProBoost - Login</title>
   <link rel="stylesheet" href="auth.css">
-  <style>
-    .password-wrapper {
-      position: relative;
-      width: 100%;
-    }
-    .password-wrapper input {
-      width: 100%;
-      padding-right: 40px;
-    }
-    .toggle-password {
-      position: absolute;
-      top: 50%;
-      right: 10px;
-      transform: translateY(-50%);
-      cursor: pointer;
-      font-size: 18px;
-      color: #555;
-      user-select: none;
-    }
-    .error-message {
-      font-size: 12px;
-      color: red;
-      margin-top: 4px;
-      display: none;
-    }
-    .success-message {
-      font-size: 14px;
-      color: green;
-      margin-top: 10px;
-      display: none;
-    }
-  </style>
 </head>
 <body>
   <!-- Header -->
@@ -56,15 +24,15 @@
 
     <!-- Form Card -->
     <div class="form-card">
-      <h2>Welcome Back</h2>
+      <h2 id="loginTitle">Login</h2>
       <form id="loginForm">
         <input type="email" id="loginEmail" placeholder="Email" required>
         <div class="error-message" id="loginEmailError">Invalid email format. Example: sha123@gmail.com</div>
 
         <div class="password-wrapper">
-          <input type="password" id="loginPassword" placeholder="Password" required>
-          <span class="toggle-password" onclick="togglePassword('loginPassword', this)">🙈</span>
-        </div>
+  <input type="password" id="loginPassword" placeholder="Password" required>
+  <span class="toggle-password" onclick="togglePassword('loginPassword', this)">🙈</span>
+</div>
         <div class="error-message" id="loginPasswordError">Password must include uppercase, lowercase, number, and symbol.</div>
 
         <button type="submit">Login</button>
@@ -90,10 +58,10 @@
     const input = document.getElementById(id);
     if (input.type === "password") {
       input.type = "text";
-      el.textContent = "🙈";
+      el.textContent = "🙉";
     } else {
       input.type = "password";
-      el.textContent = "🙉";
+      el.textContent = "🙈";
     }
   }
 
@@ -102,7 +70,6 @@
   }
 
   function validatePassword(password) {
-    // At least one lowercase, one uppercase, one number, one symbol
     return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/.test(password);
   }
 
@@ -142,27 +109,28 @@
       return;
     }
 
-    // ✅ Special check for Admin (bypass localStorage)
-    if (email === "sha123@gmail.com" && password === "Admin123!") {
-      showSuccess('✅ Admin login successful! Redirecting...');
-      setTimeout(() => { window.location.href = "Admin.html"; }, 1500);
-      return;
-    }
+  // ✅ Special check for Admin
+if (email === "sha123@gmail.com" && password === "Admin123!") {
+  localStorage.setItem("isAdmin", "true"); // mark admin session
+  showSuccess('✅ Admin login successful! Redirecting...');
+  setTimeout(() => { window.location.href = "Admin.html"; }, 1500);
+  return;
+}
 
     // ✅ Otherwise check localStorage users
     const users = JSON.parse(localStorage.getItem("users")) || [];
     const user = users.find(u => u.email === email && u.password === password);
 
     if (user) {
+      document.getElementById("loginTitle").textContent = "User Login";
+      localStorage.setItem("role", "user");
+      localStorage.setItem("userEmail", email);
       showSuccess('✅ Login successful! Redirecting...');
       setTimeout(() => { window.location.href = "User.html"; }, 1500);
     } else {
       showError('loginPasswordError', true, 'Invalid credentials!');
     }
   });
-  
-</script>
-
 </script>
 </body>
 </html>

@@ -30,7 +30,7 @@ body {
 .logo-img {
   width: 120px;
   height: auto;
-  border-radius: 10px; /* rectangle with rounded edges */
+  border-radius: 10px;
   object-fit: contain;
   background: white;
   padding: 6px;
@@ -70,7 +70,7 @@ body {
 /* Form Card */
 .form-card {
   background: white;
-  padding: 30px 40px 50px; /* smaller top padding */
+  padding: 30px 40px 50px;
   border-radius: 20px;
   box-shadow: 0 8px 25px rgba(0,0,0,0.12);
   text-align: center;
@@ -118,11 +118,19 @@ body {
   background: #1d3557;
 }
 
-/* Error message */
+/* Error + Success */
 .error-message {
   margin-top: 10px;
   color: #e63946;
   font-size: 0.9rem;
+  display: none;
+}
+
+.success-message {
+  margin-top: 10px;
+  color: green;
+  font-size: 0.9rem;
+  display: none;
 }
 
 /* Switch text */
@@ -158,4 +166,33 @@ body {
     width: 200px;
     height: 200px;
   }
+}
+
+/* Admin Login special highlight */
+#loginTitle {
+  font-weight: bold;
+}
+
+#loginTitle:contains("Admin Login") {
+  color: #e63946;
+}
+/* Password wrapper styling */
+.password-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding-right: 40px; /* space for emoji */
+}
+
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 1.2rem;
+  user-select: none;
 }

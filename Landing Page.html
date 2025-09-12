@@ -16,6 +16,8 @@
     <nav class="nav-buttons">
       <a href="Login page.html" class="btn-outline">Login</a>
       <a href="Sign up Page.html" class="btn">Sign Up</a>
+      <!-- ✅ Admin Login Button -->
+      <a href="#" class="btn-admin" onclick="adminLogin()">Admin Login</a>
     </nav>
   </header>
 
@@ -37,14 +39,27 @@
     </div>
   </section>
 
-  <!-- Script to pass email -->
+  <!-- Scripts -->
   <script>
-    function goToSignup(e) {
-      e.preventDefault();
-      const email = document.getElementById("landingEmail").value;
-      // Redirect to signup.html with email pre-filled
-      window.location.href = "Sign up Page.html?email=" + encodeURIComponent(email);
+  function goToSignup(e) {
+    e.preventDefault();
+    const email = document.getElementById("landingEmail").value;
+    window.location.href = "Sign up Page.html?email=" + encodeURIComponent(email);
+  }
+
+  // ✅ Admin Login
+  function adminLogin() {
+    const email = prompt("Enter Admin Email:");
+    const password = prompt("Enter Admin Password:");
+
+    if (email === "sha123@gmail.com" && password === "Admin123!") {
+      alert("✅ Welcome Admin!");
+      localStorage.setItem("isAdmin", "true"); // save admin session
+      window.location.href = "Admin.html";
+    } else {
+      alert("❌ Access Denied! Admin only.");
     }
-  </script>
+  }
+</script>
 </body>
 </html>

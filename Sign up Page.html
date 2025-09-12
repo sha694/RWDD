@@ -26,6 +26,12 @@
   </header>
 
   <main class="main-container">
+    <!-- Left Image -->
+    <div class="side-image">
+      <img src="https://i.pinimg.com/736x/12/e9/af/12e9aff1764df39b155fffd23af8fd7a.jpg" alt="Decorative Left">
+    </div>
+
+    <!-- Form Card -->
     <div class="form-card">
       <h2>Create Your Account</h2>
       <form id="signupForm">
@@ -49,6 +55,11 @@
       </form>
       <p class="switch-text">Already have an account? <a href="Login page.html">Login</a></p>
     </div>
+
+    <!-- Right Image -->
+    <div class="side-image">
+      <img src="https://i.pinimg.com/736x/8f/a8/78/8fa878e92dd17ba1c863adfb44f7c6a4.jpg" alt="Decorative Right">
+    </div>
   </main>
 
   <footer class="footer">
@@ -63,11 +74,23 @@
       el.textContent = input.type === "password" ? "🙈" : "🙉";
     }
 
+    // ✅ Ensure admin exists when page loads
+    if (!localStorage.getItem("userTable")) {
+      const adminUser = [{
+        id: "U001",
+        email: "sha123@gmail.com",
+        password: "Admin123!",  // admin password
+        role: "Admin",
+        status: "Active"
+      }];
+      localStorage.setItem("userTable", JSON.stringify(adminUser));
+    }
+
     document.getElementById("signupForm").addEventListener("submit", function(event) {
       event.preventDefault();
       let valid = true;
 
-      const email = document.getElementById("signupEmail").value;
+      const email = document.getElementById("signupEmail").value.trim();
       const password = document.getElementById("createPassword").value;
       const confirmPassword = document.getElementById("confirmPassword").value;
 
@@ -99,14 +122,37 @@
 
       if (!valid) return;
 
-      // Save to localStorage
-      const users = JSON.parse(localStorage.getItem("users")) || [];
-      users.push({ email, password, role: "User" });
-      localStorage.setItem("users", JSON.stringify(users));
+      let users = JSON.parse(localStorage.getItem("userTable")) || [];
+
+      // Check if email already exists
+      if (users.some(u => u.email === email)) {
+        alert("⚠️ Email already exists. Please login instead.");
+        return;
+      }
+
+      // Assign new User ID (auto-increment)
+      const newUserId = "U" + String(users.length + 1).padStart(3, "0");
+
+      // Create new user entry
+      const newUser = {
+        id: newUserId,
+        email: email,
+        password: password,
+        role: "User",
+        status: "Active"
+      };
+
+      users.push(newUser);
+      localStorage.setItem("userTable", JSON.stringify(users));
 
       // Show success
       document.getElementById("signupSuccess").style.display = "block";
       document.getElementById("signupForm").reset();
+
+      // Redirect after delay
+      setTimeout(() => {
+        window.location.href = "Login page.html";
+      }, 1500);
     });
   </script>
 </body>
