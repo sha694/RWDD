@@ -53,7 +53,7 @@
         <button type="submit">Sign Up</button>
         <p class="success-message" id="signupSuccess">✅ Account has been created successfully</p>
       </form>
-      <p class="switch-text">Already have an account? <a href="Login page.html">Login</a></p>
+      <p class="switch-text">Already have an account? <a href="Login Page.html">Login</a></p>
     </div>
 
     <!-- Right Image -->
@@ -74,38 +74,35 @@
       el.textContent = input.type === "password" ? "🙈" : "🙉";
     }
 
-    // ✅ Ensure admin exists when page loads
-    if (!localStorage.getItem("userTable")) {
-      const adminUser = [{
-        id: "U001",
-        email: "sha123@gmail.com",
-        password: "Admin123!",  // admin password
-        role: "Admin",
-        status: "Active"
-      }];
-      localStorage.setItem("userTable", JSON.stringify(adminUser));
+    // Email validation
+    function validateEmail(email) {
+      return /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(email);
+    }
+
+    // Password validation
+    function validatePassword(password) {
+      return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/.test(password);
     }
 
     document.getElementById("signupForm").addEventListener("submit", function(event) {
       event.preventDefault();
-      let valid = true;
 
       const email = document.getElementById("signupEmail").value.trim();
       const password = document.getElementById("createPassword").value;
       const confirmPassword = document.getElementById("confirmPassword").value;
 
-      // Email validation
-      const emailPattern = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
-      if (!emailPattern.test(email)) {
+      let valid = true;
+
+      // Validate email
+      if (!validateEmail(email)) {
         document.getElementById("emailError").style.display = "block";
         valid = false;
       } else {
         document.getElementById("emailError").style.display = "none";
       }
 
-      // Password validation
-      const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/;
-      if (!passwordPattern.test(password)) {
+      // Validate password
+      if (!validatePassword(password)) {
         document.getElementById("passwordError").style.display = "block";
         valid = false;
       } else {
@@ -122,7 +119,13 @@
 
       if (!valid) return;
 
-      let users = JSON.parse(localStorage.getItem("userTable")) || [];
+      let users = JSON.parse(localStorage.getItem("users")) || [];
+
+      // Block admin email
+      if (email.toLowerCase() === "sha123@gmail.com") {
+        alert("⚠️ This email is reserved for the Admin. Please use another email.");
+        return;
+      }
 
       // Check if email already exists
       if (users.some(u => u.email === email)) {
@@ -130,20 +133,10 @@
         return;
       }
 
-      // Assign new User ID (auto-increment)
-      const newUserId = "U" + String(users.length + 1).padStart(3, "0");
-
-      // Create new user entry
-      const newUser = {
-        id: newUserId,
-        email: email,
-        password: password,
-        role: "User",
-        status: "Active"
-      };
-
+      // Save new user in "users"
+      const newUser = { email: email, password: password };
       users.push(newUser);
-      localStorage.setItem("userTable", JSON.stringify(users));
+      localStorage.setItem("users", JSON.stringify(users));
 
       // Show success
       document.getElementById("signupSuccess").style.display = "block";
@@ -151,7 +144,7 @@
 
       // Redirect after delay
       setTimeout(() => {
-        window.location.href = "Login page.html";
+        window.location.href = "Login Page.html";
       }, 1500);
     });
   </script>

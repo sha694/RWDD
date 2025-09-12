@@ -180,35 +180,16 @@
         <div style="background: #ffebee; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
           <p style="color: #c62828; margin: 0;">⚠️ Warning: This action cannot be undone!</p>
         </div>
-        <form onsubmit="deleteWorkspace(event)">
+        <div>
           <label>Select Workspace to Delete</label>
           <select id="deleteWorkspaceSelect" required>
             <option value="">Choose a workspace...</option>
           </select>
 
-          <label>Type "DELETE" to confirm</label>
-          <input type="text" id="confirmDelete" placeholder="Type DELETE" required />
-
           <div style="margin-top: 15px;">
-            <button type="submit" style="background: #f44336;">🗑 Delete Workspace</button>
-            <button type="button" onclick="cancelDeleteWorkspace()">❌ Cancel</button>
+            <button onclick="deleteSelectedWorkspace()" style="background: #f44336; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">🗑 DELETE</button>
+            <button onclick="cancelDeleteWorkspace()" style="background: #666; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">❌ Cancel</button>
           </div>
-        </form>
-      </div>
-
-      <!-- Default workspace cards -->
-      <div id="defaultWorkspaceCards" class="cards">
-        <div class="card">
-          <h3>Marketing Team</h3>
-          <p>12 Members</p>
-        </div>
-        <div class="card">
-          <h3>Development Team</h3>
-          <p>20 Members</p>
-        </div>
-        <div class="card">
-          <h3>Design Team</h3>
-          <p>8 Members</p>
         </div>
       </div>
     </section>
@@ -520,13 +501,9 @@
       document.getElementById('userCount').textContent = `${activeUsers} Active Users`;
     }
 
-    // -------- WORKSPACE MANAGEMENT --------
-    let workspaces = [
-      { id: 'W001', name: 'Marketing Team', description: 'Marketing campaigns and strategies', type: 'Team', members: 12 },
-      { id: 'W002', name: 'Development Team', description: 'Software development projects', type: 'Team', members: 20 },
-      { id: 'W003', name: 'Design Team', description: 'UI/UX design and creative work', type: 'Team', members: 8 }
-    ];
-    let workspaceCounter = 4;
+    // -------- WORKSPACE MANAGEMENT (UPDATED) --------
+    let workspaces = JSON.parse(localStorage.getItem('workspaces') || '[]');
+    let workspaceCounter = workspaces.length + 1;
 
     function openWorkspaceForm() {
       hideAllWorkspaceForms();
@@ -558,6 +535,9 @@
       workspaces.push(newWorkspace);
       workspaceCounter++;
 
+      // Save to localStorage
+      localStorage.setItem('workspaces', JSON.stringify(workspaces));
+
       alert(`✅ Workspace "${name}" created successfully!`);
       cancelWorkspaceForm();
       updateWorkspaceCount();
@@ -569,6 +549,16 @@
 
       const tbody = document.querySelector('#workspaceTable tbody');
       tbody.innerHTML = '';
+
+      if (workspaces.length === 0) {
+        const row = tbody.insertRow();
+        row.innerHTML = `
+          <td colspan="6" style="text-align: center; color: #888; font-style: italic;">
+            No workspaces created yet. Create your first workspace!
+          </td>
+        `;
+        return;
+      }
 
       workspaces.forEach(ws => {
         const row = tbody.insertRow();
@@ -593,32 +583,39 @@
 
       const select = document.getElementById('deleteWorkspaceSelect');
       select.innerHTML = '<option value="">Choose a workspace...</option>';
+      
+      if (workspaces.length === 0) {
+        select.innerHTML = '<option value="">No workspaces to delete</option>';
+        return;
+      }
+      
       workspaces.forEach(ws => {
         select.innerHTML += `<option value="${ws.id}">${ws.name}</option>`;
       });
-
-      document.getElementById('confirmDelete').value = '';
     }
 
-    function deleteWorkspace(event) {
-      event.preventDefault();
+    function deleteSelectedWorkspace() {
       const workspaceId = document.getElementById('deleteWorkspaceSelect').value;
-      const confirmText = document.getElementById('confirmDelete').value;
 
       if (!workspaceId) {
         alert('Please choose a workspace to delete.');
         return;
       }
-      if (confirmText !== 'DELETE') {
-        alert('❌ Please type "DELETE" exactly to confirm.');
+
+      const workspaceToDelete = workspaces.find(ws => ws.id === workspaceId);
+      if (!workspaceToDelete) {
+        alert('Workspace not found.');
         return;
       }
 
-      const idx = workspaces.findIndex(ws => ws.id === workspaceId);
-      if (idx > -1) {
-        const deleted = workspaces[idx];
-        workspaces.splice(idx, 1);
-        alert(`✅ Workspace "${deleted.name}" has been deleted.`);
+      if (confirm(`Are you sure you want to delete "${workspaceToDelete.name}"? This action cannot be undone.`)) {
+        // Remove workspace from array
+        workspaces = workspaces.filter(ws => ws.id !== workspaceId);
+        
+        // Update localStorage
+        localStorage.setItem('workspaces', JSON.stringify(workspaces));
+        
+        alert(`✅ Workspace "${workspaceToDelete.name}" has been deleted.`);
         cancelDeleteWorkspace();
         updateWorkspaceCount();
       }
