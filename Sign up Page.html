@@ -3,158 +3,151 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Debug Sign Up Test</title>
+  <title>ProBoost - Sign Up</title>
+  <link rel="stylesheet" href="auth.css">
+  <style>
+    .password-wrapper { position: relative; width: 100%; }
+    .password-wrapper input { width: 100%; padding-right: 40px; }
+    .toggle-password {
+      position: absolute; top: 50%; right: 10px;
+      transform: translateY(-50%); cursor: pointer;
+      font-size: 18px; color: #555;
+    }
+    .error-message { font-size: 12px; color: red; margin-top: 4px; display: none; }
+    .success-message { font-size: 14px; color: green; margin-top: 10px; display: none; }
+  </style>
 </head>
 <body>
-  <h1>Debug Sign Up Test</h1>
-  
-  <form id="testForm">
-    <div>
-      <label>Email:</label><br>
-      <input type="email" id="email" placeholder="test@example.com" required>
+  <header class="header">
+    <div class="logo">
+      <img src="Logo.png" alt="ProBoost Logo" class="logo-img">
+      <span>ProBoost</span>
     </div>
-    <br>
-    <div>
-      <label>Password:</label><br>
-      <input type="password" id="password" placeholder="password123" required>
-    </div>
-    <br>
-    <button type="submit">Test Sign Up</button>
-  </form>
+  </header>
 
-  <hr>
-  
-  <h3>Debug Actions:</h3>
-  <button onclick="checkLocalStorage()">Check Current Users</button>
-  <button onclick="clearUsers()">Clear All Users</button>
-  <button onclick="testLocalStorage()">Test localStorage Access</button>
-  
-  <hr>
-  
-  <h3>Debug Output:</h3>
-  <div id="output"></div>
+  <main class="main-container">
+    <!-- Left Image -->
+    <div class="side-image">
+      <img src="https://i.pinimg.com/736x/12/e9/af/12e9aff1764df39b155fffd23af8fd7a.jpg" alt="Decorative Left">
+    </div>
+
+    <!-- Form Card -->
+    <div class="form-card">
+      <h2>Create Your Account</h2>
+      <form id="signupForm">
+        <input type="email" id="signupEmail" placeholder="Email" required>
+        <div class="error-message" id="emailError">Invalid email format. Example: sha123@gmail.com</div>
+
+        <div class="password-wrapper">
+          <input type="password" id="createPassword" placeholder="Create Password" required>
+          <span class="toggle-password" onclick="togglePassword('createPassword', this)">🙈</span>
+        </div>
+        <div class="error-message" id="passwordError">Password must include uppercase, lowercase, number, and symbol.</div>
+
+        <div class="password-wrapper">
+          <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+          <span class="toggle-password" onclick="togglePassword('confirmPassword', this)">🙈</span>
+        </div>
+        <div class="error-message" id="confirmError">Passwords do not match.</div>
+
+        <button type="submit">Sign Up</button>
+        <p class="success-message" id="signupSuccess">✅ Account has been created successfully</p>
+      </form>
+      <p class="switch-text">Already have an account? <a href="Login Page.html">Login</a></p>
+    </div>
+
+    <!-- Right Image -->
+    <div class="side-image">
+      <img src="https://i.pinimg.com/736x/8f/a8/78/8fa878e92dd17ba1c863adfb44f7c6a4.jpg" alt="Decorative Right">
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>© 2025 ProBoost. All rights reserved.</p>
+  </footer>
 
   <script>
-    function log(message) {
-      const output = document.getElementById('output');
-      output.innerHTML += '<p>' + new Date().toLocaleTimeString() + ': ' + message + '</p>';
-      console.log(message);
+    // Toggle password
+    function togglePassword(id, el) {
+      const input = document.getElementById(id);
+      input.type = input.type === "password" ? "text" : "password";
+      el.textContent = input.type === "password" ? "🙈" : "🙉";
     }
 
-    function testLocalStorage() {
-      try {
-        // Test if localStorage is available and working
-        localStorage.setItem('test', 'working');
-        const testValue = localStorage.getItem('test');
-        localStorage.removeItem('test');
-        
-        if (testValue === 'working') {
-          log('✅ localStorage is working correctly');
-        } else {
-          log('❌ localStorage test failed');
-        }
-      } catch (error) {
-        log('❌ localStorage error: ' + error.message);
+    // Email validation
+    function validateEmail(email) {
+      return /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(email);
+    }
+
+    // Password validation
+    function validatePassword(password) {
+      return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/.test(password);
+    }
+
+    document.getElementById("signupForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      const email = document.getElementById("signupEmail").value.trim();
+      const password = document.getElementById("createPassword").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
+
+      let valid = true;
+
+      // Validate email
+      if (!validateEmail(email)) {
+        document.getElementById("emailError").style.display = "block";
+        valid = false;
+      } else {
+        document.getElementById("emailError").style.display = "none";
       }
-    }
 
-    function checkLocalStorage() {
-      try {
-        const users = localStorage.getItem('users');
-        log('Raw localStorage data: ' + users);
-        
-        if (users) {
-          const parsedUsers = JSON.parse(users);
-          log('Number of users: ' + parsedUsers.length);
-          log('Users: ' + JSON.stringify(parsedUsers, null, 2));
-        } else {
-          log('No users found in localStorage');
-        }
-      } catch (error) {
-        log('❌ Error reading users: ' + error.message);
+      // Validate password
+      if (!validatePassword(password)) {
+        document.getElementById("passwordError").style.display = "block";
+        valid = false;
+      } else {
+        document.getElementById("passwordError").style.display = "none";
       }
-    }
 
-    function clearUsers() {
-      localStorage.removeItem('users');
-      log('🗑️ All users cleared from localStorage');
-    }
-
-    document.getElementById('testForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
-      
-      log('🔄 Starting signup process...');
-      log('Email: ' + email);
-      log('Password length: ' + password.length);
-
-      try {
-        // Get existing users
-        let users = [];
-        const existingUsers = localStorage.getItem('users');
-        
-        if (existingUsers) {
-          users = JSON.parse(existingUsers);
-          log('Found existing users: ' + users.length);
-        } else {
-          log('No existing users, creating new array');
-        }
-
-        // Check if user already exists
-        const duplicate = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-        if (duplicate) {
-          log('❌ User already exists!');
-          return;
-        }
-
-        // Create new user
-        const newUser = {
-          id: Date.now(),
-          email: email,
-          password: password,
-          role: 'user',
-          createdAt: new Date().toISOString()
-        };
-
-        log('Created user object: ' + JSON.stringify(newUser, null, 2));
-
-        // Add to array
-        users.push(newUser);
-        log('Added to users array. New length: ' + users.length);
-
-        // Save to localStorage
-        localStorage.setItem('users', JSON.stringify(users));
-        log('💾 Saved to localStorage');
-
-        // Verify it was saved
-        const verification = localStorage.getItem('users');
-        if (verification) {
-          const verifyParsed = JSON.parse(verification);
-          log('✅ Verification successful! Total users now: ' + verifyParsed.length);
-          log('Latest user: ' + JSON.stringify(verifyParsed[verifyParsed.length - 1], null, 2));
-        } else {
-          log('❌ Verification failed - nothing in localStorage');
-        }
-
-        // Clear form
-        document.getElementById('testForm').reset();
-        
-      } catch (error) {
-        log('❌ Error during signup: ' + error.message);
-        log('Error details: ' + error.stack);
+      // Confirm password
+      if (password !== confirmPassword) {
+        document.getElementById("confirmError").style.display = "block";
+        valid = false;
+      } else {
+        document.getElementById("confirmError").style.display = "none";
       }
-    });
 
-    // Run initial tests when page loads
-    window.addEventListener('load', function() {
-      log('🚀 Page loaded - running initial tests...');
-      testLocalStorage();
-      checkLocalStorage();
+      if (!valid) return;
+
+      // Get existing users from localStorage
+      let users = JSON.parse(localStorage.getItem("users")) || [];
+
+      // Block admin email
+      if (email.toLowerCase() === "sha123@gmail.com") {
+        alert("⚠️ This email is reserved for the Admin. Please use another email.");
+        return;
+      }
+
+      // Check if email already exists
+      if (users.some(u => u.email === email)) {
+        alert("⚠️ Email already exists. Please login instead.");
+        return;
+      }
+
+      // Save new user in the SAME "users" table (localStorage array)
+      const newUser = { email: email, password: password, role: "user" };
+      users.push(newUser);
+      localStorage.setItem("users", JSON.stringify(users));
+
+      // Show success
+      document.getElementById("signupSuccess").style.display = "block";
+      document.getElementById("signupForm").reset();
+
+      // Redirect after delay
+      setTimeout(() => {
+        window.location.href = "Login Page.html";
+      }, 1500);
     });
   </script>
 </body>
 </html>
-//bnbnkj
-//asdsad
