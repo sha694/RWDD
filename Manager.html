@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ProBoost – Manager Suite</title>
+<link rel="stylesheet" href="manager-wire.css" />
+<style>
+  /* === Reset / tokens === */
+  :root{
+    --ink:#2b2b2b;--muted:#9aa3af;--stroke:#d7dee6;--bg:#fafbfc;--panel:#ffffff;--accent:#111827;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:ui-rounded,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--ink);background:var(--bg)}
+  .app{max-width:1200px;margin:24px auto;padding:16px}
+  /* top chrome like wireframe */
+  .topbar{height:52px;border:2px solid var(--stroke);border-radius:18px;padding:10px 14px;display:flex;align-items:center;gap:14px;background:#f3f6f9}
+  .crumb{height:10px;width:56px;border-radius:8px;background:#cdd6df}
+  .logo{height:34px;width:34px;border-radius:50%;background:#b9c3ce;margin-right:8px}
+
+  /* Section heading in wireframe style */
+  .h1{font-size:42px;font-weight:700;margin:28px 6px 10px}
+  .bar{height:12px;border-radius:8px;background:#dfe6ee}
+
+  /* Controls row */
+  .controls{display:grid;grid-template-columns:200px 1fr;gap:16px;margin:16px 6px}
+  .controls .btn{height:44px;border:2px solid var(--stroke);background:var(--panel);border-radius:8px;display:flex;align-items:center;gap:10px;padding:0 12px;cursor:pointer}
+  .controls .field{height:44px;border:2px solid var(--stroke);border-radius:8px;background:var(--panel);padding:0 12px;display:flex;align-items:center}
+  .controls input{border:0;outline:0;width:100%}
+
+  /* ======= KANBAN ======= */
+  .kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin:20px 6px}
+  .col{border:2px solid var(--stroke);border-radius:10px;background:var(--panel);padding:10px;display:flex;flex-direction:column;gap:10px}
+  .col .col-head{display:flex;justify-content:space-between;align-items:center}
+  .col-title{font-weight:700}
+  .card{border:2px solid var(--stroke);border-radius:8px;padding:10px;background:#fff}
+  .thumb{height:90px;border-radius:6px;background:#cdd6df;margin:6px 0}
+  .meta{display:flex;gap:8px}
+  .dot{height:10px;width:10px;border-radius:50%;background:#cbd5e1}
+  .add-card{border:0;background:transparent;color:#444;text-align:left;padding:6px;cursor:pointer}
+
+  /* ======= Calendar + Day list ======= */
+  .calendar-wrap{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin:30px 6px}
+  .calendar{border:2px solid var(--stroke);border-radius:12px;padding:10px;background:#fff}
+  .calendar header{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:8px}
+  .calendar table{width:100%;border-collapse:collapse}
+  .calendar th,.calendar td{width:14.28%;text-align:center;padding:8px;border:1px solid #eef2f6}
+  .daylist{border:2px solid var(--stroke);border-radius:12px;padding:12px;background:#fff}
+  .pill{display:inline-block;background:#e5e7eb;border-radius:999px;padding:4px 8px;font-size:12px}
+
+  /* ======= Overview table ======= */
+  .overview{margin:32px 6px}
+  .table{width:100%;border:2px solid var(--stroke);border-radius:12px;overflow:hidden;background:#fff}
+  .table table{width:100%;border-collapse:collapse}
+  .table th,.table td{border-bottom:1px solid #eef2f6;padding:10px;text-align:left}
+  .caret{margin-right:8px}
+
+  /* ======= GOAL PLAN ======= */
+  .goal-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:18px;margin:26px 6px}
+  .panel{border:2px solid var(--stroke);border-radius:12px;background:#fff;padding:14px}
+  .donut{width:100%;aspect-ratio:1;border-radius:12px;background:#bfc8d3;display:flex;align-items:end;justify-content:center;color:#fff;font-weight:700}
+  .list{display:flex;flex-direction:column;gap:8px}
+  .list .row{height:34px;border-radius:8px;background:#e5eaf0}
+
+  .goal-sections{display:grid;grid-template-columns:1fr;gap:18px;margin:24px 6px}
+  .goal-table{border:2px solid var(--stroke);border-radius:12px;background:#fff;overflow:hidden}
+  .goal-table table{width:100%;border-collapse:collapse}
+  .goal-table th,.goal-table td{border-bottom:1px solid #eef2f6;padding:10px;text-align:left}
+  .progress{height:10px;background:#e5e7eb;border-radius:999px;overflow:hidden}
+  .progress > span{display:block;height:100%;background:#9aa3af}
+
+  /* ======= Progress Log ======= */
+  .progress-log{margin:28px 6px;display:grid;grid-template-columns:1fr;gap:14px}
+  .log-card{border:2px solid var(--stroke);border-radius:12px;background:#fff;padding:14px}
+
+  /* ======= Right rail (flowchart features) ======= */
+  .menu-bar{position:fixed;right:18px;top:120px;display:flex;flex-direction:column;gap:12px}
+  .menu-dot{height:30px;width:30px;border-radius:50%;background:#cbd5e1;border:2px solid var(--stroke);cursor:pointer}
+
+  /* Modal base */
+  .modal{position:fixed;inset:0;background:rgba(33,37,41,.45);display:none;align-items:center;justify-content:center;padding:16px}
+  .modal .box{background:#fff;border-radius:12px;max-width:520px;width:100%;padding:16px;border:2px solid var(--stroke)}
+  .modal h3{margin-top:0}
+  .row{display:flex;gap:10px}
+  input[type=text],input[type=date],input[type=email],select,textarea{width:100%;padding:10px;border:1px solid #d4dbe4;border-radius:8px}
+  button{background:#111827;color:#fff;border:0;border-radius:8px;padding:10px 14px;cursor:pointer}
+  button.ghost{background:#e5e7eb;color:#111827}
+  .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:12px}
+
+  @media (max-width: 960px){
+    .kanban{grid-template-columns:1fr 1fr}
+    .calendar-wrap{grid-template-columns:1fr}
+    .goal-grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+  <div class="app">
+    <!-- Browser chrome -->
+    <div class="topbar">
+      <div class="logo"></div>
+      <div class="crumb"></div><div class="crumb"></div><div class="crumb"></div><div class="crumb"></div>
+      <div style="margin-left:auto;display:flex;gap:8px"><div class="crumb" style="width:28px"></div><div class="crumb" style="width:28px"></div><div class="crumb" style="width:28px"></div></div>
+    </div>
+
+    <!-- TASK MANAGEMENT -->
+    <h1 class="h1">Task Management</h1>
+    <div class="controls">
+      <div class="btn" onclick="openTaskModal()">➕ Add Task</div>
+      <div class="field">
+        <label style="margin-right:8px">Sort by :</label>
+        <select id="sortSelect" onchange="sortBoard()">
+          <option value="priority">Priority</option>
+          <option value="deadline">Deadline</option>
+          <option value="assignee">Assignee</option>
+        </select>
+      </div>
+      <div class="field" style="grid-column:1 / -1">
+        <input id="searchInput" placeholder="Search Tasks" oninput="filterBoard()" />
+      </div>
+    </div>
+
+    <div class="kanban" id="kanban">
+      <!-- Upcoming -->
+      <div class="col" data-status="upcoming">
+        <div class="col-head"><span class="col-title">Upcoming</span><span>⋯</span></div>
+        <div class="cards"></div>
+        <button class="add-card" onclick="openTaskModal('upcoming')">+ Add a card</button>
+      </div>
+      <!-- In Progress -->
+      <div class="col" data-status="in-progress">
+        <div class="col-head"><span class="col-title">In Progress</span><span>⋯</span></div>
+        <div class="cards"></div>
+        <button class="add-card" onclick="openTaskModal('in-progress')">+ Add a card</button>
+      </div>
+      <!-- Completed -->
+      <div class="col" data-status="completed">
+        <div class="col-head"><span class="col-title">Completed</span><span>⋯</span></div>
+        <div class="cards"></div>
+        <button class="add-card" onclick="openTaskModal('completed')">+ Add a card</button>
+      </div>
+      <!-- Pending -->
+      <div class="col" data-status="pending">
+        <div class="col-head"><span class="col-title">Pending</span><span>⋯</span></div>
+        <div class="cards"></div>
+        <button class="add-card" onclick="openTaskModal('pending')">+ Add a card</button>
+      </div>
+    </div>
+
+    <div class="calendar-wrap">
+      <div class="calendar">
+        <header>
+          <button class="ghost" onclick="prevMonth()">◀</button>
+          <div id="calTitle" style="font-weight:700">Month YYYY</div>
+          <button class="ghost" onclick="nextMonth()">▶</button>
+        </header>
+        <table>
+          <thead><tr><th>S</th><th>M</th><th>T</th><th>W</th><th>T</th><th>F</th><th>S</th></tr></thead>
+          <tbody id="calBody"></tbody>
+        </table>
+      </div>
+      <div class="daylist">
+        <div style="display:flex;align-items:center;gap:10px;justify-content:space-between">
+          <div id="dayTitle" style="font-weight:700">—</div>
+          <span>⋯</span>
+        </div>
+        <div id="dayItems" style="margin-top:10px;display:flex;flex-direction:column;gap:10px"></div>
+      </div>
+    </div>
+
+    <section class="overview">
+      <h2 class="h1" style="font-size:36px">Overview</h2>
+      <div class="bar" style="width:180px;margin:4px 6px 14px"></div>
+      <div class="table">
+        <table id="overviewTable">
+          <thead>
+            <tr>
+              <th><span class="caret">▾</span> Project Title</th>
+              <th>Status</th>
+              <th>Assignee</th>
+              <th>Deadline</th>
+              <th>Tags</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- GOAL PLAN -->
+    <h1 class="h1">Goal Plan</h1>
+    <div class="goal-grid">
+      <div class="panel">
+        <div class="donut" id="donut"> <div style="padding:12px 0"> <div style="text-align:center"> <div id="donutLabel" style="font-size:22px">0/0 Goals Achieved</div></div></div></div>
+        <div style="text-align:center;margin-top:8px;color:#6b7280">3/6 Goals Achieved</div>
+      </div>
+      <div class="panel">
+        <div class="bar" style="height:38px;border-radius:10px;background:#cfd6df;margin-bottom:12px"></div>
+        <div class="list">
+          <div class="row"></div>
+          <div class="row"></div>
+          <div class="row"></div>
+          <div class="bar" style="height:38px;border-radius:10px;background:#cfd6df;margin:10px 0"></div>
+          <div class="row"></div>
+          <div class="row"></div>
+          <div class="row"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="goal-sections">
+      <div class="goal-table">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;font-weight:700;background:#f0f4f8">Personal
+          <div class="row"><button class="ghost" onclick="openGoalModal('personal')">+ New Goal</button><button class="ghost">Sort ▾</button></div>
+        </div>
+        <table id="personalGoals">
+          <thead>
+            <tr><th>Goals</th><th>Type</th><th>Timeframe</th><th>Goal Outcome</th><th>Status</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="goal-table">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;font-weight:700;background:#f0f4f8">Team
+          <div class="row"><button class="ghost" onclick="openGoalModal('team')">+ New Goal</button><button class="ghost">Sort ▾</button></div>
+        </div>
+        <table id="teamGoals">
+          <thead>
+            <tr><th>Goals</th><th>Type</th><th>Timeframe</th><th>Progress</th><th>Status</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <section class="progress-log">
+      <h2 class="h1" style="font-size:36px">Progress Log</h2>
+      <div class="log-card" id="progressItem">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div><strong id="plTitle">Learn New Software Skill</strong></div>
+          <button class="ghost" onclick="openProgressModal()">+ Update Progress</button>
+        </div>
+        <div class="progress" style="margin:10px 0"><span id="plBar" style="width:60%"></span></div>
+        <div style="display:flex;gap:14px;align-items:center">
+          <div style="height:56px;width:56px;border-radius:50%;background:#cbd5e1"></div>
+          <div>
+            <div id="plDate">Aug 16</div>
+            <div id="plNote" style="color:#6b7280">Watched lessons on tools</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ===== Right-rail: Manager Menu (flowchart features) ===== -->
+  <div class="menu-bar" title="Manager Menu">
+    <div class="menu-dot" onclick="openPanel('userSettings')" title="User Settings"></div>
+    <div class="menu-dot" onclick="openPanel('taskMgmt')" title="Task Management"></div>
+    <div class="menu-dot" onclick="openPanel('timeTracking')" title="Time Tracking"></div>
+    <div class="menu-dot" onclick="openPanel('goalSetting')" title="Goal Setting"></div>
+    <div class="menu-dot" onclick="openPanel('collaboration')" title="Collaboration"></div>
+    <div class="menu-dot" onclick="openPanel('analytics')" title="Productivity Analytics"></div>
+  </div>
+
+  <!-- ===== Modals for all flowchart nodes ===== -->
+  <!-- Add/Edit Task / Create Project / Assign Task -->
+  <div class="modal" id="taskModal">
+    <div class="box">
+      <h3>Create / Edit Task</h3>
+      <div class="row">
+        <input id="tTitle" type="text" placeholder="Task title" />
+        <select id="tStatus"><option>upcoming</option><option>in-progress</option><option>completed</option><option>pending</option></select>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <input id="tAssignee" type="text" placeholder="Assignee" />
+        <input id="tDeadline" type="date" />
+        <select id="tPriority"><option>Low</option><option selected>Medium</option><option>High</option></select>
+      </div>
+      <textarea id="tDesc" rows="3" placeholder="Description" style="margin-top:8px"></textarea>
+      <div class="actions">
+        <button class="ghost" onclick="openProjectModal()">Create Project</button>
+        <button class="ghost" onclick="openAssignModal()">Assign Task</button>
+        <button onclick="saveTask()">Save</button>
+        <button class="ghost" onclick="closeTaskModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="projectModal">
+    <div class="box">
+      <h3>Create Project</h3>
+      <input id="pName" type="text" placeholder="Project Title" />
+      <textarea id="pDesc" rows="3" placeholder="Short description" style="margin-top:8px"></textarea>
+      <div class="actions"><button onclick="saveProject()">Create</button><button class="ghost" onclick="closeProjectModal()">Close</button></div>
+    </div>
+  </div>
+
+  <div class="modal" id="assignModal">
+    <div class="box">
+      <h3>Assign Task</h3>
+      <input id="aWho" type="text" placeholder="Assignee email or name" />
+      <div class="actions"><button onclick="confirmAssign()">Assign</button><button class="ghost" onclick="closeAssignModal()">Close</button></div>
+    </div>
+  </div>
+
+  <!-- Time Tracking: start/log time, approve, export -->
+  <div class="modal" id="timeModal">
+    <div class="box">
+      <h3>Time Tracking</h3>
+      <div class="row">
+        <input id="ttTask" type="text" placeholder="Task ID / Title" />
+        <input id="ttHours" type="text" placeholder="Hours (e.g. 1.5)" />
+        <button onclick="logTime()">Start/Log Time</button>
+      </div>
+      <div style="margin-top:10px">
+        <h4>Pending Timesheets</h4>
+        <div id="timesheetList" style="max-height:160px;overflow:auto;border:1px solid #e5e7eb;border-radius:8px;padding:8px"></div>
+      </div>
+      <div class="actions"><button onclick="exportTimeCSV()">Export Time Data</button><button class="ghost" onclick="closeTime()">Close</button></div>
+    </div>
+  </div>
+
+  <!-- Goal Setting: set team goals, track progress -->
+  <div class="modal" id="goalModal">
+    <div class="box">
+      <h3 id="goalModalTitle">New Goal</h3>
+      <div class="row">
+        <input id="gTitle" type="text" placeholder="Goal title" />
+        <select id="gScope"><option value="personal">Personal</option><option value="team">Team</option></select>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <input id="gType" type="text" placeholder="Type (e.g., Skill, Habit)" />
+        <input id="gTimeframe" type="text" placeholder="Timeframe (e.g., 2 Months)" />
+      </div>
+      <textarea id="gOutcome" rows="3" placeholder="Outcome / acceptance criteria" style="margin-top:8px"></textarea>
+      <div class="row" style="margin-top:8px;align-items:center">
+        <label style="white-space:nowrap">Progress %</label>
+        <input id="gProgress" type="range" min="0" max="100" value="0" oninput="document.getElementById('gProgLbl').textContent=this.value+'%'" />
+        <span id="gProgLbl">0%</span>
+      </div>
+      <div class="actions"><button onclick="saveGoal()">Save Goal</button><button class="ghost" onclick="closeGoalModal()">Close</button></div>
+    </div>
+  </div>
+
+  <!-- Collaboration: comments, file sharing, real-time feed (local demo) -->
+  <div class="modal" id="collabModal">
+    <div class="box">
+      <h3>Collaboration</h3>
+      <textarea id="cmtInput" rows="2" placeholder="Write a comment..."></textarea>
+      <div class="actions"><button onclick="postComment()">Comment</button><label class="ghost" style="padding:10px 14px;border-radius:8px;cursor:pointer">📎 <input id="fileInput" type="file" hidden onchange="attachFile(event)" /> Attach</label><button class="ghost" onclick="closeCollab()">Close</button></div>
+      <div id="feed" style="margin-top:10px;max-height:220px;overflow:auto;border:1px solid #e5e7eb;border-radius:8px;padding:8px"></div>
+    </div>
+  </div>
+
+  <!-- Analytics: team productivity, usage reports, export data -->
+  <div class="modal" id="analyticsModal">
+    <div class="box">
+      <h3>Productivity Analytics</h3>
+      <div id="analytics" style="display:grid;grid-template-columns:1fr;gap:10px"></div>
+      <div class="actions"><button onclick="exportAnalyticsCSV()">Export Data</button><button class="ghost" onclick="closeAnalytics()">Close</button></div>
+    </div>
+  </div>
+
+  <!-- User Settings / Profile / Preferences / Team Settings / Data & Privacy -->
+  <div class="modal" id="settingsModal">
+    <div class="box">
+      <h3>User Settings</h3>
+      <div class="row">
+        <input id="sName" type="text" placeholder="Profile Name" />
+        <input id="sEmail" type="email" placeholder="Email" />
+      </div>
+      <div class="row" style="margin-top:8px">
+        <select id="sTheme"><option>Light</option><option>Dark</option></select>
+        <select id="sNotif"><option>All Notifications</option><option>Mentions Only</option><option>None</option></select>
+      </div>
+      <div style="margin-top:8px">
+        <label><input type="checkbox" id="sData" /> I agree to data processing and privacy policy.</label>
+      </div>
+      <div class="actions"><button onclick="saveSettings()">Save</button><button class="ghost" onclick="closeSettings()">Close</button><button class="ghost" onclick="logout()">Logout</button></div>
+    </div>
+  </div>
+
+  <!-- Progress update -->
+  <div class="modal" id="progressModal">
+    <div class="box">
+      <h3>Update Progress</h3>
+      <input id="plPct" type="range" min="0" max="100" value="60" />
+      <input id="plWhen" type="date" />
+      <input id="plWhat" type="text" placeholder="Note" />
+      <div class="actions"><button onclick="saveProgress()">Save</button><button class="ghost" onclick="closeProgress()">Close</button></div>
+    </div>
+  </div>
+
+<script>
+  /* ====== Data ====== */
+  let tasks = [];
+  let projects = [];
+  let comments = [];
+  let files = [];
+  let timesheets = [];
+  let goals = { personal: [], team: [] };
+
+  // Seed sample
+  function seed(){
+    tasks = [
+      {id:1,title:'Task Title',desc:'Description',status:'upcoming',priority:'High',assignee:'Alex',deadline:dateStr(2),tags:['UI']},
+      {id:2,title:'Task Title',desc:'Description',status:'in-progress',priority:'Medium',assignee:'Sara',deadline:dateStr(4),tags:['API']},
+      {id:3,title:'Task Title',desc:'Description',status:'completed',priority:'Low',assignee:'Me',deadline:dateStr(-1),tags:['Docs']},
+      {id:4,title:'Task Title',desc:'Description',status:'pending',priority:'High',assignee:'Alex',deadline:dateStr(7),tags:['QA']}
+    ];
+    goals.personal = [
+      {title:'Learn New Software Skill', type:'Skill', timeframe:'2 Months', outcome:'Course completion certificate (Adobe Illustrator)', status:'Active'},
+      {title:'Fitness Goal', type:'Health', timeframe:'3 Months', outcome:'Improve health and energy for work.', status:'Active'},
+      {title:'Productivity Habit', type:'Habit', timeframe:'Weekly', outcome:'Align weekly tasks with long‑term goals', status:'Active'}
+    ];
+    goals.team = [
+      {title:'Career Growth', type:'Development', timeframe:'1 Months', progress:50, status:'On Track'},
+      {title:'Skill Development', type:'Training', timeframe:'3 Months', progress:80, status:'On Track'},
+      {title:'Innovation & Creativity', type:'Culture', timeframe:'5 Months', progress:60, status:'At Risk'}
+    ];
+  }
+
+  function dateStr(offset){ const d=new Date(); d.setDate(d.getDate()+offset); return d.toISOString().slice(0,10); }
+
+  /* ====== Renderers ====== */
+  function renderBoard(){
+    document.querySelectorAll('.col .cards').forEach(c=>c.innerHTML='');
+    const term = document.getElementById('searchInput').value.toLowerCase();
+    tasks.forEach(t=>{
+      if(term && !(`${t.title} ${t.desc} ${t.assignee}`.toLowerCase().includes(term))) return;
+      const el = document.createElement('div'); el.className='card';
+      el.innerHTML = `
+        <div class="pill">${t.priority}</div>
+        <div style="font-weight:700">${t.title}</div>
+        <div style="color:#6b7280">${t.desc||''}</div>
+        <div class="thumb"></div>
+        <div class="meta"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;color:#6b7280">
+          <span>${t.assignee||'-'}</span>
+          <span class="pill">${t.deadline||'-'}</span>
+        </div>`;
+      el.onclick = ()=> editTask(t.id);
+      const col = document.querySelector(`.col[data-status='${t.status}'] .cards`);
+      if(col) col.appendChild(el);
+    });
+    updateOverview();
+    markCalendar();
+  }
+
+  function updateOverview(){
+    const tb = document.querySelector('#overviewTable tbody');
+    tb.innerHTML='';
+    tasks.slice(0,5).forEach(t=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML = `<td>${t.title}</td><td><span class='pill'>${t.status}</span></td><td>${t.assignee||'-'}</td><td>${t.deadline||'-'}</td><td>${(t.tags||[]).join(', ')}</td>`;
+      tb.appendChild(tr);
+    });
+  }
+
+  function renderGoals(){
+    const pbody = document.querySelector('#personalGoals tbody');
+    pbody.innerHTML='';
+    goals.personal.forEach(g=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML = `<td>${g.title}</td><td>${g.type}</td><td>${g.timeframe}</td><td>${g.outcome}</td><td>${g.status}</td>`;
+      pbody.appendChild(tr);
+    });
+
+    const tbody = document.querySelector('#teamGoals tbody');
+    tbody.innerHTML='';
+    goals.team.forEach(g=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML = `<td>${g.title}</td><td>${g.type}</td><td>${g.timeframe}</td>
+        <td><div class='progress'><span style='width:${g.progress}%' ></span></div></td>
+        <td>${g.status}</td>`;
+      tbody.appendChild(tr);
+    });
+
+    const achieved = goals.personal.filter(x=>x.status==='Done').length + goals.team.filter(x=>x.progress===100).length;
+    const total = goals.personal.length + goals.team.length;
+    document.getElementById('donutLabel').textContent = `${achieved}/${total} Goals Achieved`;
+  }
+
+  /* ====== Calendar ====== */
+  let calCurrent = new Date();
+  function buildCalendar(){
+    const y=calCurrent.getFullYear(), m=calCurrent.getMonth();
+    const first=new Date(y,m,1), last=new Date(y,m+1,0);
+    document.getElementById('calTitle').textContent = `${first.toLocaleString('default',{month:'long'})} ${y}`;
+    const start=first.getDay();
+    const rows=Math.ceil((start+last.getDate())/7);
+    const body=document.getElementById('calBody');
+    body.innerHTML='';
+    let day=1-start; // so that first week shows prev blanks
+    for(let r=0;r<rows;r++){
+      const tr=document.createElement('tr');
+      for(let c=0;c<7;c++){
+        const td=document.createElement('td');
+        const d=new Date(y,m,day);
+        if(d.getMonth()===m){
+          td.textContent=d.getDate();
+          td.style.cursor='pointer';
+          td.onclick=()=>selectDay(d);
+          td.dataset.date = d.toISOString().slice(0,10);
+        }
+        tr.appendChild(td); day++;
+      }
+      body.appendChild(tr);
+    }
+    markCalendar();
+  }
+  function markCalendar(){
+    const tds=[...document.querySelectorAll('#calBody td')];
+    tds.forEach(td=>{ td.style.background=''; });
+    tasks.forEach(t=>{
+      const cell = tds.find(td=>td.dataset.date===t.deadline);
+      if(cell){ cell.style.background = '#e6eef8'; }
+    });
+  }
+  function selectDay(d){
+    const label = d.toLocaleDateString(undefined,{day:'numeric',month:'long',year:'numeric'});
+    document.getElementById('dayTitle').textContent = label;
+    const cont=document.getElementById('dayItems'); cont.innerHTML='';
+    tasks.filter(t=>t.deadline===d.toISOString().slice(0,10)).forEach(t=>{
+      const div=document.createElement('div');div.className='panel';div.style.padding='10px';
+      div.innerHTML = `<strong>${t.title}</strong><div style='color:#6b7280'>${t.desc||''}</div>`;
+      cont.appendChild(div);
+    });
+  }
+  function prevMonth(){ calCurrent.setMonth(calCurrent.getMonth()-1); buildCalendar(); }
+  function nextMonth(){ calCurrent.setMonth(calCurrent.getMonth()+1); buildCalendar(); }
+
+  /* ====== Board actions ====== */
+  function openTaskModal(status){ document.getElementById('taskModal').style.display='flex'; if(status) document.getElementById('tStatus').value=status; }
+  function closeTaskModal(){ document.getElementById('taskModal').style.display='none'; }
+  function saveTask(){
+    const t={
+      id: Date.now(),
+      title: document.getElementById('tTitle').value,
+      status: document.getElementById('tStatus').value,
+      assignee: document.getElementById('tAssignee').value,
+      deadline: document.getElementById('tDeadline').value,
+      priority: document.getElementById('tPriority').value,
+      desc: document.getElementById('tDesc').value,
+      tags: []
+    };
+    tasks.push(t); closeTaskModal(); renderBoard();
+  }
+  function editTask(id){ const t=tasks.find(x=>x.id===id); if(!t) return; openTaskModal();
+    tTitle.value=t.title; tStatus.value=t.status; tAssignee.value=t.assignee; tDeadline.value=t.deadline; tPriority.value=t.priority; tDesc.value=t.desc; }
+  function sortBoard(){
+    const by=document.getElementById('sortSelect').value;
+    tasks.sort((a,b)=>{
+      if(by==='deadline') return (a.deadline||'').localeCompare(b.deadline||'');
+      if(by==='assignee') return (a.assignee||'').localeCompare(b.assignee||'');
+      const prio={High:0,Medium:1,Low:2}; return (prio[a.priority]??9)-(prio[b.priority]??9);
+    }); renderBoard();
+  }
+  function filterBoard(){ renderBoard(); }
+
+  /* Project / Assign */
+  function openProjectModal(){ document.getElementById('projectModal').style.display='flex'; }
+  function closeProjectModal(){ document.getElementById('projectModal').style.display='none'; }
+  function saveProject(){ projects.push({name:pName.value,desc:pDesc.value}); closeProjectModal(); alert('Project created'); }
+
+  function openAssignModal(){ document.getElementById('assignModal').style.display='flex'; }
+  function closeAssignModal(){ document.getElementById('assignModal').style.display='none'; }
+  function confirmAssign(){ alert('Task assigned to '+document.getElementById('aWho').value); closeAssignModal(); }
+
+  /* Time Tracking */
+  function openPanel(which){
+    if(which==='userSettings') return document.getElementById('settingsModal').style.display='flex';
+    if(which==='taskMgmt') return openTaskModal();
+    if(which==='timeTracking') return document.getElementById('timeModal').style.display='flex';
+    if(which==='goalSetting') return openGoalModal('team');
+    if(which==='collaboration') return document.getElementById('collabModal').style.display='flex';
+    if(which==='analytics') { buildAnalytics(); return document.getElementById('analyticsModal').style.display='flex'; }
+  }
+  function closeTime(){ document.getElementById('timeModal').style.display='none'; }
+  function logTime(){ const entry={id:Date.now(),task:ttTask.value,hours:ttHours.value,status:'Pending'}; timesheets.push(entry); renderTimesheets(); }
+  function renderTimesheets(){ const el=document.getElementById('timesheetList'); el.innerHTML='';
+    timesheets.forEach(ts=>{
+      const row=document.createElement('div'); row.style.display='flex'; row.style.justifyContent='space-between'; row.style.padding='6px 0';
+      row.innerHTML=`<span>${ts.task} • ${ts.hours}h</span><span>
+        <button class='ghost' onclick='approveTS(${ts.id})'>Approve</button>
+        <button class='ghost' onclick='rejectTS(${ts.id})'>Reject</button></span>`; el.appendChild(row);
+    }); }
+  function approveTS(id){ const t=timesheets.find(x=>x.id===id); if(t){ t.status='Approved'; } }
+  function rejectTS(id){ const t=timesheets.find(x=>x.id===id); if(t){ t.status='Rejected'; } }
+  function exportTimeCSV(){ const csv=['task,hours,status']; timesheets.forEach(t=>csv.push(`${t.task},${t.hours},${t.status}`)); download('time-data.csv',csv.join('\n')); }
+
+  /* Goals */
+  function openGoalModal(scope){ document.getElementById('goalModal').style.display='flex'; if(scope){ gScope.value=scope; } }
+  function closeGoalModal(){ document.getElementById('goalModal').style.display='none'; }
+  function saveGoal(){ const g={title:gTitle.value,type:gType.value,timeframe:gTimeframe.value,outcome:gOutcome.value,status:'Active',progress:parseInt(gProgress.value||'0',10)}; if(gScope.value==='personal'){ goals.personal.push(g);} else { goals.team.push(g);} closeGoalModal(); renderGoals(); }
+
+  /* Collaboration */
+  function postComment(){ const text=cmtInput.value.trim(); if(!text) return; comments.unshift({when:new Date().toLocaleString(),text}); cmtInput.value=''; renderFeed(); }
+  function attachFile(e){ const f=e.target.files[0]; if(!f) return; files.unshift({name:f.name,size:f.size}); renderFeed(); }
+  function renderFeed(){ const el=document.getElementById('feed'); el.innerHTML=''; comments.forEach(c=>{ const d=document.createElement('div'); d.style.padding='6px 0'; d.textContent=`${c.when}: ${c.text}`; el.appendChild(d); }); files.forEach(f=>{ const d=document.createElement('div'); d.style.padding='6px 0'; d.textContent=`📎 ${f.name} (${Math.round(f.size/1024)} KB)`; el.appendChild(d); }); }
+  function closeCollab(){ document.getElementById('collabModal').style.display='none'; }
+
+  /* Analytics */
+  function buildAnalytics(){
+    const wrap=document.getElementById('analytics'); wrap.innerHTML='';
+    const byStatus = tasks.reduce((m,t)=>{m[t.status]=(m[t.status]||0)+1;return m;},{});
+    const byAssignee = tasks.reduce((m,t)=>{m[t.assignee]=(m[t.assignee]||0)+1;return m;},{});
+    const blocks=[['Team Productivity (by status)',byStatus],['Usage (by assignee)',byAssignee]];
+    blocks.forEach(([title,data])=>{
+      const card=document.createElement('div'); card.className='panel';
+      card.innerHTML=`<strong>${title}</strong>`;
+      Object.entries(data).forEach(([k,v])=>{ const row=document.createElement('div'); row.style.display='flex'; row.style.alignItems='center'; row.style.gap='8px'; row.style.margin='6px 0'; row.innerHTML=`<span style='width:140px'>${k||'-'}</span><div class='progress' style='flex:1'><span style='width:${v*20}%'></span></div><span>${v}</span>`; card.appendChild(row); });
+      wrap.appendChild(card);
+    });
+  }
+  function exportAnalyticsCSV(){ const csv=['metric,key,value']; const byStatus = tasks.reduce((m,t)=>{m[t.status]=(m[t.status]||0)+1;return m;},{}); Object.entries(byStatus).forEach(([k,v])=>csv.push(`status,${k},${v}`)); const byAssignee=tasks.reduce((m,t)=>{m[t.assignee]=(m[t.assignee]||0)+1;return m;},{}); Object.entries(byAssignee).forEach(([k,v])=>csv.push(`assignee,${k},${v}`)); download('analytics.csv',csv.join('\n')); }
+
+  /* Settings */
+  function openProgressModal(){ document.getElementById('progressModal').style.display='flex'; }
+  function closeProgress(){ document.getElementById('progressModal').style.display='none'; }
+  function saveProgress(){ plBar.style.width = document.getElementById('plPct').value + '%'; plDate.textContent = new Date(document.getElementById('plWhen').value||Date.now()).toLocaleDateString(); plNote.textContent = document.getElementById('plWhat').value; closeProgress(); }
+
+  function saveSettings(){ alert('Settings saved'); closeSettings(); }
+  function closeSettings(){ document.getElementById('settingsModal').style.display='none'; }
+  function logout(){ alert('Logging out…'); }
+
+  /* Utils */
+  function download(filename, text){ const a=document.createElement('a'); a.setAttribute('href','data:text/plain;charset=utf-8,'+encodeURIComponent(text)); a.setAttribute('download',filename); a.style.display='none'; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
+
+  // click-away to close modals
+  window.addEventListener('click', (e)=>{
+    document.querySelectorAll('.modal').forEach(m=>{ if(e.target===m) m.style.display='none'; });
+  });
+
+  // boot
+  seed(); renderBoard(); buildCalendar(); renderGoals(); renderFeed();
+</script>
+</body>
+</html>
