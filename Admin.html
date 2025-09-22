@@ -76,7 +76,7 @@
         <button onclick="refreshUserTable()">🔄 Refresh</button>
       </div>
 
-      <!-- Admin-managed users table (role/status) -->
+      <!-- Admin-managed users table -->
       <table id="userTable">
         <thead>
           <tr>
@@ -85,10 +85,11 @@
             <th>Email</th>
             <th>Role</th>
             <th>Status</th>
+            <th>Created</th>
           </tr>
         </thead>
         <tbody>
-          <!-- Users will be populated from localStorage userTable -->
+          <!-- Users will be populated from localStorage users -->
         </tbody>
       </table>
       
@@ -98,22 +99,16 @@
           <span class="close" onclick="closeUserForm()">&times;</span>
           <h3 id="formTitle">Add User</h3>
           <form id="userForm" onsubmit="saveUser(event)">
-            <label>User ID</label>
-            <input type="text" id="userId" required />
-
             <label>Email</label>
             <input type="email" id="userEmail" required />
 
+            <label>Password</label>
+            <input type="password" id="userPassword" required />
+
             <label>Role</label>
             <select id="userRole">
-              <option value="User">User</option>
-              <option value="Admin">Admin</option>
-            </select>
-
-            <label>Status</label>
-            <select id="userStatus">
-              <option value="Active">Active</option>
-              <option value="Inactive">Inactive</option>
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
             </select>
 
             <button type="submit">💾 Save</button>
@@ -251,10 +246,14 @@
   </div>
 
   <script>
-    // -------- AUTH GUARD (FIXED) --------
+    // Initialize user counter for proper ID generation
+    let userIdCounter = 1;
+
+    // -------- AUTH GUARD --------
     document.addEventListener('DOMContentLoaded', () => {
       checkAuthentication();
       displayAdminInfo();
+      initializeUserCounter();
       refreshUserTable();
       updateUserCount();
       updateWorkspaceCount();
@@ -319,6 +318,34 @@
       document.getElementById('adminEmailDisplay').textContent = savedEmail;
     }
 
+    // Initialize user counter based on existing users
+    function initializeUserCounter() {
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      
+      if (users.length === 0) {
+        userIdCounter = 1;
+      } else {
+        // Find the highest user ID number and increment
+        let maxId = 0;
+        users.forEach(user => {
+          if (user.userId && user.userId.startsWith('U')) {
+            const idNumber = parseInt(user.userId.substring(1));
+            if (!isNaN(idNumber) && idNumber > maxId) {
+              maxId = idNumber;
+            }
+          }
+        });
+        userIdCounter = maxId + 1;
+      }
+    }
+
+    // Generate formatted user ID (U001, U002, etc.)
+    function generateUserId() {
+      const formattedId = `U${String(userIdCounter).padStart(3, '0')}`;
+      userIdCounter++;
+      return formattedId;
+    }
+
     // -------- NAV --------
     function showSection(sectionId, link) {
       document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
@@ -352,68 +379,117 @@
       document.getElementById('logoutModal').style.display = 'none';
     }
 
-    // -------- MANAGE USERS (Dynamic from localStorage) --------
+    // -------- MANAGE USERS (UPDATED WITH PROPER IDs) --------
     let currentAction = 'add';
+    let editingUserId = null;
 
     function refreshUserTable() {
+      // Show loading message briefly
+      const tbody = document.querySelector('#userTable tbody');
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #888;">🔄 Refreshing...</td></tr>';
+      
+      // Simulate refresh with a small delay
+      setTimeout(() => {
+        loadUserTable();
+        alert('✅ User table refreshed!');
+      }, 500);
+    }
+
+    function loadUserTable() {
       const tbody = document.querySelector('#userTable tbody');
       tbody.innerHTML = '';
 
-      // Get users from localStorage userTable (created by signup page)
-      const users = JSON.parse(localStorage.getItem('userTable') || '[]');
+      let users = JSON.parse(localStorage.getItem('users') || '[]');
 
       if (users.length === 0) {
         const row = tbody.insertRow();
         row.innerHTML = `
-          <td colspan="5" style="text-align: center; color: #888; font-style: italic;">
+          <td colspan="6" style="text-align: center; color: #888; font-style: italic;">
             No users registered yet. Users will appear here when they sign up.
           </td>
         `;
         return;
       }
 
-      users.forEach(user => {
+      // Fix users that don't have proper IDs
+      let needsUpdate = false;
+      users = users.map((user, index) => {
+        // Ensure each user has both id and userId
+        if (!user.id) {
+          user.id = user.id || Date.now() + index;
+          needsUpdate = true;
+        }
+        if (!user.userId) {
+          user.userId = generateUserId();
+          needsUpdate = true;
+        }
+        return user;
+      });
+
+      // Save updated users if needed
+      if (needsUpdate) {
+        localStorage.setItem('users', JSON.stringify(users));
+      }
+
+      users.forEach((user, index) => {
         const row = tbody.insertRow();
-        const isAdmin = user.role === 'Admin';
+        const isCurrentAdmin = user.role === 'admin' && user.email === localStorage.getItem('userEmail');
+        const createdDate = user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A';
+        
+        // Use a unique identifier - prefer id, fallback to index
+        const uniqueId = user.id || index;
         
         row.innerHTML = `
-          <td><input type="radio" name="selectedUser" value="${user.id}" ${isAdmin ? 'disabled' : ''}></td>
-          <td>${user.id}</td>
+          <td><input type="radio" name="selectedUser" value="${uniqueId}" data-email="${user.email}" ${isCurrentAdmin ? 'disabled' : ''}></td>
+          <td>${user.userId}</td>
           <td>${user.email}</td>
-          <td>${user.role}</td>
-          <td>${user.status}</td>
+          <td style="text-transform: capitalize;">${user.role || 'user'}</td>
+          <td><span style="color: #4caf50; font-weight: 600;">●</span> Active</td>
+          <td>${createdDate}</td>
         `;
       });
+
+      console.log('Users loaded:', users.length);
+      console.log('Users data:', users);
     }
 
     function openUserForm(action) {
       currentAction = action;
       const modal = document.getElementById('userFormModal');
       const formTitle = document.getElementById('formTitle');
-      const userId = document.getElementById('userId');
       const userEmail = document.getElementById('userEmail');
+      const userPassword = document.getElementById('userPassword');
       const userRole = document.getElementById('userRole');
-      const userStatus = document.getElementById('userStatus');
 
       if (action === 'add') {
         formTitle.textContent = 'Add User';
-        userId.value = '';
         userEmail.value = '';
-        userRole.value = 'User';
-        userStatus.value = 'Active';
+        userPassword.value = '';
+        userRole.value = 'user';
+        editingUserId = null;
       } else if (action === 'edit') {
         formTitle.textContent = 'Edit User';
         const selected = document.querySelector("input[name='selectedUser']:checked");
         if (!selected) {
-          alert('Please select a user to edit (Admin cannot be edited).');
+          alert('❌ Please select a user to edit.');
           return;
         }
-        const row = selected.closest('tr');
-        userId.value = row.cells[1].textContent;
-        userEmail.value = row.cells[2].textContent;
-        userRole.value = row.cells[3].textContent;
-        userStatus.value = row.cells[4].textContent;
+        
+        const userId = parseInt(selected.value);
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const user = users.find(u => u.id === userId);
+        
+        if (!user) {
+          alert('❌ User not found.');
+          return;
+        }
+        
+        userEmail.value = user.email;
+        userPassword.value = user.password;
+        userRole.value = user.role || 'user';
+        editingUserId = userId;
       }
+      
       modal.style.display = 'block';
     }
 
@@ -423,85 +499,132 @@
 
     function saveUser(event) {
       event.preventDefault();
-      const userId = document.getElementById('userId').value.trim();
       const userEmail = document.getElementById('userEmail').value.trim();
+      const userPassword = document.getElementById('userPassword').value;
       const userRole = document.getElementById('userRole').value;
-      const userStatus = document.getElementById('userStatus').value;
 
-      if (!userId || !userEmail) {
-        alert('User ID and Email are required.');
+      if (!userEmail || !userPassword) {
+        alert('❌ Email and Password are required.');
         return;
       }
 
-      let users = JSON.parse(localStorage.getItem('userTable') || '[]');
+      let users = JSON.parse(localStorage.getItem('users') || '[]');
 
       if (currentAction === 'add') {
         // Check if email already exists
-        if (users.some(u => u.email === userEmail)) {
-          alert('Email already exists!');
+        if (users.some(u => u.email.toLowerCase() === userEmail.toLowerCase())) {
+          alert('❌ Email already exists!');
           return;
         }
 
-        // Generate new user ID if not provided
-        let newUserId = userId;
-        if (!newUserId || newUserId === '') {
-          newUserId = "U" + String(users.length + 1).padStart(3, "0");
-          document.getElementById('userId').value = newUserId;
-        }
-
         const newUser = {
-          id: newUserId,
+          id: Date.now(),
+          userId: generateUserId(), // Generate formatted user ID
           email: userEmail,
-          password: 'TempPass123!', // Default password - user should change
+          password: userPassword,
           role: userRole,
-          status: userStatus
+          createdAt: new Date().toISOString()
         };
 
         users.push(newUser);
+        alert('✅ User added successfully!');
         
-      } else if (currentAction === 'edit') {
-        const userIndex = users.findIndex(u => u.id === userId);
+      } else if (currentAction === 'edit' && editingUserId) {
+        const userIndex = users.findIndex(u => u.id === editingUserId);
         if (userIndex > -1) {
+          // Check if email is taken by another user
+          const emailTaken = users.some(u => u.id !== editingUserId && u.email.toLowerCase() === userEmail.toLowerCase());
+          if (emailTaken) {
+            alert('❌ Email is already taken by another user!');
+            return;
+          }
+          
           users[userIndex].email = userEmail;
+          users[userIndex].password = userPassword;
           users[userIndex].role = userRole;
-          users[userIndex].status = userStatus;
+          alert('✅ User updated successfully!');
         }
       }
 
-      localStorage.setItem('userTable', JSON.stringify(users));
-      refreshUserTable();
+      localStorage.setItem('users', JSON.stringify(users));
+      loadUserTable();
       closeUserForm();
       updateUserCount();
-      alert('✅ User saved successfully!');
     }
 
     function removeUser() {
       const selected = document.querySelector("input[name='selectedUser']:checked");
       if (!selected) {
-        alert('Please select a user to remove (Admin cannot be removed).');
+        alert('❌ Please select a user to remove.');
         return;
       }
       
-      if (confirm('Are you sure you want to remove this user?')) {
-        const userId = selected.value;
-        let users = JSON.parse(localStorage.getItem('userTable') || '[]');
+      // Get the selected value and email
+      const selectedValue = selected.value;
+      const selectedEmail = selected.getAttribute('data-email');
+      let users = JSON.parse(localStorage.getItem('users') || '[]');
+      
+      console.log('Attempting to remove user:', selectedValue, selectedEmail);
+      console.log('Available users:', users);
+      
+      // Find the user by ID first, then by email as fallback
+      let userToRemove = users.find(u => u.id && u.id.toString() === selectedValue);
+      if (!userToRemove) {
+        userToRemove = users.find(u => u.email === selectedEmail);
+      }
+      
+      // If still not found, try finding by array index
+      if (!userToRemove) {
+        const index = parseInt(selectedValue);
+        if (!isNaN(index) && users[index]) {
+          userToRemove = users[index];
+        }
+      }
+      
+      if (!userToRemove) {
+        alert('❌ User not found. Please refresh the page and try again.');
+        console.error('User not found with value:', selectedValue, 'email:', selectedEmail);
+        return;
+      }
+      
+      // Check if trying to remove current admin
+      const currentAdminEmail = localStorage.getItem('userEmail');
+      if (userToRemove.email === currentAdminEmail && userToRemove.role === 'admin') {
+        alert('❌ You cannot remove yourself while logged in as admin.');
+        return;
+      }
+      
+      if (confirm(`⚠️ Are you sure you want to remove user "${userToRemove.email}"?\n\nUser ID: ${userToRemove.userId || 'N/A'}\nRole: ${userToRemove.role || 'user'}\n\nThis action cannot be undone.`)) {
+        // Remove the user using email as the most reliable identifier
+        const originalLength = users.length;
+        users = users.filter(u => u.email !== userToRemove.email);
         
-        users = users.filter(u => u.id !== userId);
-        localStorage.setItem('userTable', JSON.stringify(users));
+        // Verify user was actually removed
+        if (users.length === originalLength) {
+          alert('❌ Failed to remove user. Please try again.');
+          return;
+        }
         
-        refreshUserTable();
+        // Save updated users array
+        localStorage.setItem('users', JSON.stringify(users));
+        
+        // Refresh the table and update count
+        loadUserTable();
         updateUserCount();
-        alert('✅ User removed successfully!');
+        
+        alert(`✅ User "${userToRemove.email}" (${userToRemove.userId || 'N/A'}) has been removed successfully!`);
+        
+        console.log('User removed successfully:', userToRemove.email);
+        console.log('Remaining users:', users.length);
       }
     }
 
     function updateUserCount() {
-      const users = JSON.parse(localStorage.getItem('userTable') || '[]');
-      const activeUsers = users.filter(u => u.status === 'Active').length;
-      document.getElementById('userCount').textContent = `${activeUsers} Active Users`;
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      document.getElementById('userCount').textContent = `${users.length} Registered Users`;
     }
 
-    // -------- WORKSPACE MANAGEMENT (UPDATED) --------
+    // -------- WORKSPACE MANAGEMENT --------
     let workspaces = JSON.parse(localStorage.getItem('workspaces') || '[]');
     let workspaceCounter = workspaces.length + 1;
 
@@ -520,7 +643,7 @@
       const type = document.getElementById('workspaceType').value;
 
       if (!name) {
-        alert('Workspace name is required.');
+        alert('❌ Workspace name is required.');
         return;
       }
 
@@ -535,7 +658,6 @@
       workspaces.push(newWorkspace);
       workspaceCounter++;
 
-      // Save to localStorage
       localStorage.setItem('workspaces', JSON.stringify(workspaces));
 
       alert(`✅ Workspace "${name}" created successfully!`);
@@ -598,21 +720,18 @@
       const workspaceId = document.getElementById('deleteWorkspaceSelect').value;
 
       if (!workspaceId) {
-        alert('Please choose a workspace to delete.');
+        alert('❌ Please choose a workspace to delete.');
         return;
       }
 
       const workspaceToDelete = workspaces.find(ws => ws.id === workspaceId);
       if (!workspaceToDelete) {
-        alert('Workspace not found.');
+        alert('❌ Workspace not found.');
         return;
       }
 
-      if (confirm(`Are you sure you want to delete "${workspaceToDelete.name}"? This action cannot be undone.`)) {
-        // Remove workspace from array
+      if (confirm(`⚠️ Are you sure you want to delete "${workspaceToDelete.name}"? This action cannot be undone.`)) {
         workspaces = workspaces.filter(ws => ws.id !== workspaceId);
-        
-        // Update localStorage
         localStorage.setItem('workspaces', JSON.stringify(workspaces));
         
         alert(`✅ Workspace "${workspaceToDelete.name}" has been deleted.`);
@@ -654,7 +773,8 @@
       if (quickAccess && localStorage.getItem('isAdmin') === 'true') {
         quickAccess.style.display = 'none';
       }
-    }, 10000); // Hide after 10 seconds if already authenticated
+    }, 10000);
   </script>
 </body>
 </html>
+//skjdsjkankja
