@@ -23,14 +23,6 @@
     </nav>
   </header>
 
-  <script>
-  // Block access if not logged in as admin
-  if (localStorage.getItem("isAdmin") !== "true") {
-    alert("❌ Access Denied!");
-    window.location.href = "Login page.html";
-  }
-</script>
-
   <!-- Main Content -->
   <main class="main-container">
     <!-- Home -->
@@ -236,22 +228,13 @@
     </div>
   </div>
 
-  <!-- Quick Access Panel for Testing -->
-  <div id="quickAccess" style="position: fixed; bottom: 20px; right: 20px; background: rgba(33, 150, 243, 0.9); color: white; padding: 15px; border-radius: 10px; font-size: 12px; max-width: 250px;">
-    <div style="margin-bottom: 10px; font-weight: bold;">🔧 Quick Admin Access</div>
-    <div style="margin-bottom: 5px;">
-      <button onclick="enableAdminAccess()" style="padding: 5px 10px; font-size: 11px;">Enable Admin Access</button>
-    </div>
-    <div style="font-size: 10px; opacity: 0.8;">Click to set admin credentials</div>
-  </div>
-
   <script>
     // Initialize user counter for proper ID generation
     let userIdCounter = 1;
 
-    // -------- AUTH GUARD --------
+    // -------- PROPER AUTHENTICATION GUARD --------
     document.addEventListener('DOMContentLoaded', () => {
-      checkAuthentication();
+      checkAdminAuthentication();
       displayAdminInfo();
       initializeUserCounter();
       refreshUserTable();
@@ -259,63 +242,47 @@
       updateWorkspaceCount();
     });
 
-    function checkAuthentication() {
-      // Enhanced authentication check with multiple fallbacks
-      const isAdmin = localStorage.getItem('isAdmin') === 'true';
-      const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-      const userType = localStorage.getItem('userType');
-      const userRole = localStorage.getItem('userRole');
-      const currentUser = localStorage.getItem('currentUser');
+    function checkAdminAuthentication() {
+      const isLoggedIn = sessionStorage.getItem("isLoggedIn") === "true";
+      const role = sessionStorage.getItem("role");
+      const email = sessionStorage.getItem("userEmail");
+      const loginTime = sessionStorage.getItem('loginTime');
       
-      // Check multiple possible admin indicators
-      const adminIndicators = [
-        isAdmin,
-        (isLoggedIn && userType === 'admin'),
-        (userRole === 'admin'),
-        (currentUser === 'admin'),
-        (localStorage.getItem('adminLoggedIn') === 'true')
-      ];
-      
-      const allowed = adminIndicators.some(indicator => indicator === true);
+       // ✅ Only allow YOU as Admin
+  if (!isLoggedIn || role !== "admin" || email !== "sha123@gmail.com") {
+    alert("🚫 Access Denied! Admins only.");
+    sessionStorage.clear();
+    window.location.href = "Login page.html";
+  }
 
-      if (!allowed) {
-        // Show a more helpful message
-        const hasAnyAuth = localStorage.getItem('isLoggedIn') || localStorage.getItem('userEmail') || localStorage.getItem('currentUser');
+      // Check session validity (optional: expire after 24 hours)
+      if (loginTime) {
+        const loginDate = new Date(loginTime);
+        const now = new Date();
+        const hoursSinceLogin = (now - loginDate) / (1000 * 60 * 60);
         
-        if (hasAnyAuth) {
-          alert('Access denied. You need admin privileges to access this dashboard.');
-        } else {
-          alert('Access denied. Please login as admin first.');
+        if (hoursSinceLogin > 24) {
+          alert('⏰ Session expired. Please login again.');
+          sessionStorage.clear();
+          window.location.href = 'Login page.html';
+          return;
         }
-        
-        // Redirect to login page
-        window.location.href = 'Login page.html';
-        return;
       }
 
-      console.log('✅ Admin access granted');
-    }
-
-    function enableAdminAccess() {
-      // Quick function to enable admin access for testing
-      localStorage.setItem('isAdmin', 'true');
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('userType', 'admin');
-      localStorage.setItem('userEmail', 'sha123@gmail.com');
-      localStorage.setItem('adminLoggedIn', 'true');
-      
-      alert('✅ Admin access enabled! Refreshing page...');
-      location.reload();
+      console.log('✅ Admin access granted for:', userEmail);
     }
 
     function displayAdminInfo() {
-      // Show saved email or fallback to fixed admin email
-      const savedEmail = localStorage.getItem('userEmail') || 
-                        localStorage.getItem('adminEmail') || 
-                        localStorage.getItem('currentUserEmail') ||
-                        'sha123@gmail.com';
+      const userEmail = sessionStorage.getItem('userEmail') || 'sha123@gmail.com';
+      const userName = userEmail.split('@')[0];
       
-      document.getElementById('adminEmailDisplay').textContent = savedEmail;
+      document.getElementById('adminEmailDisplay').textContent = userEmail;
+      
+      // Update welcome message
+      const welcomeTitle = document.querySelector('h1');
+      if (welcomeTitle && welcomeTitle.textContent.includes('Welcome')) {
+        welcomeTitle.textContent = `Welcome Back, Admin ${userName}! 👑`;
+      }
     }
 
     // Initialize user counter based on existing users
@@ -362,16 +329,15 @@
     }
 
     function confirmLogout() {
-      // Clear all possible session markers
-      const keysToRemove = [
-        'isAdmin', 'isLoggedIn', 'userType', 'userEmail', 'loginTime',
-        'adminLoggedIn', 'userRole', 'currentUser', 'currentUserEmail',
-        'adminEmail', 'sessionToken', 'authToken'
-      ];
+      // Clear session data
+      sessionStorage.clear();
       
-      keysToRemove.forEach(key => localStorage.removeItem(key));
-
-      alert('✅ Successfully logged out!');
+      // Also clear any localStorage auth data for good measure
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('role');
+      localStorage.removeItem('userEmail');
+      
+      alert('✅ Admin logged out successfully!');
       window.location.href = 'Landing Page.html';
     }
 
@@ -433,7 +399,7 @@
 
       users.forEach((user, index) => {
         const row = tbody.insertRow();
-        const isCurrentAdmin = user.role === 'admin' && user.email === localStorage.getItem('userEmail');
+        const isCurrentAdmin = user.role === 'admin' && user.email === sessionStorage.getItem('userEmail');
         const createdDate = user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A';
         
         // Use a unique identifier - prefer id, fallback to index
@@ -588,7 +554,7 @@
       }
       
       // Check if trying to remove current admin
-      const currentAdminEmail = localStorage.getItem('userEmail');
+      const currentAdminEmail = sessionStorage.getItem('userEmail');
       if (userToRemove.email === currentAdminEmail && userToRemove.role === 'admin') {
         alert('❌ You cannot remove yourself while logged in as admin.');
         return;
@@ -767,13 +733,19 @@
       if (event.target === logoutModal) cancelLogout();
     };
 
-    // -------- HIDE QUICK ACCESS AFTER USE --------
-    setTimeout(() => {
-      const quickAccess = document.getElementById('quickAccess');
-      if (quickAccess && localStorage.getItem('isAdmin') === 'true') {
-        quickAccess.style.display = 'none';
+    // -------- PREVENT BACK BUTTON ACCESS AFTER LOGOUT --------
+    window.addEventListener('pageshow', function(event) {
+      if (event.persisted) {
+        // Page was loaded from cache, recheck authentication
+        checkAdminAuthentication();
       }
-    }, 10000);
+    });
+
+    // Prevent unauthorized access through browser navigation
+    window.addEventListener('beforeunload', function() {
+      // Session data will persist for legitimate navigation
+      // but will be cleared on login page
+    });
   </script>
 </body>
 </html>

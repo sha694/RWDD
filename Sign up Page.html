@@ -26,12 +26,10 @@
   </header>
 
   <main class="main-container">
-    <!-- Left Image -->
     <div class="side-image">
       <img src="https://i.pinimg.com/736x/12/e9/af/12e9aff1764df39b155fffd23af8fd7a.jpg" alt="Decorative Left">
     </div>
 
-    <!-- Form Card -->
     <div class="form-card">
       <h2>Create Your Account</h2>
       <form id="signupForm">
@@ -56,7 +54,6 @@
       <p class="switch-text">Already have an account? <a href="Login Page.html">Login</a></p>
     </div>
 
-    <!-- Right Image -->
     <div class="side-image">
       <img src="https://i.pinimg.com/736x/8f/a8/78/8fa878e92dd17ba1c863adfb44f7c6a4.jpg" alt="Decorative Right">
     </div>
@@ -67,19 +64,16 @@
   </footer>
 
   <script>
-    // Toggle password
     function togglePassword(id, el) {
       const input = document.getElementById(id);
       input.type = input.type === "password" ? "text" : "password";
       el.textContent = input.type === "password" ? "🙈" : "🙉";
     }
 
-    // Email validation
     function validateEmail(email) {
       return /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(email);
     }
 
-    // Password validation
     function validatePassword(password) {
       return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/.test(password);
     }
@@ -93,7 +87,6 @@
 
       let valid = true;
 
-      // Validate email
       if (!validateEmail(email)) {
         document.getElementById("emailError").style.display = "block";
         valid = false;
@@ -101,7 +94,6 @@
         document.getElementById("emailError").style.display = "none";
       }
 
-      // Validate password
       if (!validatePassword(password)) {
         document.getElementById("passwordError").style.display = "block";
         valid = false;
@@ -109,7 +101,6 @@
         document.getElementById("passwordError").style.display = "none";
       }
 
-      // Confirm password
       if (password !== confirmPassword) {
         document.getElementById("confirmError").style.display = "block";
         valid = false;
@@ -119,31 +110,26 @@
 
       if (!valid) return;
 
-      // Get existing users from localStorage
       let users = JSON.parse(localStorage.getItem("users")) || [];
 
-      // Block admin email
+      // Prevent signing up with Admin's reserved email
       if (email.toLowerCase() === "sha123@gmail.com") {
         alert("⚠️ This email is reserved for the Admin. Please use another email.");
         return;
       }
 
-      // Check if email already exists
       if (users.some(u => u.email === email)) {
         alert("⚠️ Email already exists. Please login instead.");
         return;
       }
 
-      // Save new user in the SAME "users" table (localStorage array)
       const newUser = { email: email, password: password, role: "user" };
       users.push(newUser);
       localStorage.setItem("users", JSON.stringify(users));
 
-      // Show success
       document.getElementById("signupSuccess").style.display = "block";
       document.getElementById("signupForm").reset();
 
-      // Redirect after delay
       setTimeout(() => {
         window.location.href = "Login Page.html";
       }, 1500);
