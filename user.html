@@ -7,360 +7,284 @@
   <link rel="stylesheet" href="user.css">
 </head>
 <body>
-  <!-- Authentication Guard Script -->
-  <script>
-    // Block access if not logged in as user
-    document.addEventListener('DOMContentLoaded', function() {
-      checkUserAuthentication();
-      displayUserInfo();
-    });
+  <!-- Top Navigation Bar -->
+  <header class="top-navbar">
+    <div class="navbar-left">
+      <div class="logo">
+        <img src="Logo.png" alt="ProBoost Logo">
+        <span>ProBoost</span>
+      </div>
+      <button class="nav-button home-btn" onclick="goToMainMenu()">Home</button>
 
-    function checkUserAuthentication() {
-      const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-      const userRole = localStorage.getItem('role');
-      const userEmail = localStorage.getItem('userEmail');
-      
-      // Check if user is properly authenticated
-      if (!isLoggedIn || userRole !== 'user' || !userEmail) {
-        alert('❌ Access Denied! Please login first.');
-        window.location.href = 'Login page.html';
-        return;
-      }
-
-      console.log('✅ User access granted for:', userEmail);
-    }
-
-    function displayUserInfo() {
-      const userEmail = localStorage.getItem('userEmail') || 'user@example.com';
-      const userName = userEmail.split('@')[0]; // Extract name from email
-      
-      // Update welcome message with user's name
-      const welcomeTitle = document.querySelector('#home h1');
-      if (welcomeTitle) {
-        welcomeTitle.textContent = `Welcome Back, ${userName}! 🌟`;
-      }
-    }
-  </script>
-
-  <!-- Navbar -->
-  <header class="navbar">
-    <div class="logo">
-      <img src="Logo.png" alt="ProBoost Logo">
-      <span>ProBoost</span>
+      <div class="search-container">
+        <input type="text" placeholder="Search..." class="search-input">
+        <button class="search-btn" aria-label="Search">🔍</button>
+      </div>
     </div>
-    <nav class="nav-links">
-      <a href="#" class="active" onclick="showSection('home', this)">🏠 Home</a>
-      <a href="#" onclick="showSection('collab', this)">🤝 Collaboration</a>
-      <a href="#" onclick="showSection('time', this)">⏳ Time Tracking</a>
-      <a href="#" onclick="showSection('analytics', this)">📊 Analytics</a>
-      <a href="#" onclick="showSection('goals', this)">🎯 Goals</a>
-      <a href="#" onclick="showSection('tasks', this)">📝 Tasks</a>
-      <a href="#" onclick="showSection('countdown', this)">⏰ Countdown</a>
-    </nav>
-    <div class="logout">
-      <a href="#" onclick="logoutUser()">🚪 Logout</a>
+    
+    <div class="navbar-right">
+      <button class="icon-btn" title="Add New" aria-label="Add New">➕</button>
+      <button class="icon-btn" title="Notifications" aria-label="Notifications">🔔</button>
+      <div class="user-profile" onclick="toggleUserMenu()">
+        <div class="user-avatar" id="userAvatar">👤</div>
+        <span id="userNameDisplay">User</span>
+      </div>
+      <button class="icon-btn" title="Settings" onclick="openSettings()" aria-label="Settings">⚙️</button>
     </div>
   </header>
 
-  <!-- Content -->
-  <main class="container">
-    <!-- Home -->
-    <section id="home" class="section active">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <div>
-          <h1>Welcome Back 🌟</h1>
-          <p class="subtitle">Your personal productivity hub ✨</p>
-        </div>
-        <div style="text-align: right;">
-          <p style="color: #666; font-size: 0.9rem;">Logged in as:</p>
-          <p style="font-weight: bold; color: #1565c0;" id="userEmailDisplay">Loading...</p>
-        </div>
-      </div>
-      <div class="cards">
-        <div class="card"><h3>🤝 Collaboration</h3><p>Work with your team seamlessly.</p></div>
-        <div class="card"><h3>⏳ Time Tracking</h3><p>Log and monitor your hours.</p></div>
-        <div class="card"><h3>🎯 Goals</h3><p>Stay focused and motivated.</p></div>
-      </div>
-    </section>
-
-    <!-- Collaboration -->
-    <section id="collab" class="section">
-      <h1>Team Collaboration 🤝</h1>
-      <p>Chat, share files, and brainstorm with your team.</p>
-      <div class="collab-box">
-        <textarea placeholder="Write a message..." id="collabMessage"></textarea>
-        <button onclick="sendMessage()">Send</button>
-      </div>
-      <div id="messageHistory" style="margin-top: 20px; padding: 15px; background: #f5f5f5; border-radius: 8px; max-height: 200px; overflow-y: auto;">
-        <p style="color: #666; font-style: italic;">No messages yet. Start the conversation!</p>
-      </div>
-    </section>
-
-    <!-- Time Tracking -->
-    <section id="time" class="section">
-      <h1>Time Tracking ⏳</h1>
-      <div style="margin-bottom: 20px;">
-        <input type="text" id="taskName" placeholder="Task name" style="margin-right: 10px; padding: 8px;">
-        <input type="number" id="taskHours" placeholder="Hours" style="margin-right: 10px; padding: 8px; width: 80px;">
-        <button onclick="addTimeEntry()">Add Entry</button>
-      </div>
-      <table id="timeTable">
-        <tr><th>Date</th><th>Task</th><th>Hours</th><th>Action</th></tr>
-        <tr><td>2025-09-06</td><td>Design UI</td><td>3h</td><td><button onclick="removeTimeEntry(this)" style="background: #f44336; color: white; padding: 4px 8px; border: none; border-radius: 4px;">Remove</button></td></tr>
-        <tr><td>2025-09-06</td><td>Meeting</td><td>2h</td><td><button onclick="removeTimeEntry(this)" style="background: #f44336; color: white; padding: 4px 8px; border: none; border-radius: 4px;">Remove</button></td></tr>
-      </table>
-    </section>
-
-    <!-- Analytics -->
-    <section id="analytics" class="section">
-      <h1>Productivity Analytics 📊</h1>
-      <div class="cards">
-        <div class="card"><h3>Focus Time</h3><p id="totalHours">5 hrs this week</p></div>
-        <div class="card"><h3>Tasks Done</h3><p id="taskCount">15 completed</p></div>
-        <div class="card"><h3>Streak</h3><p>🔥 5 days in a row</p></div>
-      </div>
-    </section>
-
-    <!-- Goals -->
-    <section id="goals" class="section">
-      <h1>Goal Setting 🎯</h1>
-      <div style="margin-bottom: 20px;">
-        <input type="text" id="newGoal" placeholder="Add a new goal..." style="margin-right: 10px; padding: 8px; width: 250px;">
-        <button onclick="addGoal()">Add Goal</button>
-      </div>
-      <ul class="goal-list" id="goalList">
-        <li onclick="toggleGoal(this)">Finish sprint ✅</li>
-        <li onclick="toggleGoal(this)">Read 10 pages/day 📚</li>
-        <li onclick="toggleGoal(this)">Exercise 30 min daily 💪</li>
-      </ul>
-    </section>
-
-    <!-- Tasks -->
-    <section id="tasks" class="section">
-      <h1>Task Management 📝</h1>
-      <div style="margin-bottom: 20px;">
-        <input type="text" id="newTask" placeholder="Add a new task..." style="margin-right: 10px; padding: 8px; width: 250px;">
-        <button onclick="addTask()">Add Task</button>
-      </div>
-      <div class="task-list" id="taskList">
-        <div class="task" onclick="toggleTask(this)">✔ Complete project proposal</div>
-        <div class="task" onclick="toggleTask(this)">⏳ Fix login issue</div>
-        <div class="task" onclick="toggleTask(this)">📌 Plan team meeting</div>
-      </div>
-    </section>
-
-    <!-- Countdown -->
-    <section id="countdown" class="section">
-      <h1>Memorial Countdown ⏰</h1>
-      <p>Counting down to New Year 2026:</p>
-      <div id="countdown-timer" class="countdown">Loading...</div>
-    </section>
-  </main>
-
-  <!-- Logout Confirmation Modal -->
-  <div id="logoutModal" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
-    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 10px; text-align: center; max-width: 400px;">
-      <h3>🚪 Confirm Logout</h3>
-      <p style="margin: 20px 0; color: #666;">Are you sure you want to logout?</p>
-      <div style="display: flex; gap: 15px; justify-content: center;">
-        <button onclick="confirmLogout()" style="background: #f44336; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">Yes, Logout</button>
-        <button onclick="cancelLogout()" style="background: #666; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">Cancel</button>
-      </div>
+  <!-- Circular Navigation FAB -->
+  <div class="circular-nav" id="circularNav">
+    <div class="fab-main" onclick="toggleCircularNav()">
+      <div class="fab-icon">☰</div>
+    </div>
+    <div class="fab-options" id="fabOptions">/
+      <div class="fab-option" onclick="navigateToSection('collaboration')" title="Team Collaboration">🤝</div>
+      <div class="fab-option" onclick="navigateToSection('time')" title="Time Tracking">⏳</div>
+      <div class="fab-option" onclick="navigateToSection('analytics')" title="Analytics">📊</div>
+      <div class="fab-option" onclick="navigateToSection('goals')" title="Goals">🎯</div>
+      <div class="fab-option" onclick="navigateToSection('tasks')" title="Tasks">📝</div>
+      <div class="fab-option" onclick="navigateToSection('countdown')" title="Countdown">⏰</div>
+      <div class="fab-option logout-fab" onclick="logoutUser()" title="Logout">🚪</div>
     </div>
   </div>
 
+  <!-- Main Layout -->
+  <div class="main-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" onclick="showSection('collaboration', this)">🤝 Team Collaboration</a>
+        <a href="#" class="nav-item" onclick="showSection('time', this)">⏳ Time Tracking</a>
+        <a href="#" class="nav-item" onclick="showSection('analytics', this)">📊 Analytics</a>
+        <a href="#" class="nav-item" onclick="showSection('goals', this)">🎯 Goals</a>
+        <a href="#" class="nav-item" onclick="showSection('tasks', this)">📝 Tasks</a>
+        <a href="#" class="nav-item" onclick="showSection('countdown', this)">⏰ Countdown</a>
+        <div class="nav-divider"></div>
+        <a href="#" class="nav-item logout" onclick="logoutUser()">🚪 Logout</a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Sections -->
+      <section id="collaboration" class="section active">
+        <h1>🤝 Team Collaboration</h1>
+        <p>Work with your team seamlessly</p>
+        <div class="collaboration-board">
+          <div class="board-column">
+            <div class="column-header">
+              <h3>📝 To Do</h3>
+              <button onclick="addCard('todo')">+ Add Card</button>
+            </div>
+            <div class="card-container" id="todo-cards"></div>
+          </div>
+          <div class="board-column">
+            <div class="column-header">
+              <h3>⚡ In Progress</h3>
+              <button onclick="addCard('progress')">+ Add Card</button>
+            </div>
+            <div class="card-container" id="progress-cards"></div>
+          </div>
+          <div class="board-column">
+            <div class="column-header">
+              <h3>✅ Completed</h3>
+              <button onclick="addCard('completed')">+ Add Card</button>
+            </div>
+            <div class="card-container" id="completed-cards"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="time" class="section">
+        <h1>⏳ Time Tracking</h1>
+        <p>Log and monitor your hours</p>
+        <div class="time-tracking-container">
+          <div class="input-group">
+            <input type="text" id="taskName" placeholder="Task name">
+            <input type="number" id="taskHours" placeholder="Hours">
+            <button onclick="addTimeEntry()">Add Entry</button>
+          </div>
+          <table id="timeTable">
+            <thead>
+              <tr><th>Date</th><th>Task</th><th>Hours</th><th>Action</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <p>Total Hours: <span id="totalHours">0 hrs</span></p>
+        </div>
+      </section>
+
+      <section id="analytics" class="section">
+        <h1>📊 Productivity Analytics</h1>
+        <p>Track your productivity metrics</p>
+      </section>
+
+      <section id="goals" class="section">
+        <h1>🎯 Goal Setting</h1>
+        <input type="text" id="newGoal" placeholder="Add new goal">
+        <button onclick="addGoal()">Add Goal</button>
+        <div id="goalList"></div>
+      </section>
+
+      <section id="tasks" class="section">
+        <h1>📝 Task Management</h1>
+        <input type="text" id="newTask" placeholder="Add new task">
+        <button onclick="addTask()">Add Task</button>
+        <div id="taskList"></div>
+      </section>
+
+      <section id="countdown" class="section">
+        <h1>⏰ Countdown</h1>
+        <div id="countdown-timer">Loading...</div>
+      </section>
+    </main>
+  </div>
+
+  <!-- User Menu -->
+  <div id="userMenu" class="user-menu">
+    <p id="userEmailMenu">user@example.com</p>
+    <button onclick="logoutUser()">Logout</button>
+  </div>
+
+  <!-- Logout Modal -->
+  <div id="logoutModal" class="modal">
+    <div class="modal-content">
+      <h3>Confirm Logout</h3>
+      <button onclick="confirmLogout()">Yes, Logout</button>
+      <button onclick="cancelLogout()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- JS -->
   <script>
-    // -------- AUTHENTICATION & USER INFO --------
-    function displayUserInfo() {
-      const userEmail = localStorage.getItem('userEmail') || 'user@example.com';
-      const userName = userEmail.split('@')[0];
-      
-      document.getElementById('userEmailDisplay').textContent = userEmail;
-      
-      // Update welcome message
-      const welcomeTitle = document.querySelector('#home h1');
-      if (welcomeTitle) {
-        welcomeTitle.textContent = `Welcome Back, ${userName}! 🌟`;
+    let circularNavOpen = false;
+
+    document.addEventListener('DOMContentLoaded', function() {
+      checkUserAuthentication();
+      displayUserInfo();
+      updateTotalHours();
+      setInterval(updateCountdown, 1000);
+    });
+
+    function checkUserAuthentication() {
+      const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
+      const userRole = sessionStorage.getItem('role');
+      const userEmail = sessionStorage.getItem('userEmail');
+      if (!isLoggedIn || userRole !== 'user' || !userEmail) {
+        alert('Access Denied! Login as a user.');
+        window.location.href = 'Login page.html';
       }
     }
 
-    // -------- LOGOUT FUNCTIONALITY --------
-    function logoutUser() {
-      document.getElementById('logoutModal').style.display = 'block';
+    function displayUserInfo() {
+      const userEmail = sessionStorage.getItem('userEmail') || 'user@example.com';
+      const userName = userEmail.split('@')[0];
+      document.getElementById('userNameDisplay').textContent = userName;
+      document.getElementById('userEmailMenu').textContent = userEmail;
     }
 
-    function confirmLogout() {
-      // Clear user session data
-      localStorage.removeItem('isLoggedIn');
-      localStorage.removeItem('role');
-      localStorage.removeItem('userEmail');
-      localStorage.removeItem('loginTime');
-      
-      alert('✅ Successfully logged out!');
-      window.location.href = 'Landing Page.html';
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('collapsed');
     }
 
-    function cancelLogout() {
-      document.getElementById('logoutModal').style.display = 'none';
-    }
-
-    // -------- NAVIGATION --------
     function showSection(id, link) {
       document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
       document.getElementById(id).classList.add('active');
-      document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
-      link.classList.add('active');
+      document.querySelectorAll('.nav-item').forEach(a => a.classList.remove('active'));
+      if (link) link.classList.add('active');
+      if (circularNavOpen) toggleCircularNav();
     }
 
-    // -------- COLLABORATION --------
-    function sendMessage() {
-      const messageInput = document.getElementById('collabMessage');
-      const messageHistory = document.getElementById('messageHistory');
-      const message = messageInput.value.trim();
-      
-      if (!message) return;
-      
-      const userEmail = localStorage.getItem('userEmail');
-      const userName = userEmail.split('@')[0];
-      const timestamp = new Date().toLocaleTimeString();
-      
-      messageHistory.innerHTML += `
-        <div style="margin-bottom: 10px; padding: 8px; background: white; border-radius: 5px;">
-          <strong>${userName}</strong> <small style="color: #888;">${timestamp}</small><br>
-          ${message}
-        </div>
-      `;
-      
-      messageInput.value = '';
-      messageHistory.scrollTop = messageHistory.scrollHeight;
+    function toggleCircularNav() {
+      circularNavOpen = !circularNavOpen;
+      document.getElementById('circularNav').classList.toggle('open');
     }
 
-    // -------- TIME TRACKING --------
+    function navigateToSection(sectionId) { showSection(sectionId); }
+
+    function toggleUserMenu() { document.getElementById('userMenu').classList.toggle('show'); }
+    function openSettings() { alert('Settings panel opens'); }
+
+    function logoutUser() { document.getElementById('logoutModal').style.display='block'; }
+    function confirmLogout() {
+      sessionStorage.clear();
+      window.location.href='Landing Page.html';
+    }
+    function cancelLogout() { document.getElementById('logoutModal').style.display='none'; }
+
+    // Collaboration
+    function addCard(column) {
+      const title = prompt('Enter card title:'); if(!title) return;
+      const container = document.getElementById(column+'-cards');
+      const card = document.createElement('div'); card.className='task-card';
+      card.innerHTML = `<h4>${title}</h4><p>New task</p>`;
+      container.appendChild(card);
+    }
+
+    // Time tracking
     function addTimeEntry() {
-      const taskName = document.getElementById('taskName').value.trim();
-      const taskHours = document.getElementById('taskHours').value;
-      
-      if (!taskName || !taskHours) {
-        alert('Please enter both task name and hours.');
-        return;
-      }
-      
-      const today = new Date().toISOString().split('T')[0];
-      const table = document.getElementById('timeTable');
-      const newRow = table.insertRow();
-      
-      newRow.innerHTML = `
-        <td>${today}</td>
-        <td>${taskName}</td>
-        <td>${taskHours}h</td>
-        <td><button onclick="removeTimeEntry(this)" style="background: #f44336; color: white; padding: 4px 8px; border: none; border-radius: 4px;">Remove</button></td>
-      `;
-      
-      document.getElementById('taskName').value = '';
-      document.getElementById('taskHours').value = '';
+      const name = document.getElementById('taskName').value.trim();
+      const hours = document.getElementById('taskHours').value;
+      if(!name || !hours){ alert('Enter both'); return; }
+      const tbody = document.querySelector('#timeTable tbody');
+      const row = tbody.insertRow();
+      row.innerHTML = `<td>${new Date().toISOString().split('T')[0]}</td>
+        <td>${name}</td><td>${hours}h</td>
+        <td><button onclick="removeTimeEntry(this)">Remove</button></td>`;
+      document.getElementById('taskName').value=''; document.getElementById('taskHours').value='';
       updateTotalHours();
     }
 
-    function removeTimeEntry(button) {
-      if (confirm('Remove this time entry?')) {
-        button.closest('tr').remove();
-        updateTotalHours();
-      }
-    }
-
-    function updateTotalHours() {
-      const rows = document.querySelectorAll('#timeTable tr:not(:first-child)');
-      let total = 0;
-      
-      rows.forEach(row => {
-        const hoursText = row.cells[2].textContent;
-        const hours = parseFloat(hoursText.replace('h', ''));
-        total += hours;
+    function removeTimeEntry(btn){ btn.closest('tr').remove(); updateTotalHours(); }
+    function updateTotalHours(){
+      let total=0;
+      document.querySelectorAll('#timeTable tbody tr').forEach(r=>{
+        total+=parseFloat(r.cells[2].textContent.replace('h',''));
       });
-      
-      document.getElementById('totalHours').textContent = `${total} hrs this week`;
+      document.getElementById('totalHours').textContent = total+' hrs';
     }
 
-    // -------- GOALS --------
+    // Goals
     function addGoal() {
-      const goalInput = document.getElementById('newGoal');
-      const goalText = goalInput.value.trim();
-      
-      if (!goalText) return;
-      
-      const goalList = document.getElementById('goalList');
-      const newGoal = document.createElement('li');
-      newGoal.textContent = goalText + ' 📚';
-      newGoal.onclick = function() { toggleGoal(this); };
-      
-      goalList.appendChild(newGoal);
-      goalInput.value = '';
+      const text=document.getElementById('newGoal').value.trim(); if(!text) return;
+      const div=document.createElement('div'); div.className='goal-item';
+      div.innerHTML=`<span>📚</span> ${text}`; div.onclick=function(){ this.querySelector('span').textContent==='📚'?this.querySelector('span').textContent='✅':this.querySelector('span').textContent='📚'; };
+      document.getElementById('goalList').appendChild(div); document.getElementById('newGoal').value='';
     }
 
-    function toggleGoal(goal) {
-      if (goal.textContent.includes('✅')) {
-        goal.textContent = goal.textContent.replace('✅', '📚');
-      } else {
-        goal.textContent = goal.textContent.replace('📚', '✅');
-      }
-    }
-
-    // -------- TASKS --------
+    // Tasks
     function addTask() {
-      const taskInput = document.getElementById('newTask');
-      const taskText = taskInput.value.trim();
-      
-      if (!taskText) return;
-      
-      const taskList = document.getElementById('taskList');
-      const newTask = document.createElement('div');
-      newTask.className = 'task';
-      newTask.textContent = '⏳ ' + taskText;
-      newTask.onclick = function() { toggleTask(this); };
-      
-      taskList.appendChild(newTask);
-      taskInput.value = '';
+      const text=document.getElementById('newTask').value.trim(); if(!text) return;
+      const div=document.createElement('div'); div.className='task-item';
+      div.innerHTML=`<span>⏳</span> ${text}`; div.onclick=function(){ this.querySelector('span').textContent==='⏳'?this.querySelector('span').textContent='✔':this.querySelector('span').textContent='⏳'; };
+      document.getElementById('taskList').appendChild(div); document.getElementById('newTask').value='';
     }
 
-    function toggleTask(task) {
-      if (task.textContent.startsWith('✔')) {
-        task.textContent = task.textContent.replace('✔', '⏳');
-      } else {
-        task.textContent = task.textContent.replace('⏳', '✔');
-        task.textContent = task.textContent.replace('📌', '✔');
-      }
-    }
-
-    // -------- COUNTDOWN --------
+    // Countdown
     const countdownDate = new Date("Jan 1, 2026 00:00:00").getTime();
-    setInterval(() => {
-      const now = new Date().getTime();
-      const diff = countdownDate - now;
-      const el = document.getElementById("countdown-timer");
+    function updateCountdown(){
+      const diff=countdownDate-new Date().getTime();
+      const el=document.getElementById("countdown-timer");
+      if(diff<0){ el.innerHTML="🎉 Event Started!"; return; }
+      const d=Math.floor(diff/(1000*60*60*24));
+      const h=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
+      const m=Math.floor((diff%(1000*60*60))/(1000*60));
+      const s=Math.floor((diff%(1000*60))/1000);
+      el.innerHTML=`${d}d ${h}h ${m}m ${s}s`;
+    }
 
-      if (diff < 0) {
-        el.innerHTML = "🎉 Event Started!";
-        return;
-      }
-      const d = Math.floor(diff / (1000*60*60*24));
-      const h = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
-      const m = Math.floor((diff % (1000*60*60)) / (1000*60));
-      const s = Math.floor((diff % (1000*60)) / 1000);
-      el.innerHTML = `${d}d ${h}h ${m}m ${s}s`;
-    }, 1000);
-
-    // -------- CLOSE MODAL ON OUTSIDE CLICK --------
-    window.onclick = function(event) {
-      const logoutModal = document.getElementById('logoutModal');
-      if (event.target === logoutModal) {
-        cancelLogout();
-      }
+    // Close menus on outside click
+    window.onclick = function(event){
+      if(!event.target.closest('.user-profile')&&!event.target.closest('.user-menu')) document.getElementById('userMenu').classList.remove('show');
+      if(!event.target.closest('#circularNav') && circularNavOpen) toggleCircularNav();
+      if(event.target===document.getElementById('logoutModal')) cancelLogout();
     };
 
-    // -------- INITIALIZE ON PAGE LOAD --------
-    document.addEventListener('DOMContentLoaded', function() {
-      updateTotalHours();
-    });
-  </script>
+  function goToMainMenu() {
+    // Replace 'main_menu.html' with your main menu page when created
+    window.location.href = "main menu.html";
+  }
+</script>
 </body>
 </html>
