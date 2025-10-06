@@ -248,12 +248,18 @@
       const email = sessionStorage.getItem("userEmail");
       const loginTime = sessionStorage.getItem('loginTime');
       
-       // ✅ Only allow YOU as Admin
-  if (!isLoggedIn || role !== "admin" || email !== "sha123@gmail.com") {
-    alert("🚫 Access Denied! Admins only.");
-    sessionStorage.clear();
-    window.location.href = "Login page.html";
-  }
+      console.log('🔍 Checking authentication...');
+      console.log('isLoggedIn:', isLoggedIn);
+      console.log('role:', role);
+      console.log('email:', email);
+      
+      // ✅ Only allow admin users
+      if (!isLoggedIn || role !== "admin") {
+        alert("🚫 Access Denied! Admins only.");
+        sessionStorage.clear();
+        window.location.href = "Login page.html";
+        return;
+      }
 
       // Check session validity (optional: expire after 24 hours)
       if (loginTime) {
@@ -269,7 +275,7 @@
         }
       }
 
-      console.log('✅ Admin access granted for:', userEmail);
+      console.log('✅ Admin access granted for:', email);
     }
 
     function displayAdminInfo() {

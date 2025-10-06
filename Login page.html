@@ -56,13 +56,19 @@
 
   <!-- Scripts -->
   <script>
-  // ✅ Initialize users array with admin account
-  (function initializeUsers() {
+  // ✅ Clear session when visiting login page
+  window.addEventListener('DOMContentLoaded', () => {
+    sessionStorage.clear();
+    console.log('🔄 Session cleared on login page load');
+    initializeAdmin();
+  });
+
+  // ✅ Ensure Admin account exists
+  function initializeAdmin() {
     let users = JSON.parse(localStorage.getItem("users")) || [];
-    
-    // Add admin account if it doesn't exist
     const adminEmail = "sha123@gmail.com";
-    if (!users.some(u => u.email.toLowerCase() === adminEmail.toLowerCase())) {
+
+    if (!users.find(u => u.email.toLowerCase() === adminEmail.toLowerCase())) {
       users.push({
         id: Date.now(),
         userId: "U001",
@@ -72,11 +78,13 @@
         createdAt: new Date().toISOString()
       });
       localStorage.setItem("users", JSON.stringify(users));
-      console.log("✅ Admin account created: sha123@gmail.com / Admin123!");
+      console.log("✅ Admin account created:", adminEmail);
+    } else {
+      console.log("✅ Admin account already exists");
     }
-  })();
+  }
 
-  // Toggle show/hide password
+  // ✅ Toggle password visibility
   function togglePassword(id, el) {
     const input = document.getElementById(id);
     if (input.type === "password") {
@@ -88,14 +96,13 @@
     }
   }
 
-  // Show/hide error messages
+  // ✅ Show/Hide error & success messages
   function showError(id, message = '', show = true) {
     const el = document.getElementById(id);
     if (message) el.textContent = message;
     el.style.display = show ? 'block' : 'none';
   }
 
-  // Show/hide success message
   function showSuccess(message) {
     const el = document.getElementById('loginSuccess');
     el.textContent = message;
@@ -106,24 +113,21 @@
     document.getElementById('loginSuccess').style.display = 'none';
   }
 
-  // Clear all messages
   function clearMessages() {
     showError('loginEmailError', '', false);
     showError('loginPasswordError', '', false);
     hideSuccess();
   }
 
-  // ✅ Main login function
+  // ✅ Login function
   function login(event) {
     event.preventDefault();
 
     const email = document.getElementById('loginEmail').value.trim();
     const password = document.getElementById('loginPassword').value;
 
-    // Clear previous messages
     clearMessages();
 
-    // Basic validation
     if (!email) {
       showError('loginEmailError', '❌ Email is required');
       return;
@@ -134,11 +138,9 @@
       return;
     }
 
-    // Get users from localStorage
     const users = JSON.parse(localStorage.getItem("users")) || [];
-    console.log('Available users:', users);
+    console.log('🔍 Available users:', users);
 
-    // Find matching user
     const user = users.find(u => 
       u.email.toLowerCase() === email.toLowerCase() && 
       u.password === password
@@ -146,35 +148,32 @@
 
     if (!user) {
       showError('loginPasswordError', '❌ Invalid email or password!');
+      console.log('❌ Login failed for:', email);
       return;
     }
 
-    // Set session data
+    console.log('✅ User found:', user);
+
+    // Save session
     sessionStorage.setItem("isLoggedIn", "true");
     sessionStorage.setItem("role", user.role || "user");
     sessionStorage.setItem("userEmail", user.email);
-    sessionStorage.setItem("loginTime", new Date().toISOString());
 
-    console.log('✅ Login successful for:', user.email, 'Role:', user.role);
-
-    // Show success and redirect
+    // Redirect based on role
     if (user.role === "admin") {
       showSuccess("✅ Admin login successful! Redirecting...");
-      setTimeout(() => {
-        window.location.href = "Admin.html";
-      }, 1500);
+      setTimeout(() => { window.location.href = "Admin.html"; }, 1000);
     } else {
       showSuccess("✅ User login successful! Redirecting...");
-      setTimeout(() => {
-        window.location.href = "User.html";
-      }, 1500);
+      setTimeout(() => { window.location.href = "User.html"; }, 1000);
     }
   }
 
-  // Test credentials display (for development - remove in production)
-  console.log('=== TEST CREDENTIALS ===');
-  console.log('Admin: sha123@gmail.com / Admin123!');
-  console.log('========================');
+  // ✅ Test accounts (remove in production)
+  console.log("=== TEST ACCOUNTS ===");
+  console.log("Admin: sha123@gmail.com / Admin123!");
+  console.log("Sign up to create user accounts.");
+  console.log("======================");
   </script>
 </body>
 </html>
