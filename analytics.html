@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productivity Analytics - ProBoost</title>
+    <link rel="stylesheet" href="user.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        .analytics-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .analytics-module {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            min-height: 450px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (max-width: 1200px) {
+            .analytics-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .analytics-module {
+                min-height: 400px;
+            }
+        }
+
+        .module-title {
+            color: #1e3a8a;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 8px;
+        }
+
+        /* Overview Module Styles */
+        .overview-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            flex: 1;
+        }
+
+        .overview-card {
+            background: linear-gradient(135deg, #3b82f6, #1e40af);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .overview-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .overview-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .overview-label {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        /* Chart Modules */
+        .chart-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .time-range-selector {
+            display: flex;
+            gap: 10px;
+            background: #f3f4f6;
+            padding: 5px;
+            border-radius: 10px;
+        }
+
+        .time-range-btn {
+            padding: 8px 16px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .time-range-btn.active {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .chart-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 250px;
+        }
+
+        .chart-wrapper canvas {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        /* Goal Progress Styles */
+        .goals-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .goal-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border-left: 4px solid #3b82f6;
+            transition: all 0.3s ease;
+        }
+
+        .goal-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .goal-info {
+            flex: 1;
+        }
+
+        .goal-info h4 {
+            margin: 0 0 8px 0;
+            font-size: 1.1rem;
+            color: #1e3a8a;
+        }
+
+        .goal-due {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        .goal-progress {
+            text-align: right;
+            min-width: 100px;
+        }
+
+        .progress-percent {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            width: 120px;
+            height: 10px;
+            background: #e5e7eb;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #34d399);
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        /* Time Distribution Styles */
+        .total-time-display {
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin: 15px 0 25px 0;
+            padding: 15px;
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border-radius: 10px;
+        }
+
+        .time-distribution {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .distribution-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .distribution-item:hover {
+            transform: translateX(5px);
+            background: #f0f9ff;
+        }
+
+        .distribution-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .distribution-bar {
+            width: 100px;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .distribution-fill {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        .color-intelligence { background: #3b82f6; }
+        .color-meetings { background: #10b981; }
+        .color-planning { background: #f59e0b; }
+        .color-other { background: #ef4444; }
+
+        /* Insights & Recommendations Styles */
+        .insights-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            flex: 1;
+        }
+
+        .insights-column, .recommendations-column {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section-title {
+            color: #1e3a8a;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .insights-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .insight-item {
+            padding: 18px;
+            background: #f8fafc;
+            border-radius: 10px;
+            border-left: 4px solid #0ea5e9;
+            transition: all 0.3s ease;
+        }
+
+        .insight-item:hover {
+            transform: translateX(5px);
+            background: #f0f9ff;
+        }
+
+        .insight-item h4 {
+            margin: 0 0 8px 0;
+            color: #1e3a8a;
+            font-size: 1rem;
+        }
+
+        .insight-item p {
+            margin: 0;
+            color: #4b5563;
+            line-height: 1.5;
+        }
+
+        .recommendation {
+            padding: 18px;
+            background: #f0f9ff;
+            border-left: 4px solid #10b981;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .recommendation:hover {
+            transform: translateX(5px);
+            background: #ecfdf5;
+        }
+
+        .recommendation strong {
+            color: #065f46;
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .recommendation p {
+            margin: 0;
+            color: #047857;
+            line-height: 1.5;
+            font-size: 0.9rem;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 20px 0 30px 0;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: white;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        .loading-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .overview-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .insights-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .goal-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .goal-progress {
+                text-align: left;
+                width: 100%;
+            }
+            
+            .progress-bar {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <header class="navbar">
+        <div class="logo">
+            <img src="Logo.png" alt="ProBoost Logo">
+            <span>ProBoost</span>
+        </div>
+        <nav class="nav-links">
+            <a href="user.html">🏠 Home</a>
+            <a href="collaboration.html">🤝 Collaboration</a>
+            <a href="time-tracking.html">⏳ Time Tracking</a>
+            <a href="#" class="active">📊 Analytics</a>
+            <a href="goals.html">🎯 Goals</a>
+            <a href="tasks.html">📝 Tasks</a>
+            <a href="countdown.html">⏰ Countdown</a>
+        </nav>
+        <div class="logout">
+            <a href="Landing Page.html">🚪 Logout</a>
+        </div>
+    </header>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Generating PDF Report...</div>
+    </div>
+
+    <main class="container">
+        <section id="analytics" class="section active">
+            <h1>Productivity Analytics 📊</h1>
+            <p>Gain insights into your work patterns and performance metrics</p>
+
+            <button class="download-btn" onclick="downloadReport()">
+                📥 Download Full Report (PDF)
+            </button>
+
+            <!-- 6 Equal Modules Grid -->
+            <div class="analytics-container">
+                <!-- Module 1: Overview -->
+                <div class="analytics-module">
+                    <h3 class="module-title">📊 Performance Overview</h3>
+                    <div class="overview-cards">
+                        <div class="overview-card">
+                            <span class="overview-number">3</span>
+                            <span class="overview-label">Today's Completion</span>
+                        </div>
+                        <div class="overview-card">
+                            <span class="overview-number">5h 10m</span>
+                            <span class="overview-label">Today's Focus</span>
+                        </div>
+                        <div class="overview-card">
+                            <span class="overview-number">10</span>
+                            <span class="overview-label">Total Completion</span>
+                        </div>
+                        <div class="overview-card">
+                            <span class="overview-number">50h 04m</span>
+                            <span class="overview-label">Total Focus Duration</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Module 2: Daily Productivity Trend -->
+                <div class="analytics-module">
+                    <h3 class="module-title">📈 Daily Productivity Trend</h3>
+                    <div class="chart-content">
+                        <div class="chart-wrapper">
+                            <canvas id="dailyTrendChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Module 3: Recent Completion Curve -->
+                <div class="analytics-module">
+                    <h3 class="module-title">📊 Recent Completion Curve</h3>
+                    <div class="chart-content">
+                        <div class="chart-header">
+                            <div class="time-range-selector">
+                                <button class="time-range-btn" onclick="changeTimeRange('week')">Week</button>
+                                <button class="time-range-btn active" onclick="changeTimeRange('month')">Month</button>
+                                <button class="time-range-btn" onclick="changeTimeRange('year')">Year</button>
+                            </div>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="completionCurveChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Module 4: Goal Progress Tracking -->
+                <div class="analytics-module">
+                    <h3 class="module-title">🎯 Goal Progress Tracking</h3>
+                    <div class="goals-container">
+                        <div class="goal-item">
+                            <div class="goal-info">
+                                <h4>Complete Ru/DD assignment</h4>
+                                <span class="goal-due">Due date: 4th Nov 2025</span>
+                            </div>
+                            <div class="goal-progress">
+                                <span class="progress-percent">65%</span>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 65%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="goal-item">
+                            <div class="goal-info">
+                                <h4>Learn New Framework</h4>
+                                <span class="goal-due">Due date: 4th Nov 2025</span>
+                            </div>
+                            <div class="goal-progress">
+                                <span class="progress-percent">40%</span>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 40%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="goal-item">
+                            <div class="goal-info">
+                                <h4>Complete OOP assignment</h4>
+                                <span class="goal-due">Due date: 4th Nov 2025</span>
+                            </div>
+                            <div class="goal-progress">
+                                <span class="progress-percent">80%</span>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 80%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="goal-item">
+                            <div class="goal-info">
+                                <h4>Complete VRAR assignment</h4>
+                                <span class="goal-due">Due date: 4th Nov 2025</span>
+                            </div>
+                            <div class="goal-progress">
+                                <span class="progress-percent">25%</span>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 25%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Module 5: Time Distribution -->
+                <div class="analytics-module">
+                    <h3 class="module-title">⏰ Time Distribution</h3>
+                    <div class="chart-content">
+                        <div class="total-time-display">34.5h Total Time</div>
+                        <div class="chart-wrapper">
+                            <canvas id="timeDistributionChart"></canvas>
+                        </div>
+                        <div class="time-distribution">
+                            <div class="distribution-item">
+                                <span class="distribution-label">
+                                    <div class="distribution-bar">
+                                        <div class="distribution-fill color-intelligence" style="width: 40%"></div>
+                                    </div>
+                                    Intelligence
+                                </span>
+                                <span style="font-weight: 600; color: #1e3a8a;">40%</span>
+                            </div>
+                            <div class="distribution-item">
+                                <span class="distribution-label">
+                                    <div class="distribution-bar">
+                                        <div class="distribution-fill color-meetings" style="width: 30%"></div>
+                                    </div>
+                                    Meetings
+                                </span>
+                                <span style="font-weight: 600; color: #1e3a8a;">30%</span>
+                            </div>
+                            <div class="distribution-item">
+                                <span class="distribution-label">
+                                    <div class="distribution-bar">
+                                        <div class="distribution-fill color-planning" style="width: 20%"></div>
+                                    </div>
+                                    Planning
+                                </span>
+                                <span style="font-weight: 600; color: #1e3a8a;">20%</span>
+                            </div>
+                            <div class="distribution-item">
+                                <span class="distribution-label">
+                                    <div class="distribution-bar">
+                                        <div class="distribution-fill color-other" style="width: 10%"></div>
+                                    </div>
+                                    Other
+                                </span>
+                                <span style="font-weight: 600; color: #1e3a8a;">10%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Module 6: Insights & Recommendations -->
+                <div class="analytics-module">
+                    <h3 class="module-title">🔍 Insights & Recommendations</h3>
+                    <div class="insights-grid">
+                        <div class="insights-column">
+                            <div class="section-title">📊 Performance Insights</div>
+                            <div class="insights-content">
+                                <div class="insight-item">
+                                    <h4>🎯 Best Performance Day</h4>
+                                    <p>Tuesday - 9.1 hours of focused work with 95% task completion rate</p>
+                                </div>
+                                <div class="insight-item">
+                                    <h4>⏰ Peak Hours</h4>
+                                    <p>4:00 AM - 11:00 AM & 2:00 PM - 4:00 PM show maximum productivity</p>
+                                </div>
+                                <div class="insight-item">
+                                    <h4>📈 Weekly Trend</h4>
+                                    <p>Productivity increased by 12% compared to last week, maintaining 5-day streak</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="recommendations-column">
+                            <div class="section-title">💡 Recommendations</div>
+                            <div class="insights-content">
+                                <div class="recommendation">
+                                    <strong>Focus on maintaining Tuesday's momentum</strong>
+                                    <p>Your most productive day can set the tone for the entire week. Plan important tasks for Tuesdays.</p>
+                                </div>
+                                <div class="recommendation">
+                                    <strong>Schedule important tasks during peak hours</strong>
+                                    <p>Leverage your natural productivity rhythms by aligning complex work with your peak performance times.</p>
+                                </div>
+                                <div class="recommendation">
+                                    <strong>Consider reducing weekend work for better balance</strong>
+                                    <p>Sustainable productivity requires proper rest. Aim for 2 full days of recovery each week.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Initialize Charts
+        function initializeCharts() {
+            // Daily Trend Chart
+            const dailyCtx = document.getElementById('dailyTrendChart').getContext('2d');
+            new Chart(dailyCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Focus Hours',
+                        data: [5.2, 9.1, 6.8, 7.5, 8.2, 3.1, 2.5],
+                        backgroundColor: '#3b82f6',
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Hours' }
+                        }
+                    }
+                }
+            });
+
+            // Completion Curve Chart
+            const completionCtx = document.getElementById('completionCurveChart').getContext('2d');
+            window.completionChart = new Chart(completionCtx, {
+                type: 'line',
+                data: getCompletionData('month'),
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Tasks Completed' }
+                        }
+                    }
+                }
+            });
+
+            // Time Distribution Chart
+            const timeCtx = document.getElementById('timeDistributionChart').getContext('2d');
+            new Chart(timeCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Intelligence', 'Meetings', 'Planning', 'Other'],
+                    datasets: [{
+                        data: [40, 30, 20, 10],
+                        backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: {
+                        legend: { 
+                            position: 'bottom',
+                            labels: { boxWidth: 12, font: { size: 11 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        function getCompletionData(range) {
+            const data = {
+                week: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    data: [3, 8, 5, 7, 6, 2, 1]
+                },
+                month: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                    data: [15, 22, 18, 25]
+                },
+                year: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    data: [85, 92, 78, 95, 88, 102, 95, 110, 105, 98, 115, 125]
+                }
+            };
+            return {
+                labels: data[range].labels,
+                datasets: [{
+                    label: 'Tasks Completed',
+                    data: data[range].data,
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            };
+        }
+
+        function changeTimeRange(range) {
+            // Update button states
+            document.querySelectorAll('.time-range-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update chart data
+            window.completionChart.data = getCompletionData(range);
+            window.completionChart.update();
+        }
+
+            // PDF Generation Function
+            async function generatePDFReport() {
+                const loadingOverlay = document.getElementById('loadingOverlay');
+                loadingOverlay.classList.add('active');
+                
+                try {
+                    // Use setTimeout to show loading animation for a moment
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    
+                    // Set PDF properties
+                    pdf.setProperties({
+                        title: 'Productivity Analytics Report - ProBoost',
+                        subject: 'Productivity Analysis',
+                        author: 'ProBoost System',
+                        keywords: 'productivity, analytics, report',
+                        creator: 'ProBoost Web Application'
+                    });
+
+                    let yPosition = 20;
+                    const pageWidth = pdf.internal.pageSize.getWidth();
+                    const margin = 20;
+                    const contentWidth = pageWidth - (margin * 2);
+
+                    // Cover Page
+                    pdf.setFillColor(59, 130, 246);
+                    pdf.rect(0, 0, pageWidth, 80, 'F');
+                    
+                    pdf.setTextColor(255, 255, 255);
+                    pdf.setFontSize(24);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.text('Productivity Analytics Report', pageWidth / 2, 40, { align: 'center' });
+                    
+                    pdf.setFontSize(16);
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.text('ProBoost System', pageWidth / 2, 55, { align: 'center' });
+                    
+                    pdf.setTextColor(100, 100, 100);
+                    pdf.setFontSize(12);
+                    pdf.text(`Generated on: ${new Date().toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                    })}`, pageWidth / 2, 70, { align: 'center' });
+
+                    // Add new page
+                    pdf.addPage();
+                    yPosition = 20;
+
+                    // Title
+                    pdf.setTextColor(30, 58, 138);
+                    pdf.setFontSize(18);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.text('Executive Summary', margin, yPosition);
+                    yPosition += 15;
+
+                    // Overview Data
+                    pdf.setFontSize(11);
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.setTextColor(0, 0, 0);
+                    
+                    const overviewData = [
+                        { label: "Today's Task Completion", value: "3 tasks" },
+                        { label: "Today's Focus Time", value: "5 hours 10 minutes" },
+                        { label: "Total Task Completion", value: "10 tasks" },
+                        { label: "Total Focus Duration", value: "50 hours 4 minutes" }
+                    ];
+
+                    overviewData.forEach(item => {
+                        pdf.text(`${item.label}:`, margin, yPosition);
+                        pdf.text(item.value, margin + 80, yPosition);
+                        yPosition += 8;
+                    });
+
+                    yPosition += 10;
+
+                    // Key Performance Indicators Section
+                    pdf.setFontSize(14);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.setTextColor(30, 58, 138);
+                    pdf.text('Key Performance Indicators', margin, yPosition);
+                    yPosition += 12;
+
+                    pdf.setFontSize(10);
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.setTextColor(0, 0, 0);
+
+                    const kpis = [
+                        "✓ Productivity increased by 12% compared to last week",
+                        "✓ Best performance day: Tuesday (9.1 hours focused work)",
+                        "✓ Peak productivity hours: 4:00 AM - 11:00 AM & 2:00 PM - 4:00 PM",
+                        "✓ Current streak: 5 consecutive productive days",
+                        "✓ Task completion rate: 92% success rate",
+                        "✓ Average daily focus time: 7.1 hours"
+                    ];
+
+                    kpis.forEach(kpi => {
+                        if (yPosition > 250) {
+                            pdf.addPage();
+                            yPosition = 20;
+                        }
+                        pdf.text(kpi, margin + 5, yPosition);
+                        yPosition += 8;
+                    });
+
+                    yPosition += 15;
+
+                    // Goal Progress Section
+                    pdf.setFontSize(14);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.setTextColor(30, 58, 138);
+                    pdf.text('Goal Progress Tracking', margin, yPosition);
+                    yPosition += 12;
+
+                    pdf.setFontSize(10);
+                    pdf.setFont('helvetica', 'normal');
+
+                    const goals = [
+                        { name: "Complete Ru/DD Assignment", progress: "65%", due: "Nov 4, 2025" },
+                        { name: "Learn New Framework", progress: "40%", due: "Nov 4, 2025" },
+                        { name: "Complete OOP Assignment", progress: "80%", due: "Nov 4, 2025" },
+                        { name: "Complete VRAR Assignment", progress: "25%", due: "Nov 4, 2025" },
+                        { name: "Team Project Completion", progress: "75%", due: "Dec 15, 2025" },
+                        { name: "Professional Certification", progress: "30%", due: "Mar 1, 2026" }
+                    ];
+
+                    goals.forEach(goal => {
+                        if (yPosition > 250) {
+                            pdf.addPage();
+                            yPosition = 20;
+                        }
+                        pdf.setTextColor(30, 58, 138);
+                        pdf.setFont('helvetica', 'bold');
+                        pdf.text(goal.name, margin, yPosition);
+                        
+                        pdf.setTextColor(16, 185, 129);
+                        pdf.text(goal.progress, pageWidth - margin - 20, yPosition, { align: 'right' });
+                        
+                        yPosition += 6;
+                        
+                        pdf.setTextColor(100, 100, 100);
+                        pdf.setFont('helvetica', 'normal');
+                        pdf.text(`Due: ${goal.due}`, margin, yPosition);
+                        
+                        yPosition += 10;
+                    });
+
+                    // Time Distribution Section
+                    if (yPosition > 200) {
+                        pdf.addPage();
+                        yPosition = 20;
+                    }
+
+                    pdf.setFontSize(14);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.setTextColor(30, 58, 138);
+                    pdf.text('Time Distribution Analysis', margin, yPosition);
+                    yPosition += 12;
+
+                    pdf.setFontSize(10);
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.setTextColor(0, 0, 0);
+
+                    const timeDistribution = [
+                        { category: "Deep Work & Intelligence", percentage: "40%", hours: "13.8h" },
+                        { category: "Meetings & Collaboration", percentage: "30%", hours: "10.35h" },
+                        { category: "Planning & Strategy", percentage: "20%", hours: "6.9h" },
+                        { category: "Administrative Tasks", percentage: "10%", hours: "3.45h" }
+                    ];
+
+                    timeDistribution.forEach(item => {
+                        pdf.text(`${item.category}:`, margin, yPosition);
+                        pdf.text(item.percentage, margin + 70, yPosition);
+                        pdf.text(item.hours, pageWidth - margin - 20, yPosition, { align: 'right' });
+                        yPosition += 8;
+                    });
+
+                    yPosition += 15;
+
+                    // Weekly Performance Section
+                    pdf.setFontSize(14);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.setTextColor(30, 58, 138);
+                    pdf.text('Weekly Performance Trends', margin, yPosition);
+                    yPosition += 12;
+
+                    pdf.setFontSize(10);
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.setTextColor(0, 0, 0);
+
+                    const weeklyData = [
+                        { day: "Monday", hours: "5.2h", tasks: "8" },
+                        { day: "Tuesday", hours: "9.1h", tasks: "12" },
+                        { day: "Wednesday", hours: "6.8h", tasks: "9" },
+                        { day: "Thursday", hours: "7.5h", tasks: "10" },
+                        { day: "Friday", hours: "8.2h", tasks: "11" },
+                        { day: "Saturday", hours: "3.1h", tasks: "4" },
+                        { day: "Sunday", hours: "2.5h", tasks: "3" }
+                    ];
+
+                    weeklyData.forEach(day => {
+                        if (yPosition > 250) {
+                            pdf.addPage();
+                            yPosition = 20;
+                        }
+                        pdf.text(`${day.day}:`, margin, yPosition);
+                        pdf.text(`${day.hours} focused`, margin + 40, yPosition);
+                        pdf.text(`${day.tasks} tasks`, pageWidth - margin - 20, yPosition, { align: 'right' });
+                        yPosition += 8;
+                    });
+
+                    yPosition += 15;
+
+                    // Recommendations Section
+                    pdf.setFontSize(14);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.setTextColor(30, 58, 138);
+                    pdf.text('Strategic Recommendations', margin, yPosition);
+                    yPosition += 12;
+
+                    pdf.setFontSize(10);
+                    pdf.setFont('helvetica', 'normal');
+
+                    const recommendations = [
+                        "• Maintain Tuesday's high productivity momentum throughout the week by replicating successful routines",
+                        "• Schedule complex, high-priority tasks during peak performance hours (4:00 AM - 11:00 AM)",
+                        "• Consider reducing weekend work intensity to prevent burnout and maintain long-term productivity",
+                        "• Implement the 25-minute focus technique for tasks requiring deep concentration",
+                        "• Allocate specific time blocks for administrative tasks to minimize context switching",
+                        "• Review and adjust goal priorities based on current progress and upcoming deadlines",
+                        "• Incorporate short breaks between focused work sessions to maintain mental freshness"
+                    ];
+
+                    recommendations.forEach(rec => {
+                        if (yPosition > 250) {
+                            pdf.addPage();
+                            yPosition = 20;
+                        }
+                        pdf.text(rec, margin, yPosition, { maxWidth: contentWidth });
+                        yPosition += 12;
+                    });
+
+                    // Footer
+                    const pageCount = pdf.getNumberOfPages();
+                    for (let i = 1; i <= pageCount; i++) {
+                        pdf.setPage(i);
+                        pdf.setFontSize(8);
+                        pdf.setTextColor(100, 100, 100);
+                        pdf.text(`Page ${i} of ${pageCount}`, pageWidth / 2, 290, { align: 'center' });
+                        pdf.text('Confidential - ProBoost Productivity Analytics Report', pageWidth / 2, 295, { align: 'center' });
+                    }
+
+                    // Save PDF
+                    const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+                    pdf.save(`proboost-productivity-report-${timestamp}.pdf`);
+                    
+                } catch (error) {
+                    console.error('PDF generation error:', error);
+                    alert('Error generating PDF report. Please try again.');
+                } finally {
+                    loadingOverlay.classList.remove('active');
+                }
+            }
+
+            // Update download button click event
+            function downloadReport() {
+                generatePDFReport();
+            }
+
+        // Initialize charts when page loads
+        document.addEventListener('DOMContentLoaded', initializeCharts);
+    </script>
+</body>
+</html>

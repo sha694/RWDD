@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
     "sqltools.connections": [
         {
             "mysqlOptions": {
@@ -17,4 +18,7 @@
             "askForPassword": true
         }
     ]
+=======
+    "liveServer.settings.port": 5501
+>>>>>>> 258b40dcbaf435c332dcc416cf08e82451e2aa03
 }
