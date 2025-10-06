@@ -26,6 +26,10 @@
   </header>
 
   <main class="main-container">
+    <div class="side-image">
+      <img src="https://i.pinimg.com/736x/12/e9/af/12e9aff1764df39b155fffd23af8fd7a.jpg" alt="Decorative Left">
+    </div>
+
     <div class="form-card">
       <h2>Create Your Account</h2>
       <form id="signupForm">
@@ -47,7 +51,11 @@
         <button type="submit">Sign Up</button>
         <p class="success-message" id="signupSuccess">✅ Account has been created successfully</p>
       </form>
-      <p class="switch-text">Already have an account? <a href="Login page.html">Login</a></p>
+      <p class="switch-text">Already have an account? <a href="Login Page.html">Login</a></p>
+    </div>
+
+    <div class="side-image">
+      <img src="https://i.pinimg.com/736x/8f/a8/78/8fa878e92dd17ba1c863adfb44f7c6a4.jpg" alt="Decorative Right">
     </div>
   </main>
 
@@ -56,40 +64,43 @@
   </footer>
 
   <script>
-    // Toggle password
     function togglePassword(id, el) {
       const input = document.getElementById(id);
       input.type = input.type === "password" ? "text" : "password";
       el.textContent = input.type === "password" ? "🙈" : "🙉";
     }
 
+    function validateEmail(email) {
+      return /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(email);
+    }
+
+    function validatePassword(password) {
+      return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/.test(password);
+    }
+
     document.getElementById("signupForm").addEventListener("submit", function(event) {
       event.preventDefault();
-      let valid = true;
 
-      const email = document.getElementById("signupEmail").value;
+      const email = document.getElementById("signupEmail").value.trim();
       const password = document.getElementById("createPassword").value;
       const confirmPassword = document.getElementById("confirmPassword").value;
 
-      // Email validation
-      const emailPattern = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
-      if (!emailPattern.test(email)) {
+      let valid = true;
+
+      if (!validateEmail(email)) {
         document.getElementById("emailError").style.display = "block";
         valid = false;
       } else {
         document.getElementById("emailError").style.display = "none";
       }
 
-      // Password validation
-      const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/;
-      if (!passwordPattern.test(password)) {
+      if (!validatePassword(password)) {
         document.getElementById("passwordError").style.display = "block";
         valid = false;
       } else {
         document.getElementById("passwordError").style.display = "none";
       }
 
-      // Confirm password
       if (password !== confirmPassword) {
         document.getElementById("confirmError").style.display = "block";
         valid = false;
@@ -99,14 +110,29 @@
 
       if (!valid) return;
 
-      // Save to localStorage
-      const users = JSON.parse(localStorage.getItem("users")) || [];
-      users.push({ email, password, role: "User" });
+      let users = JSON.parse(localStorage.getItem("users")) || [];
+
+      // Prevent signing up with Admin's reserved email
+      if (email.toLowerCase() === "sha123@gmail.com") {
+        alert("⚠️ This email is reserved for the Admin. Please use another email.");
+        return;
+      }
+
+      if (users.some(u => u.email === email)) {
+        alert("⚠️ Email already exists. Please login instead.");
+        return;
+      }
+
+      const newUser = { email: email, password: password, role: "user" };
+      users.push(newUser);
       localStorage.setItem("users", JSON.stringify(users));
 
-      // Show success
       document.getElementById("signupSuccess").style.display = "block";
       document.getElementById("signupForm").reset();
+
+      setTimeout(() => {
+        window.location.href = "Login Page.html";
+      }, 1500);
     });
   </script>
 </body>

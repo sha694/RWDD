@@ -1,42 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ProBoost - Login</title>
   <link rel="stylesheet" href="auth.css">
-  <style>
-    .password-wrapper {
-      position: relative;
-      width: 100%;
-    }
-    .password-wrapper input {
-      width: 100%;
-      padding-right: 40px;
-    }
-    .toggle-password {
-      position: absolute;
-      top: 50%;
-      right: 10px;
-      transform: translateY(-50%);
-      cursor: pointer;
-      font-size: 18px;
-      color: #555;
-      user-select: none;
-    }
-    .error-message {
-      font-size: 12px;
-      color: red;
-      margin-top: 4px;
-      display: none;
-    }
-    .success-message {
-      font-size: 14px;
-      color: green;
-      margin-top: 10px;
-      display: none;
-    }
-  </style>
 </head>
 <body>
   <!-- Header -->
@@ -56,20 +24,22 @@
 
     <!-- Form Card -->
     <div class="form-card">
-      <h2>Welcome Back</h2>
-      <form id="loginForm">
+      <h2>Login</h2>
+      <form id="loginForm" onsubmit="login(event)">
         <input type="email" id="loginEmail" placeholder="Email" required>
-        <div class="error-message" id="loginEmailError">Invalid email format. Example: sha123@gmail.com</div>
+        <div class="error-message" id="loginEmailError">Invalid email format</div>
 
         <div class="password-wrapper">
           <input type="password" id="loginPassword" placeholder="Password" required>
           <span class="toggle-password" onclick="togglePassword('loginPassword', this)">🙈</span>
         </div>
-        <div class="error-message" id="loginPasswordError">Password must include uppercase, lowercase, number, and symbol.</div>
+        <div class="error-message" id="loginPasswordError">Invalid password</div>
 
+        <!-- Login button -->
         <button type="submit">Login</button>
-        <p class="success-message" id="loginSuccess">✅ Login is successful</p>
       </form>
+
+      <p class="success-message" id="loginSuccess">✅ Login successful</p>
       <p class="switch-text">Don't have an account? <a href="Sign up Page.html">Sign Up</a></p>
     </div>
 
@@ -85,33 +55,47 @@
   </footer>
 
   <!-- Scripts -->
-<script>
+  <script>
+  // ✅ Initialize users array with admin account
+  (function initializeUsers() {
+    let users = JSON.parse(localStorage.getItem("users")) || [];
+    
+    // Add admin account if it doesn't exist
+    const adminEmail = "sha123@gmail.com";
+    if (!users.some(u => u.email.toLowerCase() === adminEmail.toLowerCase())) {
+      users.push({
+        id: Date.now(),
+        userId: "U001",
+        email: adminEmail,
+        password: "Admin123!",
+        role: "admin",
+        createdAt: new Date().toISOString()
+      });
+      localStorage.setItem("users", JSON.stringify(users));
+      console.log("✅ Admin account created: sha123@gmail.com / Admin123!");
+    }
+  })();
+
+  // Toggle show/hide password
   function togglePassword(id, el) {
     const input = document.getElementById(id);
     if (input.type === "password") {
       input.type = "text";
-      el.textContent = "🙈";
+      el.textContent = "🙉";
     } else {
       input.type = "password";
-      el.textContent = "🙉";
+      el.textContent = "🙈";
     }
   }
 
-  function validateEmail(email) {
-    return /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(email);
-  }
-
-  function validatePassword(password) {
-    // At least one lowercase, one uppercase, one number, one symbol
-    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/.test(password);
-  }
-
-  function showError(id, show = true, message = '') {
+  // Show/hide error messages
+  function showError(id, message = '', show = true) {
     const el = document.getElementById(id);
-    el.textContent = message || el.textContent;
+    if (message) el.textContent = message;
     el.style.display = show ? 'block' : 'none';
   }
 
+  // Show/hide success message
   function showSuccess(message) {
     const el = document.getElementById('loginSuccess');
     el.textContent = message;
@@ -122,47 +106,75 @@
     document.getElementById('loginSuccess').style.display = 'none';
   }
 
-  document.getElementById('loginForm').addEventListener('submit', function(e) {
-    e.preventDefault();
+  // Clear all messages
+  function clearMessages() {
+    showError('loginEmailError', '', false);
+    showError('loginPasswordError', '', false);
+    hideSuccess();
+  }
+
+  // ✅ Main login function
+  function login(event) {
+    event.preventDefault();
 
     const email = document.getElementById('loginEmail').value.trim();
     const password = document.getElementById('loginPassword').value;
 
-    showError('loginEmailError', false);
-    showError('loginPasswordError', false);
-    hideSuccess();
+    // Clear previous messages
+    clearMessages();
 
-    if (!validateEmail(email)) {
-      showError('loginEmailError', true, 'Invalid email format. Example: sha123@gmail.com');
+    // Basic validation
+    if (!email) {
+      showError('loginEmailError', '❌ Email is required');
       return;
     }
 
-    if (!validatePassword(password)) {
-      showError('loginPasswordError', true, 'Password must include uppercase, lowercase, number, and symbol.');
+    if (!password) {
+      showError('loginPasswordError', '❌ Password is required');
       return;
     }
 
-    // ✅ Special check for Admin (bypass localStorage)
-    if (email === "sha123@gmail.com" && password === "Admin123!") {
-      showSuccess('✅ Admin login successful! Redirecting...');
-      setTimeout(() => { window.location.href = "Admin.html"; }, 1500);
-      return;
-    }
-
-    // ✅ Otherwise check localStorage users
+    // Get users from localStorage
     const users = JSON.parse(localStorage.getItem("users")) || [];
-    const user = users.find(u => u.email === email && u.password === password);
+    console.log('Available users:', users);
 
-    if (user) {
-      showSuccess('✅ Login successful! Redirecting...');
-      setTimeout(() => { window.location.href = "User.html"; }, 1500);
-    } else {
-      showError('loginPasswordError', true, 'Invalid credentials!');
+    // Find matching user
+    const user = users.find(u => 
+      u.email.toLowerCase() === email.toLowerCase() && 
+      u.password === password
+    );
+
+    if (!user) {
+      showError('loginPasswordError', '❌ Invalid email or password!');
+      return;
     }
-  });
-  
-</script>
 
-</script>
+    // Set session data
+    sessionStorage.setItem("isLoggedIn", "true");
+    sessionStorage.setItem("role", user.role || "user");
+    sessionStorage.setItem("userEmail", user.email);
+    sessionStorage.setItem("loginTime", new Date().toISOString());
+
+    console.log('✅ Login successful for:', user.email, 'Role:', user.role);
+
+    // Show success and redirect
+    if (user.role === "admin") {
+      showSuccess("✅ Admin login successful! Redirecting...");
+      setTimeout(() => {
+        window.location.href = "Admin.html";
+      }, 1500);
+    } else {
+      showSuccess("✅ User login successful! Redirecting...");
+      setTimeout(() => {
+        window.location.href = "User.html";
+      }, 1500);
+    }
+  }
+
+  // Test credentials display (for development - remove in production)
+  console.log('=== TEST CREDENTIALS ===');
+  console.log('Admin: sha123@gmail.com / Admin123!');
+  console.log('========================');
+  </script>
 </body>
 </html>

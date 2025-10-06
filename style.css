@@ -183,6 +183,23 @@
   }
 }
 
+/* Admin button style */
+.btn-admin {
+  background: #e63946;
+  color: white;
+  padding: 10px 18px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: 0.3s ease;
+  margin-left: 10px;
+}
+
+.btn-admin:hover {
+  background: #b71c1c;
+}
+
+
 /* Mobile */
 @media (max-width: 600px) {
   .hero {

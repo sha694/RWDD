@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ProBoost - Admin Dashboard</title>
-  <link rel="stylesheet" href="admin.css">
+  <link rel="stylesheet" href="admin.css" />
 </head>
 <body>
   <!-- Navbar -->
   <header class="navbar">
     <div class="logo">
-      <img src="Logo.png" alt="ProBoost Logo">
+      <img src="Logo.png" alt="ProBoost Logo" />
       <span>ProBoost Admin</span>
     </div>
     <nav class="nav-links">
@@ -37,14 +37,15 @@
           <p style="font-weight: bold; color: #1565c0;" id="adminEmailDisplay">Loading...</p>
         </div>
       </div>
+
       <div class="cards">
         <div class="card">
           <h3>👤 Users</h3>
-          <p id="userCount">2 Active Users</p>
+          <p id="userCount">0 Active Users</p>
         </div>
         <div class="card">
           <h3>💼 Workspaces</h3>
-          <p id="workspaceCount">3 Workspaces</p>
+          <p id="workspaceCount">0 Workspaces</p>
         </div>
         <div class="card">
           <h3>⚙️ Settings</h3>
@@ -64,21 +65,10 @@
         <button onclick="openUserForm('add')">➕ Add User</button>
         <button onclick="openUserForm('edit')">✏️ Edit User</button>
         <button onclick="removeUser()">🗑 Remove User</button>
+        <button onclick="refreshUserTable()">🔄 Refresh</button>
       </div>
-      
-      <section id="manageUsers">
-  <h2>Manage Users</h2>
-  <table border="1" cellpadding="8" cellspacing="0">
-    <thead>
-      <tr>
-        <th>Email</th>
-        <th>Password</th>
-      </tr>
-    </thead>
-    <tbody id="userTableBody"></tbody>
-  </table>
-</section>
 
+      <!-- Admin-managed users table -->
       <table id="userTable">
         <thead>
           <tr>
@@ -87,46 +77,30 @@
             <th>Email</th>
             <th>Role</th>
             <th>Status</th>
+            <th>Created</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <!-- Permanent Admin -->
-            <td><input type="radio" disabled></td>
-            <td>U001</td>
-            <td>sha123@gmail.com</td>
-            <td>Admin</td>
-            <td>Active</td>
-          </tr>
-          <tr>
-            <td><input type="radio" name="selectedUser"></td>
-            <td>U002</td>
-            <td>john@example.com</td>
-            <td>User</td>
-            <td>Active</td>
-          </tr>
+          <!-- Users will be populated from localStorage users -->
         </tbody>
       </table>
-
+      
       <!-- User Form Modal -->
       <div id="userFormModal" class="modal" style="display:none;">
         <div class="modal-content">
           <span class="close" onclick="closeUserForm()">&times;</span>
           <h3 id="formTitle">Add User</h3>
           <form id="userForm" onsubmit="saveUser(event)">
-            <label>User ID</label>
-            <input type="text" id="userId" required>
-
             <label>Email</label>
-            <input type="email" id="userEmail" required>
+            <input type="email" id="userEmail" required />
+
+            <label>Password</label>
+            <input type="password" id="userPassword" required />
 
             <label>Role</label>
-            <input type="text" id="userRole" value="User" readonly>
-
-            <label>Status</label>
-            <select id="userStatus">
-              <option value="Active">Active</option>
-              <option value="Inactive">Inactive</option>
+            <select id="userRole">
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
             </select>
 
             <button type="submit">💾 Save</button>
@@ -149,18 +123,18 @@
         <h3>Create New Workspace</h3>
         <form onsubmit="createWorkspace(event)">
           <label>Workspace Name</label>
-          <input type="text" id="workspaceName" required>
-          
+          <input type="text" id="workspaceName" required />
+
           <label>Description</label>
           <textarea id="workspaceDesc" rows="3"></textarea>
-          
+
           <label>Type</label>
           <select id="workspaceType">
             <option value="Team">Team</option>
             <option value="Private">Private</option>
             <option value="Public">Public</option>
           </select>
-          
+
           <div style="margin-top: 15px;">
             <button type="submit">💾 Create Workspace</button>
             <button type="button" onclick="cancelWorkspaceForm()">❌ Cancel</button>
@@ -182,9 +156,7 @@
               <th>Members</th>
             </tr>
           </thead>
-          <tbody>
-            <!-- Workspaces will be populated here -->
-          </tbody>
+          <tbody></tbody>
         </table>
         <button onclick="hideWorkspaceView()">❌ Close</button>
       </div>
@@ -195,35 +167,16 @@
         <div style="background: #ffebee; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
           <p style="color: #c62828; margin: 0;">⚠️ Warning: This action cannot be undone!</p>
         </div>
-        <form onsubmit="deleteWorkspace(event)">
+        <div>
           <label>Select Workspace to Delete</label>
           <select id="deleteWorkspaceSelect" required>
             <option value="">Choose a workspace...</option>
           </select>
-          
-          <label>Type "DELETE" to confirm</label>
-          <input type="text" id="confirmDelete" placeholder="Type DELETE" required>
-          
-          <div style="margin-top: 15px;">
-            <button type="submit" style="background: #f44336;">🗑 Delete Workspace</button>
-            <button type="button" onclick="cancelDeleteWorkspace()">❌ Cancel</button>
-          </div>
-        </form>
-      </div>
 
-      <!-- Default workspace cards -->
-      <div id="defaultWorkspaceCards" class="cards">
-        <div class="card">
-          <h3>Marketing Team</h3>
-          <p>12 Members</p>
-        </div>
-        <div class="card">
-          <h3>Development Team</h3>
-          <p>20 Members</p>
-        </div>
-        <div class="card">
-          <h3>Design Team</h3>
-          <p>8 Members</p>
+          <div style="margin-top: 15px;">
+            <button onclick="deleteSelectedWorkspace()" style="background: #f44336; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">🗑 DELETE</button>
+            <button onclick="cancelDeleteWorkspace()" style="background: #666; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">❌ Cancel</button>
+          </div>
         </div>
       </div>
     </section>
@@ -276,155 +229,374 @@
   </div>
 
   <script>
-    // Check authentication on page load
-    document.addEventListener('DOMContentLoaded', function() {
-      checkAuthentication();
+    // Initialize user counter for proper ID generation
+    let userIdCounter = 1;
+
+    // -------- PROPER AUTHENTICATION GUARD --------
+    document.addEventListener('DOMContentLoaded', () => {
+      checkAdminAuthentication();
       displayAdminInfo();
+      initializeUserCounter();
+      refreshUserTable();
+      updateUserCount();
+      updateWorkspaceCount();
     });
 
-    // Check if user is authenticated and is admin
-    function checkAuthentication() {
-      const isLoggedIn = localStorage.getItem('isLoggedIn');
-      const userType = localStorage.getItem('userType');
+    function checkAdminAuthentication() {
+      const isLoggedIn = sessionStorage.getItem("isLoggedIn") === "true";
+      const role = sessionStorage.getItem("role");
+      const email = sessionStorage.getItem("userEmail");
+      const loginTime = sessionStorage.getItem('loginTime');
       
-      if (isLoggedIn !== 'true' || userType !== 'admin') {
-        // Redirect to login if not authenticated as admin
-        alert('Access denied. Please login as admin.');
-        window.location.href = 'Login page.html';
-        return;
+       // ✅ Only allow YOU as Admin
+  if (!isLoggedIn || role !== "admin" || email !== "sha123@gmail.com") {
+    alert("🚫 Access Denied! Admins only.");
+    sessionStorage.clear();
+    window.location.href = "Login page.html";
+  }
+
+      // Check session validity (optional: expire after 24 hours)
+      if (loginTime) {
+        const loginDate = new Date(loginTime);
+        const now = new Date();
+        const hoursSinceLogin = (now - loginDate) / (1000 * 60 * 60);
+        
+        if (hoursSinceLogin > 24) {
+          alert('⏰ Session expired. Please login again.');
+          sessionStorage.clear();
+          window.location.href = 'Login page.html';
+          return;
+        }
       }
+
+      console.log('✅ Admin access granted for:', userEmail);
     }
 
-    // Display admin information
     function displayAdminInfo() {
-      const adminEmail = localStorage.getItem('userEmail');
-      if (adminEmail) {
-        document.getElementById('adminEmailDisplay').textContent = adminEmail;
+      const userEmail = sessionStorage.getItem('userEmail') || 'sha123@gmail.com';
+      const userName = userEmail.split('@')[0];
+      
+      document.getElementById('adminEmailDisplay').textContent = userEmail;
+      
+      // Update welcome message
+      const welcomeTitle = document.querySelector('h1');
+      if (welcomeTitle && welcomeTitle.textContent.includes('Welcome')) {
+        welcomeTitle.textContent = `Welcome Back, Admin ${userName}! 👑`;
       }
     }
 
-    // Logout function
+    // Initialize user counter based on existing users
+    function initializeUserCounter() {
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      
+      if (users.length === 0) {
+        userIdCounter = 1;
+      } else {
+        // Find the highest user ID number and increment
+        let maxId = 0;
+        users.forEach(user => {
+          if (user.userId && user.userId.startsWith('U')) {
+            const idNumber = parseInt(user.userId.substring(1));
+            if (!isNaN(idNumber) && idNumber > maxId) {
+              maxId = idNumber;
+            }
+          }
+        });
+        userIdCounter = maxId + 1;
+      }
+    }
+
+    // Generate formatted user ID (U001, U002, etc.)
+    function generateUserId() {
+      const formattedId = `U${String(userIdCounter).padStart(3, '0')}`;
+      userIdCounter++;
+      return formattedId;
+    }
+
+    // -------- NAV --------
+    function showSection(sectionId, link) {
+      document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+      const target = document.getElementById(sectionId);
+      if (target) target.classList.add('active');
+
+      document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+      if (link) link.classList.add('active');
+    }
+
+    // -------- LOGOUT --------
     function logout() {
       document.getElementById('logoutModal').style.display = 'block';
     }
 
-    // Confirm logout
     function confirmLogout() {
-      // Clear all session data
+      // Clear session data
+      sessionStorage.clear();
+      
+      // Also clear any localStorage auth data for good measure
       localStorage.removeItem('isLoggedIn');
-      localStorage.removeItem('userType');
+      localStorage.removeItem('role');
       localStorage.removeItem('userEmail');
-      localStorage.removeItem('loginTime');
       
-      // Show logout message
-      alert('✅ Successfully logged out!');
-      
-      // Redirect to landing page
+      alert('✅ Admin logged out successfully!');
       window.location.href = 'Landing Page.html';
     }
 
-    // Cancel logout
     function cancelLogout() {
       document.getElementById('logoutModal').style.display = 'none';
     }
 
-    // Existing functions...
-    function showSection(sectionId, link) {
-      document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
-      document.getElementById(sectionId).classList.add('active');
-      document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
-      link.classList.add('active');
+    // -------- MANAGE USERS (UPDATED WITH PROPER IDs) --------
+    let currentAction = 'add';
+    let editingUserId = null;
+
+    function refreshUserTable() {
+      // Show loading message briefly
+      const tbody = document.querySelector('#userTable tbody');
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #888;">🔄 Refreshing...</td></tr>';
+      
+      // Simulate refresh with a small delay
+      setTimeout(() => {
+        loadUserTable();
+        alert('✅ User table refreshed!');
+      }, 500);
     }
 
-    // Manage Users Functions
-    let currentAction = "add";
+    function loadUserTable() {
+      const tbody = document.querySelector('#userTable tbody');
+      tbody.innerHTML = '';
+
+      let users = JSON.parse(localStorage.getItem('users') || '[]');
+
+      if (users.length === 0) {
+        const row = tbody.insertRow();
+        row.innerHTML = `
+          <td colspan="6" style="text-align: center; color: #888; font-style: italic;">
+            No users registered yet. Users will appear here when they sign up.
+          </td>
+        `;
+        return;
+      }
+
+      // Fix users that don't have proper IDs
+      let needsUpdate = false;
+      users = users.map((user, index) => {
+        // Ensure each user has both id and userId
+        if (!user.id) {
+          user.id = user.id || Date.now() + index;
+          needsUpdate = true;
+        }
+        if (!user.userId) {
+          user.userId = generateUserId();
+          needsUpdate = true;
+        }
+        return user;
+      });
+
+      // Save updated users if needed
+      if (needsUpdate) {
+        localStorage.setItem('users', JSON.stringify(users));
+      }
+
+      users.forEach((user, index) => {
+        const row = tbody.insertRow();
+        const isCurrentAdmin = user.role === 'admin' && user.email === sessionStorage.getItem('userEmail');
+        const createdDate = user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A';
+        
+        // Use a unique identifier - prefer id, fallback to index
+        const uniqueId = user.id || index;
+        
+        row.innerHTML = `
+          <td><input type="radio" name="selectedUser" value="${uniqueId}" data-email="${user.email}" ${isCurrentAdmin ? 'disabled' : ''}></td>
+          <td>${user.userId}</td>
+          <td>${user.email}</td>
+          <td style="text-transform: capitalize;">${user.role || 'user'}</td>
+          <td><span style="color: #4caf50; font-weight: 600;">●</span> Active</td>
+          <td>${createdDate}</td>
+        `;
+      });
+
+      console.log('Users loaded:', users.length);
+      console.log('Users data:', users);
+    }
 
     function openUserForm(action) {
       currentAction = action;
-      const modal = document.getElementById("userFormModal");
-      const formTitle = document.getElementById("formTitle");
-      const userId = document.getElementById("userId");
-      const userEmail = document.getElementById("userEmail");
-      const userStatus = document.getElementById("userStatus");
+      const modal = document.getElementById('userFormModal');
+      const formTitle = document.getElementById('formTitle');
+      const userEmail = document.getElementById('userEmail');
+      const userPassword = document.getElementById('userPassword');
+      const userRole = document.getElementById('userRole');
 
-      if (action === "add") {
-        formTitle.textContent = "Add User";
-        userId.value = "";
-        userEmail.value = "";
-        userStatus.value = "Active";
-      } else if (action === "edit") {
-        formTitle.textContent = "Edit User";
-        const selectedRow = document.querySelector("input[name='selectedUser']:checked");
-        if (!selectedRow) {
-          alert("Please select a user to edit (not the Admin).");
+      if (action === 'add') {
+        formTitle.textContent = 'Add User';
+        userEmail.value = '';
+        userPassword.value = '';
+        userRole.value = 'user';
+        editingUserId = null;
+      } else if (action === 'edit') {
+        formTitle.textContent = 'Edit User';
+        const selected = document.querySelector("input[name='selectedUser']:checked");
+        if (!selected) {
+          alert('❌ Please select a user to edit.');
           return;
         }
-        const row = selectedRow.closest("tr");
-        userId.value = row.cells[1].textContent;
-        userEmail.value = row.cells[2].textContent;
-        userStatus.value = row.cells[4].textContent;
+        
+        const userId = parseInt(selected.value);
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const user = users.find(u => u.id === userId);
+        
+        if (!user) {
+          alert('❌ User not found.');
+          return;
+        }
+        
+        userEmail.value = user.email;
+        userPassword.value = user.password;
+        userRole.value = user.role || 'user';
+        editingUserId = userId;
       }
-      modal.style.display = "block";
+      
+      modal.style.display = 'block';
     }
 
     function closeUserForm() {
-      document.getElementById("userFormModal").style.display = "none";
+      document.getElementById('userFormModal').style.display = 'none';
     }
 
     function saveUser(event) {
       event.preventDefault();
-      const userId = document.getElementById("userId").value;
-      const userEmail = document.getElementById("userEmail").value;
-      const userStatus = document.getElementById("userStatus").value;
-      const table = document.getElementById("userTable").getElementsByTagName("tbody")[0];
+      const userEmail = document.getElementById('userEmail').value.trim();
+      const userPassword = document.getElementById('userPassword').value;
+      const userRole = document.getElementById('userRole').value;
 
-      if (currentAction === "add") {
-        const newRow = table.insertRow();
-        newRow.innerHTML = `
-          <td><input type="radio" name="selectedUser"></td>
-          <td>${userId}</td>
-          <td>${userEmail}</td>
-          <td>User</td>
-          <td>${userStatus}</td>
-        `;
-      } else if (currentAction === "edit") {
-        const selectedRow = document.querySelector("input[name='selectedUser']:checked").closest("tr");
-        selectedRow.cells[1].textContent = userId;
-        selectedRow.cells[2].textContent = userEmail;
-        selectedRow.cells[4].textContent = userStatus;
+      if (!userEmail || !userPassword) {
+        alert('❌ Email and Password are required.');
+        return;
       }
+
+      let users = JSON.parse(localStorage.getItem('users') || '[]');
+
+      if (currentAction === 'add') {
+        // Check if email already exists
+        if (users.some(u => u.email.toLowerCase() === userEmail.toLowerCase())) {
+          alert('❌ Email already exists!');
+          return;
+        }
+
+        const newUser = {
+          id: Date.now(),
+          userId: generateUserId(), // Generate formatted user ID
+          email: userEmail,
+          password: userPassword,
+          role: userRole,
+          createdAt: new Date().toISOString()
+        };
+
+        users.push(newUser);
+        alert('✅ User added successfully!');
+        
+      } else if (currentAction === 'edit' && editingUserId) {
+        const userIndex = users.findIndex(u => u.id === editingUserId);
+        if (userIndex > -1) {
+          // Check if email is taken by another user
+          const emailTaken = users.some(u => u.id !== editingUserId && u.email.toLowerCase() === userEmail.toLowerCase());
+          if (emailTaken) {
+            alert('❌ Email is already taken by another user!');
+            return;
+          }
+          
+          users[userIndex].email = userEmail;
+          users[userIndex].password = userPassword;
+          users[userIndex].role = userRole;
+          alert('✅ User updated successfully!');
+        }
+      }
+
+      localStorage.setItem('users', JSON.stringify(users));
+      loadUserTable();
       closeUserForm();
       updateUserCount();
     }
 
     function removeUser() {
-      const selectedRow = document.querySelector("input[name='selectedUser']:checked");
-      if (!selectedRow) {
-        alert("Please select a user to remove (not the Admin).");
+      const selected = document.querySelector("input[name='selectedUser']:checked");
+      if (!selected) {
+        alert('❌ Please select a user to remove.');
         return;
       }
-      selectedRow.closest("tr").remove();
-      updateUserCount();
+      
+      // Get the selected value and email
+      const selectedValue = selected.value;
+      const selectedEmail = selected.getAttribute('data-email');
+      let users = JSON.parse(localStorage.getItem('users') || '[]');
+      
+      console.log('Attempting to remove user:', selectedValue, selectedEmail);
+      console.log('Available users:', users);
+      
+      // Find the user by ID first, then by email as fallback
+      let userToRemove = users.find(u => u.id && u.id.toString() === selectedValue);
+      if (!userToRemove) {
+        userToRemove = users.find(u => u.email === selectedEmail);
+      }
+      
+      // If still not found, try finding by array index
+      if (!userToRemove) {
+        const index = parseInt(selectedValue);
+        if (!isNaN(index) && users[index]) {
+          userToRemove = users[index];
+        }
+      }
+      
+      if (!userToRemove) {
+        alert('❌ User not found. Please refresh the page and try again.');
+        console.error('User not found with value:', selectedValue, 'email:', selectedEmail);
+        return;
+      }
+      
+      // Check if trying to remove current admin
+      const currentAdminEmail = sessionStorage.getItem('userEmail');
+      if (userToRemove.email === currentAdminEmail && userToRemove.role === 'admin') {
+        alert('❌ You cannot remove yourself while logged in as admin.');
+        return;
+      }
+      
+      if (confirm(`⚠️ Are you sure you want to remove user "${userToRemove.email}"?\n\nUser ID: ${userToRemove.userId || 'N/A'}\nRole: ${userToRemove.role || 'user'}\n\nThis action cannot be undone.`)) {
+        // Remove the user using email as the most reliable identifier
+        const originalLength = users.length;
+        users = users.filter(u => u.email !== userToRemove.email);
+        
+        // Verify user was actually removed
+        if (users.length === originalLength) {
+          alert('❌ Failed to remove user. Please try again.');
+          return;
+        }
+        
+        // Save updated users array
+        localStorage.setItem('users', JSON.stringify(users));
+        
+        // Refresh the table and update count
+        loadUserTable();
+        updateUserCount();
+        
+        alert(`✅ User "${userToRemove.email}" (${userToRemove.userId || 'N/A'}) has been removed successfully!`);
+        
+        console.log('User removed successfully:', userToRemove.email);
+        console.log('Remaining users:', users.length);
+      }
     }
 
     function updateUserCount() {
-      const count = document.querySelectorAll("#userTable tbody tr").length;
-      document.getElementById("userCount").textContent = `${count} Active Users`;
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      document.getElementById('userCount').textContent = `${users.length} Registered Users`;
     }
 
-    // WORKSPACE MANAGEMENT FUNCTIONS
-    let workspaces = [
-      {id: 'W001', name: 'Marketing Team', description: 'Marketing campaigns and strategies', type: 'Team', members: 12},
-      {id: 'W002', name: 'Development Team', description: 'Software development projects', type: 'Team', members: 20},
-      {id: 'W003', name: 'Design Team', description: 'UI/UX design and creative work', type: 'Team', members: 8}
-    ];
+    // -------- WORKSPACE MANAGEMENT --------
+    let workspaces = JSON.parse(localStorage.getItem('workspaces') || '[]');
+    let workspaceCounter = workspaces.length + 1;
 
-    let workspaceCounter = 4;
-
-    function openWorkspaceForm(action) {
+    function openWorkspaceForm() {
       hideAllWorkspaceForms();
       document.getElementById('createWorkspaceForm').style.display = 'block';
-      // Clear form
       document.getElementById('workspaceName').value = '';
       document.getElementById('workspaceDesc').value = '';
       document.getElementById('workspaceType').value = 'Team';
@@ -432,21 +604,28 @@
 
     function createWorkspace(event) {
       event.preventDefault();
-      const name = document.getElementById('workspaceName').value;
-      const desc = document.getElementById('workspaceDesc').value;
+      const name = document.getElementById('workspaceName').value.trim();
+      const desc = document.getElementById('workspaceDesc').value.trim();
       const type = document.getElementById('workspaceType').value;
-      
+
+      if (!name) {
+        alert('❌ Workspace name is required.');
+        return;
+      }
+
       const newWorkspace = {
         id: `W${String(workspaceCounter).padStart(3, '0')}`,
-        name: name,
-        description: desc,
-        type: type,
+        name,
+        description: desc || 'No description',
+        type,
         members: 0
       };
-      
+
       workspaces.push(newWorkspace);
       workspaceCounter++;
-      
+
+      localStorage.setItem('workspaces', JSON.stringify(workspaces));
+
       alert(`✅ Workspace "${name}" created successfully!`);
       cancelWorkspaceForm();
       updateWorkspaceCount();
@@ -455,10 +634,20 @@
     function viewWorkspaces() {
       hideAllWorkspaceForms();
       document.getElementById('workspaceView').style.display = 'block';
-      
+
       const tbody = document.querySelector('#workspaceTable tbody');
       tbody.innerHTML = '';
-      
+
+      if (workspaces.length === 0) {
+        const row = tbody.insertRow();
+        row.innerHTML = `
+          <td colspan="6" style="text-align: center; color: #888; font-style: italic;">
+            No workspaces created yet. Create your first workspace!
+          </td>
+        `;
+        return;
+      }
+
       workspaces.forEach(ws => {
         const row = tbody.insertRow();
         row.innerHTML = `
@@ -479,33 +668,39 @@
     function openDeleteWorkspace() {
       hideAllWorkspaceForms();
       document.getElementById('deleteWorkspaceForm').style.display = 'block';
-      
-      // Populate delete dropdown
+
       const select = document.getElementById('deleteWorkspaceSelect');
       select.innerHTML = '<option value="">Choose a workspace...</option>';
-      workspaces.forEach(ws => {
-        select.innerHTML += `<option value="${ws.id}">${ws.name}</option>`;
-      });
       
-      // Clear confirm field
-      document.getElementById('confirmDelete').value = '';
-    }
-
-    function deleteWorkspace(event) {
-      event.preventDefault();
-      const workspaceId = document.getElementById('deleteWorkspaceSelect').value;
-      const confirmText = document.getElementById('confirmDelete').value;
-      
-      if (confirmText !== 'DELETE') {
-        alert('❌ Please type "DELETE" to confirm.');
+      if (workspaces.length === 0) {
+        select.innerHTML = '<option value="">No workspaces to delete</option>';
         return;
       }
       
-      const workspaceIndex = workspaces.findIndex(ws => ws.id === workspaceId);
-      if (workspaceIndex > -1) {
-        const deletedWorkspace = workspaces[workspaceIndex];
-        workspaces.splice(workspaceIndex, 1);
-        alert(`✅ Workspace "${deletedWorkspace.name}" has been deleted.`);
+      workspaces.forEach(ws => {
+        select.innerHTML += `<option value="${ws.id}">${ws.name}</option>`;
+      });
+    }
+
+    function deleteSelectedWorkspace() {
+      const workspaceId = document.getElementById('deleteWorkspaceSelect').value;
+
+      if (!workspaceId) {
+        alert('❌ Please choose a workspace to delete.');
+        return;
+      }
+
+      const workspaceToDelete = workspaces.find(ws => ws.id === workspaceId);
+      if (!workspaceToDelete) {
+        alert('❌ Workspace not found.');
+        return;
+      }
+
+      if (confirm(`⚠️ Are you sure you want to delete "${workspaceToDelete.name}"? This action cannot be undone.`)) {
+        workspaces = workspaces.filter(ws => ws.id !== workspaceId);
+        localStorage.setItem('workspaces', JSON.stringify(workspaces));
+        
+        alert(`✅ Workspace "${workspaceToDelete.name}" has been deleted.`);
         cancelDeleteWorkspace();
         updateWorkspaceCount();
       }
@@ -529,20 +724,28 @@
       document.getElementById('workspaceCount').textContent = `${workspaces.length} Workspaces`;
     }
 
-    // Close modal when clicking outside
-    window.onclick = function(event) {
-      const userModal = document.getElementById("userFormModal");
-      const logoutModal = document.getElementById("logoutModal");
-      
-      if (event.target === userModal) {
-        closeUserForm();
+    // -------- MODAL OUTSIDE CLICK CLOSE --------
+    window.onclick = function (event) {
+      const userModal = document.getElementById('userFormModal');
+      const logoutModal = document.getElementById('logoutModal');
+
+      if (event.target === userModal) closeUserForm();
+      if (event.target === logoutModal) cancelLogout();
+    };
+
+    // -------- PREVENT BACK BUTTON ACCESS AFTER LOGOUT --------
+    window.addEventListener('pageshow', function(event) {
+      if (event.persisted) {
+        // Page was loaded from cache, recheck authentication
+        checkAdminAuthentication();
       }
-      if (event.target === logoutModal) {
-        cancelLogout();
-      }
-    }
+    });
+
+    // Prevent unauthorized access through browser navigation
+    window.addEventListener('beforeunload', function() {
+      // Session data will persist for legitimate navigation
+      // but will be cleared on login page
+    });
   </script>
 </body>
 </html>
-
-//testing commit
