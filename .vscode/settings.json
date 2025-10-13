@@ -1,3 +1,24 @@
 {
+<<<<<<< HEAD
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 3306,
+            "driver": "MySQL",
+            "name": "MySQL LocalHost",
+            "username": "root",
+            "database": "new_db",
+            "connectionTimeout": 30,
+            "askForPassword": true
+        }
+    ]
+=======
     "liveServer.settings.port": 5501
+>>>>>>> 258b40dcbaf435c332dcc416cf08e82451e2aa03
 }

@@ -15,12 +15,12 @@
         <span>ProBoost</span>
       </div>
       <button class="nav-button home-btn" onclick="goToMainMenu()">Home</button>
-
       <div class="search-container">
         <input type="text" placeholder="Search..." class="search-input">
         <button class="search-btn" aria-label="Search">🔍</button>
       </div>
     </div>
+<<<<<<< HEAD
     <nav class="nav-links">
       <a href="#" class="active" onclick="showSection('home', this)">🏠 Home</a>
       <a href="#" onclick="showSection('collab', this)">🤝 Collaboration</a>
@@ -32,6 +32,17 @@
     </nav>
     <div class="logout">
       <a href="Landing Page.html">🚪 Logout</a>
+=======
+    
+    <div class="navbar-right">
+      <button class="icon-btn" title="Add New" aria-label="Add New">➕</button>
+      <button class="icon-btn" title="Notifications" aria-label="Notifications">🔔</button>
+      <div class="user-profile" onclick="toggleUserMenu()">
+        <div class="user-avatar" id="userAvatar">👤</div>
+        <span id="userNameDisplay">User</span>
+      </div>
+      <button class="icon-btn" title="Settings" onclick="openSettings()" aria-label="Settings">⚙️</button>
+>>>>>>> 398e03780021996f23ee1ffac172b756b82d912d
     </div>
   </header>
 
@@ -40,7 +51,7 @@
     <div class="fab-main" onclick="toggleCircularNav()">
       <div class="fab-icon">☰</div>
     </div>
-    <div class="fab-options" id="fabOptions">/
+    <div class="fab-options" id="fabOptions">
       <div class="fab-option" onclick="navigateToSection('collaboration')" title="Team Collaboration">🤝</div>
       <div class="fab-option" onclick="navigateToSection('time')" title="Time Tracking">⏳</div>
       <div class="fab-option" onclick="navigateToSection('analytics')" title="Analytics">📊</div>
@@ -51,114 +62,97 @@
     </div>
   </div>
 
-  <!-- Main Layout -->
-  <div class="main-layout">
-    <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
-      <nav class="sidebar-nav">
-        <a href="#" class="nav-item active" onclick="showSection('collaboration', this)">🤝 Team Collaboration</a>
-        <a href="#" class="nav-item" onclick="showSection('time', this)">⏳ Time Tracking</a>
-        <a href="#" class="nav-item" onclick="showSection('analytics', this)">📊 Analytics</a>
-        <a href="#" class="nav-item" onclick="showSection('goals', this)">🎯 Goals</a>
-        <a href="#" class="nav-item" onclick="showSection('tasks', this)">📝 Tasks</a>
-        <a href="#" class="nav-item" onclick="showSection('countdown', this)">⏰ Countdown</a>
-        <div class="nav-divider"></div>
-        <a href="#" class="nav-item logout" onclick="logoutUser()">🚪 Logout</a>
-      </nav>
-    </aside>
-
-    <!-- Main Content -->
-    <main class="main-content">
-      <!-- Sections -->
-      <section id="collaboration" class="section active">
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Team Collaboration Section -->
+    <section id="collaboration" class="section active">
+      <div class="section-header">
         <h1>🤝 Team Collaboration</h1>
         <p>Work with your team seamlessly</p>
-        <div class="collaboration-board">
-          <div class="board-column">
-            <div class="column-header">
-              <h3>📝 To Do</h3>
-              <button onclick="addCard('todo')">+ Add Card</button>
-            </div>
-            <div class="card-container" id="todo-cards"></div>
+      </div>
+      <div class="collaboration-board">
+        <div class="board-column">
+          <div class="column-header">
+            <h3>📝 To Do</h3>
+            <button class="add-card-btn" onclick="addCard('todo')">+ Add Card</button>
           </div>
-          <div class="board-column">
-            <div class="column-header">
-              <h3>⚡ In Progress</h3>
-              <button onclick="addCard('progress')">+ Add Card</button>
-            </div>
-            <div class="card-container" id="progress-cards"></div>
-          </div>
-          <div class="board-column">
-            <div class="column-header">
-              <h3>✅ Completed</h3>
-              <button onclick="addCard('completed')">+ Add Card</button>
-            </div>
-            <div class="card-container" id="completed-cards"></div>
-          </div>
+          <div class="card-container" id="todo-cards"></div>
         </div>
-      </section>
+        <div class="board-column">
+          <div class="column-header">
+            <h3>⚡ In Progress</h3>
+            <button class="add-card-btn" onclick="addCard('progress')">+ Add Card</button>
+          </div>
+          <div class="card-container" id="progress-cards"></div>
+        </div>
+        <div class="board-column">
+          <div class="column-header">
+            <h3>✅ Completed</h3>
+            <button class="add-card-btn" onclick="addCard('completed')">+ Add Card</button>
+          </div>
+          <div class="card-container" id="completed-cards"></div>
+        </div>
+      </div>
+    </section>
 
-      <section id="time" class="section">
+    <!-- Time Tracking Section -->
+    <section id="time" class="section">
+      <div class="section-header">
         <h1>⏳ Time Tracking</h1>
         <p>Log and monitor your hours</p>
-        <div class="time-tracking-container">
+      </div>
+      <div class="time-tracking-container">
+        <div class="time-input-section">
           <div class="input-group">
-            <input type="text" id="taskName" placeholder="Task name">
-            <input type="number" id="taskHours" placeholder="Hours">
-            <button onclick="addTimeEntry()">Add Entry</button>
+            <input type="text" id="taskName" placeholder="Task name" class="input-field">
+            <input type="number" id="taskHours" placeholder="Hours" class="input-field hours-input">
+            <button class="btn-primary" onclick="addTimeEntry()">Add Entry</button>
           </div>
-          <table id="timeTable">
+        </div>
+        <div class="time-table-container">
+          <table class="time-table" id="timeTable">
             <thead>
-              <tr><th>Date</th><th>Task</th><th>Hours</th><th>Action</th></tr>
+              <tr>
+                <th>Date</th>
+                <th>Task</th>
+                <th>Hours</th>
+                <th>Action</th>
+              </tr>
             </thead>
             <tbody></tbody>
           </table>
-          <p>Total Hours: <span id="totalHours">0 hrs</span></p>
+          <div class="total-hours">
+            <strong>Total Hours:</strong> <span id="totalHours">0 hrs</span>
+          </div>
         </div>
-      </section>
-
-      <section id="analytics" class="section">
-        <h1>📊 Productivity Analytics</h1>
-        <p>Track your productivity metrics</p>
-      </section>
-
-      <section id="goals" class="section">
-        <h1>🎯 Goal Setting</h1>
-        <input type="text" id="newGoal" placeholder="Add new goal">
-        <button onclick="addGoal()">Add Goal</button>
-        <div id="goalList"></div>
-      </section>
-
-      <section id="tasks" class="section">
-        <h1>📝 Task Management</h1>
-        <input type="text" id="newTask" placeholder="Add new task">
-        <button onclick="addTask()">Add Task</button>
-        <div id="taskList"></div>
-      </section>
-
-      <section id="countdown" class="section">
-        <h1>⏰ Countdown</h1>
-        <div id="countdown-timer">Loading...</div>
-      </section>
-    </main>
-  </div>
+      </div>
+    </section>
 
   <!-- User Menu -->
   <div id="userMenu" class="user-menu">
-    <p id="userEmailMenu">user@example.com</p>
-    <button onclick="logoutUser()">Logout</button>
+    <div class="user-info">
+      <div class="user-avatar-large">👤</div>
+      <div>
+        <div class="user-name" id="userNameMenu">User</div>
+        <div class="user-role" id="userEmailMenu">user@example.com</div>
+      </div>
+    </div>
+    <a href="#" class="menu-item" onclick="openSettings(); return false;">⚙️ Settings</a>
+    <a href="#" class="menu-item logout-item" onclick="logoutUser(); return false;">🚪 Logout</a>
   </div>
 
   <!-- Logout Modal -->
   <div id="logoutModal" class="modal">
     <div class="modal-content">
       <h3>Confirm Logout</h3>
-      <button onclick="confirmLogout()">Yes, Logout</button>
-      <button onclick="cancelLogout()">Cancel</button>
+      <p>Are you sure you want to logout?</p>
+      <div class="modal-actions">
+        <button class="btn-primary" onclick="confirmLogout()">Yes, Logout</button>
+        <button class="btn-secondary" onclick="cancelLogout()">Cancel</button>
+      </div>
     </div>
   </div>
 
-  <!-- JS -->
   <script>
     let circularNavOpen = false;
 
@@ -167,6 +161,7 @@
       displayUserInfo();
       updateTotalHours();
       setInterval(updateCountdown, 1000);
+      updateCountdown();
     });
 
     function checkUserAuthentication() {
@@ -183,43 +178,60 @@
       const userEmail = sessionStorage.getItem('userEmail') || 'user@example.com';
       const userName = userEmail.split('@')[0];
       document.getElementById('userNameDisplay').textContent = userName;
+      document.getElementById('userNameMenu').textContent = userName;
       document.getElementById('userEmailMenu').textContent = userEmail;
-    }
-
-    function toggleSidebar() {
-      document.getElementById('sidebar').classList.toggle('collapsed');
     }
 
     function showSection(id, link) {
       document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
       document.getElementById(id).classList.add('active');
-      document.querySelectorAll('.nav-item').forEach(a => a.classList.remove('active'));
-      if (link) link.classList.add('active');
       if (circularNavOpen) toggleCircularNav();
     }
 
     function toggleCircularNav() {
       circularNavOpen = !circularNavOpen;
-      document.getElementById('circularNav').classList.toggle('open');
+      const nav = document.getElementById('circularNav');
+      nav.classList.toggle('open');
+      const fabMain = nav.querySelector('.fab-main');
+      fabMain.classList.toggle('rotated');
     }
 
-    function navigateToSection(sectionId) { showSection(sectionId); }
+    function navigateToSection(sectionId) { 
+      showSection(sectionId); 
+    }
 
-    function toggleUserMenu() { document.getElementById('userMenu').classList.toggle('show'); }
-    function openSettings() { alert('Settings panel opens'); }
+    function toggleUserMenu() { 
+      document.getElementById('userMenu').classList.toggle('show'); 
+    }
 
-    function logoutUser() { document.getElementById('logoutModal').style.display='block'; }
+    function openSettings() { 
+      alert('Settings panel opens'); 
+    }
+
+    function logoutUser() { 
+      document.getElementById('logoutModal').style.display='flex'; 
+    }
+
     function confirmLogout() {
       sessionStorage.clear();
       window.location.href='Landing Page.html';
     }
-    function cancelLogout() { document.getElementById('logoutModal').style.display='none'; }
+
+    function cancelLogout() { 
+      document.getElementById('logoutModal').style.display='none'; 
+    }
+
+    function goToMainMenu() {
+      window.location.href = "main menu.html";
+    }
 
     // Collaboration
     function addCard(column) {
-      const title = prompt('Enter card title:'); if(!title) return;
+      const title = prompt('Enter card title:'); 
+      if(!title) return;
       const container = document.getElementById(column+'-cards');
-      const card = document.createElement('div'); card.className='task-card';
+      const card = document.createElement('div'); 
+      card.className='task-card';
       card.innerHTML = `<h4>${title}</h4><p>New task</p>`;
       container.appendChild(card);
     }
@@ -228,17 +240,28 @@
     function addTimeEntry() {
       const name = document.getElementById('taskName').value.trim();
       const hours = document.getElementById('taskHours').value;
-      if(!name || !hours){ alert('Enter both'); return; }
+      if(!name || !hours){ 
+        alert('Please enter both task name and hours'); 
+        return; 
+      }
       const tbody = document.querySelector('#timeTable tbody');
       const row = tbody.insertRow();
-      row.innerHTML = `<td>${new Date().toISOString().split('T')[0]}</td>
-        <td>${name}</td><td>${hours}h</td>
-        <td><button onclick="removeTimeEntry(this)">Remove</button></td>`;
-      document.getElementById('taskName').value=''; document.getElementById('taskHours').value='';
+      row.innerHTML = `
+        <td>${new Date().toISOString().split('T')[0]}</td>
+        <td>${name}</td>
+        <td>${hours}h</td>
+        <td><button class="btn-danger" onclick="removeTimeEntry(this)">Remove</button></td>
+      `;
+      document.getElementById('taskName').value=''; 
+      document.getElementById('taskHours').value='';
       updateTotalHours();
     }
 
-    function removeTimeEntry(btn){ btn.closest('tr').remove(); updateTotalHours(); }
+    function removeTimeEntry(btn){ 
+      btn.closest('tr').remove(); 
+      updateTotalHours(); 
+    }
+
     function updateTotalHours(){
       let total=0;
       document.querySelectorAll('#timeTable tbody tr').forEach(r=>{
@@ -249,18 +272,44 @@
 
     // Goals
     function addGoal() {
-      const text=document.getElementById('newGoal').value.trim(); if(!text) return;
-      const div=document.createElement('div'); div.className='goal-item';
-      div.innerHTML=`<span>📚</span> ${text}`; div.onclick=function(){ this.querySelector('span').textContent==='📚'?this.querySelector('span').textContent='✅':this.querySelector('span').textContent='📚'; };
-      document.getElementById('goalList').appendChild(div); document.getElementById('newGoal').value='';
+      const text=document.getElementById('newGoal').value.trim(); 
+      if(!text) return;
+      const div=document.createElement('div'); 
+      div.className='goal-item';
+      div.innerHTML=`<span class="goal-status">📚</span><span class="goal-text">${text}</span>`;
+      div.onclick=function(){ 
+        const status = this.querySelector('.goal-status');
+        if(status.textContent==='📚') {
+          status.textContent='✅';
+          this.classList.add('completed');
+        } else {
+          status.textContent='📚';
+          this.classList.remove('completed');
+        }
+      };
+      document.getElementById('goalList').appendChild(div); 
+      document.getElementById('newGoal').value='';
     }
 
     // Tasks
     function addTask() {
-      const text=document.getElementById('newTask').value.trim(); if(!text) return;
-      const div=document.createElement('div'); div.className='task-item';
-      div.innerHTML=`<span>⏳</span> ${text}`; div.onclick=function(){ this.querySelector('span').textContent==='⏳'?this.querySelector('span').textContent='✔':this.querySelector('span').textContent='⏳'; };
-      document.getElementById('taskList').appendChild(div); document.getElementById('newTask').value='';
+      const text=document.getElementById('newTask').value.trim(); 
+      if(!text) return;
+      const div=document.createElement('div'); 
+      div.className='task-item';
+      div.innerHTML=`<span class="task-status">⏳</span><span class="task-text">${text}</span>`;
+      div.onclick=function(){ 
+        const status = this.querySelector('.task-status');
+        if(status.textContent==='⏳') {
+          status.textContent='✔';
+          this.classList.add('completed');
+        } else {
+          status.textContent='⏳';
+          this.classList.remove('completed');
+        }
+      };
+      document.getElementById('taskList').appendChild(div); 
+      document.getElementById('newTask').value='';
     }
 
     // Countdown
@@ -268,7 +317,10 @@
     function updateCountdown(){
       const diff=countdownDate-new Date().getTime();
       const el=document.getElementById("countdown-timer");
-      if(diff<0){ el.innerHTML="🎉 Event Started!"; return; }
+      if(diff<0){ 
+        el.innerHTML="🎉 Event Started!"; 
+        return; 
+      }
       const d=Math.floor(diff/(1000*60*60*24));
       const h=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
       const m=Math.floor((diff%(1000*60*60))/(1000*60));
@@ -278,15 +330,19 @@
 
     // Close menus on outside click
     window.onclick = function(event){
-      if(!event.target.closest('.user-profile')&&!event.target.closest('.user-menu')) document.getElementById('userMenu').classList.remove('show');
-      if(!event.target.closest('#circularNav') && circularNavOpen) toggleCircularNav();
-      if(event.target===document.getElementById('logoutModal')) cancelLogout();
+      if(!event.target.closest('.user-profile') && !event.target.closest('.user-menu')) {
+        document.getElementById('userMenu').classList.remove('show');
+      }
+      if(!event.target.closest('#circularNav') && circularNavOpen) {
+        toggleCircularNav();
+      }
+      if(event.target===document.getElementById('logoutModal')) {
+        cancelLogout();
+      }
     };
-
-  function goToMainMenu() {
-    // Replace 'main_menu.html' with your main menu page when created
+    function goToMainMenu() {
     window.location.href = "main menu.html";
   }
-</script>
+  </script>
 </body>
 </html>

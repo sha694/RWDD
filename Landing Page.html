@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ProBoost Landing Page</title>
+  <title>ProBoost - Boost Your Business Growth</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -16,22 +16,29 @@
     <nav class="nav-buttons">
       <a href="Login page.html" class="btn-outline">Login</a>
       <a href="Sign up Page.html" class="btn">Sign Up</a>
-      <!-- ✅ Admin Login Button -->
-      <a href="#" class="btn-admin" onclick="adminLogin()">Admin Login</a>
+      <a href="#" class="btn-admin" onclick="adminLogin(event)">👑 Admin</a>
     </nav>
   </header>
 
   <!-- Hero Section -->
   <section class="hero">
     <div class="hero-text">
-      <h1>Boost Your <span>Business Growth</span></h1>
+      <h1>Boost Your <span class="highlight">Business Growth</span></h1>
       <p>Take your business to the next level with smart tools, seamless integrations, and powerful analytics.</p>
       
       <!-- Signup Form -->
       <form class="signup-form" onsubmit="goToSignup(event)">
-        <input type="email" id="landingEmail" placeholder="Enter your email" required>
+        <input 
+          type="email" 
+          id="landingEmail" 
+          placeholder="Enter your email" 
+          autocomplete="email"
+          required>
         <button type="submit" class="btn">Sign Up — It's Free</button>
       </form>
+      
+      <div class="feature-badges">
+      </div>
     </div>
 
     <div class="hero-image">
@@ -39,27 +46,243 @@
     </div>
   </section>
 
+  <!-- Admin Login Modal -->
+  <div id="adminLoginModal" class="modal">
+    <div class="modal-content admin-modal">
+      <span class="close" onclick="closeAdminModal()">&times;</span>
+      <h2>👑 Admin Access</h2>
+      <p class="admin-subtitle">Enter your admin credentials</p>
+      
+      <form id="adminLoginForm" onsubmit="submitAdminLogin(event)">
+        <div class="form-group">
+          <label for="adminEmail">Email</label>
+          <input 
+            type="email" 
+            id="adminEmail" 
+            placeholder="admin@proboost.com" 
+            autocomplete="email"
+            required>
+          <span class="error-message" id="adminEmailError"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="adminPassword">Password</label>
+          <div class="password-wrapper">
+            <input 
+              type="password" 
+              id="adminPassword" 
+              placeholder="Enter password" 
+              autocomplete="current-password"
+              required>
+            <span class="toggle-password" onclick="toggleAdminPassword()">🙈</span>
+          </div>
+          <span class="error-message" id="adminPasswordError"></span>
+        </div>
+
+        <button type="submit" class="btn-admin-submit">Login as Admin</button>
+      </form>
+
+      <p class="success-message" id="adminSuccess"></p>
+      
+      <div class="admin-note">
+        <p><strong>⚠️ Admin Access Only</strong></p>
+        <p>Regular users should use the <a href="Login page.html">standard login</a></p>
+      </div>
+    </div>
+  </div>
+
   <!-- Scripts -->
   <script>
-  function goToSignup(e) {
-    e.preventDefault();
-    const email = document.getElementById("landingEmail").value;
-    window.location.href = "Sign up Page.html?email=" + encodeURIComponent(email);
-  }
+    // ============================================
+    // INITIALIZATION
+    // ============================================
+    
+    window.addEventListener('DOMContentLoaded', () => {
+      sessionStorage.clear();
+      console.log('🏠 Welcome to ProBoost Landing Page');
+      initializeAdmin();
+    });
 
-  // ✅ Admin Login
-  function adminLogin() {
-    const email = prompt("Enter Admin Email:");
-    const password = prompt("Enter Admin Password:");
+    // ============================================
+    // ADMIN INITIALIZATION
+    // ============================================
+    
+    function initializeAdmin() {
+      let users = JSON.parse(localStorage.getItem("users")) || [];
+      const adminEmail = "sha123@gmail.com";
+      const adminPassword = "Admin123!";
 
-    if (email === "sha123@gmail.com" && password === "Admin123!") {
-      alert("✅ Welcome Admin!");
-      localStorage.setItem("isAdmin", "true"); // save admin session
-      window.location.href = "Admin.html";
-    } else {
-      alert("❌ Access Denied! Admin only.");
+      const adminExists = users.find(u => u.email.toLowerCase() === adminEmail.toLowerCase());
+      
+      if (!adminExists) {
+        const adminUser = {
+          id: Date.now(),
+          userId: "U001",
+          email: adminEmail,
+          password: adminPassword,
+          role: "admin",
+          createdAt: new Date().toISOString()
+        };
+        
+        users.push(adminUser);
+        localStorage.setItem("users", JSON.stringify(users));
+        console.log("✅ Admin account initialized");
+      }
     }
-  }
-</script>
+
+    // ============================================
+    // NAVIGATION FUNCTIONS
+    // ============================================
+    
+    function goToSignup(event) {
+      event.preventDefault();
+      const email = document.getElementById("landingEmail").value.trim();
+      
+      if (email) {
+        window.location.href = "Sign up Page.html?email=" + encodeURIComponent(email);
+      } else {
+        window.location.href = "Sign up Page.html";
+      }
+    }
+
+    // ============================================
+    // ADMIN LOGIN MODAL
+    // ============================================
+    
+    function adminLogin(event) {
+      event.preventDefault();
+      document.getElementById("adminLoginModal").style.display = "flex";
+      document.getElementById("adminEmail").value = "";
+      document.getElementById("adminPassword").value = "";
+      clearAdminMessages();
+      
+      setTimeout(() => {
+        document.getElementById("adminEmail").focus();
+      }, 100);
+    }
+
+    function closeAdminModal() {
+      document.getElementById("adminLoginModal").style.display = "none";
+      clearAdminMessages();
+    }
+
+    function toggleAdminPassword() {
+      const input = document.getElementById("adminPassword");
+      const toggle = document.querySelector(".toggle-password");
+      
+      if (input.type === "password") {
+        input.type = "text";
+        toggle.textContent = "🙉";
+      } else {
+        input.type = "password";
+        toggle.textContent = "🙈";
+      }
+    }
+
+    // ============================================
+    // ADMIN LOGIN SUBMISSION
+    // ============================================
+    
+    function submitAdminLogin(event) {
+      event.preventDefault();
+      
+      const email = document.getElementById("adminEmail").value.trim();
+      const password = document.getElementById("adminPassword").value;
+      
+      clearAdminMessages();
+
+      if (!email) {
+        showAdminError("adminEmailError", "❌ Email is required");
+        return;
+      }
+
+      if (!password) {
+        showAdminError("adminPasswordError", "❌ Password is required");
+        return;
+      }
+
+      const users = JSON.parse(localStorage.getItem("users")) || [];
+      
+      const admin = users.find(u => 
+        u.email.toLowerCase() === email.toLowerCase() && 
+        u.password === password &&
+        u.role === "admin"
+      );
+
+      if (!admin) {
+        showAdminError("adminPasswordError", "❌ Invalid admin credentials or not an admin account!");
+        console.log("❌ Admin login failed for:", email);
+        return;
+      }
+
+      console.log("✅ Admin authenticated:", admin.email);
+
+      sessionStorage.setItem("isLoggedIn", "true");
+      sessionStorage.setItem("role", "admin");
+      sessionStorage.setItem("userEmail", admin.email);
+      sessionStorage.setItem("userId", admin.userId || admin.id);
+      sessionStorage.setItem("loginTime", new Date().toISOString());
+
+      showAdminSuccess("✅ Admin access granted! Redirecting...");
+
+      setTimeout(() => {
+        window.location.href = "Admin.html";
+      }, 1500);
+    }
+
+    // ============================================
+    // MESSAGE HANDLING
+    // ============================================
+    
+    function showAdminError(elementId, message) {
+      const element = document.getElementById(elementId);
+      element.textContent = message;
+      element.style.display = "block";
+    }
+
+    function showAdminSuccess(message) {
+      const element = document.getElementById("adminSuccess");
+      element.textContent = message;
+      element.style.display = "block";
+    }
+
+    function clearAdminMessages() {
+      document.getElementById("adminEmailError").style.display = "none";
+      document.getElementById("adminPasswordError").style.display = "none";
+      document.getElementById("adminSuccess").style.display = "none";
+    }
+
+    // ============================================
+    // MODAL CLOSE ON OUTSIDE CLICK
+    // ============================================
+    
+    window.onclick = function(event) {
+      const modal = document.getElementById("adminLoginModal");
+      if (event.target === modal) {
+        closeAdminModal();
+      }
+    };
+
+    // ============================================
+    // KEYBOARD SHORTCUTS
+    // ============================================
+    
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        const modal = document.getElementById("adminLoginModal");
+        if (modal.style.display === 'flex') {
+          closeAdminModal();
+        }
+      }
+    });
+
+    console.log("=================================");
+    console.log("     PROBOOST LANDING PAGE");
+    console.log("=================================");
+    console.log("👑 Admin Login: Use the Admin button");
+    console.log("👤 User Login: Use Login button");
+    console.log("✨ New User: Use Sign Up button");
+    console.log("=================================");
+  </script>
 </body>
 </html>
