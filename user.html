@@ -20,19 +20,6 @@
         <button class="search-btn" aria-label="Search">🔍</button>
       </div>
     </div>
-<<<<<<< HEAD
-    <nav class="nav-links">
-      <a href="#" class="active" onclick="showSection('home', this)">🏠 Home</a>
-      <a href="#" onclick="showSection('collab', this)">🤝 Collaboration</a>
-      <a href="#" onclick="showSection('time', this)">⏳ Time Tracking</a>
-      <a href="analytics.html">📊 Analytics</a>
-      <a href="#" onclick="showSection('goals', this)">🎯 Goals</a>
-      <a href="#" onclick="showSection('tasks', this)">📝 Tasks</a>
-      <a href="countdown.html">⏰ Countdown</a>
-    </nav>
-    <div class="logout">
-      <a href="Landing Page.html">🚪 Logout</a>
-=======
     
     <div class="navbar-right">
       <button class="icon-btn" title="Add New" aria-label="Add New">➕</button>
@@ -41,8 +28,7 @@
         <div class="user-avatar" id="userAvatar">👤</div>
         <span id="userNameDisplay">User</span>
       </div>
-      <button class="icon-btn" title="Settings" onclick="openSettings()" aria-label="Settings">⚙️</button>
->>>>>>> 398e03780021996f23ee1ffac172b756b82d912d
+      <button class="icon-btn" title="Settings" onclick="openSettings()" aria-label="Settings">⚙</button>
     </div>
   </header>
 
@@ -137,7 +123,7 @@
         <div class="user-role" id="userEmailMenu">user@example.com</div>
       </div>
     </div>
-    <a href="#" class="menu-item" onclick="openSettings(); return false;">⚙️ Settings</a>
+    <a href="#" class="menu-item" onclick="openSettings(); return false;">⚙ Settings</a>
     <a href="#" class="menu-item logout-item" onclick="logoutUser(); return false;">🚪 Logout</a>
   </div>
 
@@ -232,7 +218,7 @@
       const container = document.getElementById(column+'-cards');
       const card = document.createElement('div'); 
       card.className='task-card';
-      card.innerHTML = `<h4>${title}</h4><p>New task</p>`;
+      card.innerHTML = <h4>${title}</h4><p>New task</p>;
       container.appendChild(card);
     }
 
@@ -276,7 +262,7 @@
       if(!text) return;
       const div=document.createElement('div'); 
       div.className='goal-item';
-      div.innerHTML=`<span class="goal-status">📚</span><span class="goal-text">${text}</span>`;
+      div.innerHTML=<span class="goal-status">📚</span><span class="goal-text">${text}</span>;
       div.onclick=function(){ 
         const status = this.querySelector('.goal-status');
         if(status.textContent==='📚') {
@@ -297,7 +283,7 @@
       if(!text) return;
       const div=document.createElement('div'); 
       div.className='task-item';
-      div.innerHTML=`<span class="task-status">⏳</span><span class="task-text">${text}</span>`;
+      div.innerHTML=<span class="task-status">⏳</span><span class="task-text">${text}</span>;
       div.onclick=function(){ 
         const status = this.querySelector('.task-status');
         if(status.textContent==='⏳') {
@@ -325,7 +311,7 @@
       const h=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
       const m=Math.floor((diff%(1000*60*60))/(1000*60));
       const s=Math.floor((diff%(1000*60))/1000);
-      el.innerHTML=`${d}d ${h}h ${m}m ${s}s`;
+      el.innerHTML=${d}d ${h}h ${m}m ${s}s;
     }
 
     // Close menus on outside click
@@ -346,4 +332,3 @@
   </script>
 </body>
 </html>
-//sha123
