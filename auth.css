@@ -197,3 +197,32 @@ body {
   user-select: none;
 }
 
+/* User Type Selection Styles */
+.user-type-selection {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 1.5rem;
+}
+
+.user-type-btn {
+  flex: 1;
+  padding: 8px 12px; 
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: white;
+  cursor: pointer;
+  text-align: center;
+  font-weight: 500;
+  transition: all 0.3s;
+  font-size: 0.9rem;
+}
+
+.user-type-btn:hover {
+  border-color: #4a90e2;
+}
+
+.user-type-btn.active {
+  border-color: #4a90e2;
+  background-color: #4a90e2;
+  color: white;
+}

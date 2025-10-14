@@ -23,7 +23,15 @@
     <div class="form-card">
       <h2>Create Your Account</h2>
 
+      <!-- User Type Selection -->
+      <div class="user-type-selection">
+        <div class="user-type-btn active" data-type="user">Sign Up as User</div>
+        <div class="user-type-btn" data-type="manager">Sign Up as Manager</div>
+      </div>
+
       <form id="signupForm" method="POST" action="signup.php">
+        <input type="hidden" name="userType" id="userType" value="user">
+        
         <input type="text" name="fullname" id="fullname" placeholder="Full Name" required>
 
         <input type="email" name="email" id="signupEmail" placeholder="Email" required>
@@ -57,6 +65,33 @@
   </footer>
 
   <script>
+    // User type selection
+    const userTypeButtons = document.querySelectorAll('.user-type-btn');
+    const userTypeInput = document.getElementById('userType');
+    
+    userTypeButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        // Remove active class from all buttons
+        userTypeButtons.forEach(btn => btn.classList.remove('active'));
+        
+        // Add active class to clicked button
+        button.classList.add('active');
+        
+        // Update hidden input value
+        userTypeInput.value = button.getAttribute('data-type');
+      });
+    });
+
+   // Validate User or Manager
+  const userData = {
+      fullname: document.getElementById("fullname").value,
+      email: document.getElementById("signupEmail").value,
+      password: document.getElementById("createPassword").value,
+      userType: document.getElementById("userType").value, // "user" or "manager"
+      role: "user", // Regular users have "user" role
+      createdAt: new Date().toISOString()
+    };
+
     // Toggle password visibility
     function togglePassword(id, el) {
       const input = document.getElementById(id);
@@ -90,31 +125,4 @@
     });
   </script>
 </body>
-</html>
-
-      // Prevent signing up with Admin's reserved email
-      if (email.toLowerCase() === "sha123@gmail.com") {
-        alert("⚠️ This email is reserved for the Admin. Please use another email.");
-        return;
-      }
-
-      if (users.some(u => u.email === email)) {
-        alert("⚠️ Email already exists. Please login instead.");
-        return;
-      }
-
-      const newUser = { email: email, password: password, role: "user" };
-      users.push(newUser);
-      localStorage.setItem("users", JSON.stringify(users));
-
-      document.getElementById("signupSuccess").style.display = "block";
-      document.getElementById("signupForm").reset();
-
-      setTimeout(() => {
-        window.location.href = "Login Page.html";
-      }, 1500);
-    });
-  </script>
-</body>
-</html>
 </html>
