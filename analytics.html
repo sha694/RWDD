@@ -9,6 +9,336 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
+        /* 顶部导航栏样式 */
+        .top-navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: #1e3a8a;
+        }
+
+        .logo img {
+            height: 35px;
+            width: auto;
+        }
+
+        .nav-button {
+            background: #f3f4f6;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .nav-button:hover {
+            background: #e5e7eb;
+        }
+
+        .search-container {
+            display: flex;
+            align-items: center;
+            background: #f3f4f6;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .search-input {
+            border: none;
+            background: transparent;
+            padding: 8px 12px;
+            outline: none;
+            width: 200px;
+        }
+
+        .search-btn {
+            border: none;
+            background: transparent;
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .icon-btn:hover {
+            background: #f3f4f6;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .user-profile:hover {
+            background: #f3f4f6;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #3b82f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        /* 用户菜单样式 */
+        .user-menu {
+            position: absolute;
+            top: 70px;
+            right: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 15px;
+            width: 250px;
+            z-index: 1001;
+            display: none;
+        }
+
+        .user-menu.show {
+            display: block;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 10px;
+        }
+
+        .user-avatar-large {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #3b82f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .user-role {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        .menu-item {
+            display: block;
+            padding: 10px 15px;
+            text-decoration: none;
+            color: #374151;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .menu-item:hover {
+            background: #f3f4f6;
+        }
+
+        .logout-item {
+            color: #ef4444;
+        }
+
+        /* 圆形导航样式 */
+        .circular-nav {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 999;
+        }
+
+        .fab-main {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #1e40af);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .fab-main:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+        }
+
+        .fab-main.rotated .fab-icon {
+            transform: rotate(45deg);
+        }
+
+        .fab-options {
+            position: absolute;
+            bottom: 70px;
+            right: 0;
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .circular-nav.open .fab-options {
+            display: flex;
+        }
+
+        .fab-option {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .fab-option:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .logout-fab {
+            background: #fef2f2;
+            color: #ef4444;
+        }
+
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #1e40af);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        /* 主内容区域样式 */
+        .main-content {
+            padding: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Analytics 模块样式 */
         .analytics-container {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -361,6 +691,45 @@
             box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
         }
 
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .overview-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .insights-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .goal-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .goal-progress {
+                text-align: left;
+                width: 100%;
+            }
+            
+            .progress-bar {
+                width: 100%;
+            }
+            
+            .top-navbar {
+                padding: 15px;
+            }
+            
+            .navbar-left {
+                gap: 10px;
+            }
+            
+            .search-input {
+                width: 150px;
+            }
+        }
+
         .loading-overlay {
             display: none;
             position: fixed;
@@ -399,69 +768,71 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .overview-cards {
-                grid-template-columns: 1fr;
-            }
-            
-            .insights-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-            
-            .goal-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-            
-            .goal-progress {
-                text-align: left;
-                width: 100%;
-            }
-            
-            .progress-bar {
-                width: 100%;
-            }
-        }
     </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <header class="navbar">
-        <div class="logo">
-            <img src="Logo.png" alt="ProBoost Logo">
-            <span>ProBoost</span>
+    <!-- Top Navigation Bar -->
+    <header class="top-navbar">
+        <div class="navbar-left">
+            <div class="logo">
+                <img src="Logo.png" alt="ProBoost Logo">
+                <span>ProBoost</span>
+            </div>
+            <button class="nav-button home-btn" onclick="goToMainMenu()">Home</button>
+            <div class="search-container">
+                <input type="text" placeholder="Search..." class="search-input">
+                <button class="search-btn" aria-label="Search">🔍</button>
+            </div>
         </div>
-        <nav class="nav-links">
-            <a href="user.html">🏠 Home</a>
-            <a href="collaboration.html">🤝 Collaboration</a>
-            <a href="time-tracking.html">⏳ Time Tracking</a>
-            <a href="#" class="active">📊 Analytics</a>
-            <a href="goals.html">🎯 Goals</a>
-            <a href="tasks.html">📝 Tasks</a>
-            <a href="countdown.html">⏰ Countdown</a>
-        </nav>
-        <div class="logout">
-            <a href="Landing Page.html">🚪 Logout</a>
+        
+        <div class="navbar-right">
+            <button class="icon-btn" title="Add New" aria-label="Add New">➕</button>
+            <button class="icon-btn" title="Notifications" aria-label="Notifications">🔔</button>
+            <div class="user-profile" onclick="toggleUserMenu()">
+                <div class="user-avatar" id="userAvatar">👤</div>
+                <span id="userNameDisplay">User</span>
+            </div>
+            <button class="icon-btn" title="Settings" onclick="openSettings()" aria-label="Settings">⚙</button>
         </div>
     </header>
 
-    <!-- Loading Overlay -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-spinner"></div>
-        <div class="loading-text">Generating PDF Report...</div>
+    <!-- User Menu -->
+    <div id="userMenu" class="user-menu">
+        <div class="user-info">
+            <div class="user-avatar-large">👤</div>
+            <div>
+                <div class="user-name" id="userNameMenu">User</div>
+                <div class="user-role" id="userEmailMenu">user@example.com</div>
+            </div>
+        </div>
+        <a href="#" class="menu-item" onclick="openSettings(); return false;">⚙ Settings</a>
+        <a href="#" class="menu-item logout-item" onclick="logoutUser(); return false;">🚪 Logout</a>
     </div>
 
-    <main class="container">
+    <!-- Circular Navigation FAB -->
+    <div class="circular-nav" id="circularNav">
+        <div class="fab-main" onclick="toggleCircularNav()">
+            <div class="fab-icon">☰</div>
+        </div>
+        <div class="fab-options" id="fabOptions">
+            <div class="fab-option" onclick="navigateToSection('collaboration')" title="Team Collaboration">🤝</div>
+            <div class="fab-option" onclick="navigateToSection('time')" title="Time Tracking">⏳</div>
+            <div class="fab-option" onclick="navigateToSection('analytics')" title="Analytics">📊</div>
+            <div class="fab-option" onclick="navigateToSection('goals')" title="Goals">🎯</div>
+            <div class="fab-option" onclick="navigateToSection('tasks')" title="Tasks">📝</div>
+            <div class="fab-option" onclick="navigateToSection('countdown')" title="Countdown">⏰</div>
+            <div class="fab-option logout-fab" onclick="logoutUser()" title="Logout">🚪</div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
         <section id="analytics" class="section active">
             <h1>Productivity Analytics 📊</h1>
             <p>Gain insights into your work patterns and performance metrics</p>
 
             <button class="download-btn" onclick="downloadReport()">
-                📥 Download Full Report (PDF)
+                📊 Generate Comprehensive Report (PDF)
             </button>
 
             <!-- 6 Equal Modules Grid -->
@@ -664,7 +1035,92 @@
         </section>
     </main>
 
+    <!-- Logout Modal -->
+    <div id="logoutModal" class="modal">
+        <div class="modal-content">
+            <h3>Confirm Logout</h3>
+            <p>Are you sure you want to logout?</p>
+            <div class="modal-actions">
+                <button class="btn-primary" onclick="confirmLogout()">Yes, Logout</button>
+                <button class="btn-secondary" onclick="cancelLogout()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay for PDF Generation -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Generating PDF Report...</div>
+    </div>
+
     <script>
+        let circularNavOpen = false;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            checkUserAuthentication();
+            displayUserInfo();
+            initializeCharts();
+        });
+
+        function checkUserAuthentication() {
+            const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
+            const userRole = sessionStorage.getItem('role');
+            const userEmail = sessionStorage.getItem('userEmail');
+            if (!isLoggedIn || userRole !== 'user' || !userEmail) {
+                alert('Access Denied! Login as a user.');
+                window.location.href = 'Login page.html';
+            }
+        }
+
+        function displayUserInfo() {
+            const userEmail = sessionStorage.getItem('userEmail') || 'user@example.com';
+            const userName = userEmail.split('@')[0];
+            document.getElementById('userNameDisplay').textContent = userName;
+            document.getElementById('userNameMenu').textContent = userName;
+            document.getElementById('userEmailMenu').textContent = userEmail;
+        }
+
+        function toggleCircularNav() {
+            circularNavOpen = !circularNavOpen;
+            const nav = document.getElementById('circularNav');
+            nav.classList.toggle('open');
+            const fabMain = nav.querySelector('.fab-main');
+            fabMain.classList.toggle('rotated');
+        }
+
+        function navigateToSection(sectionId) { 
+            // For now, we'll just show an alert since we don't have other sections in this page
+            if (sectionId === 'analytics') {
+                return; // Already on analytics page
+            }
+            alert(`Would navigate to ${sectionId} section. In a full implementation, this would load the appropriate page.`);
+        }
+
+        function toggleUserMenu() { 
+            document.getElementById('userMenu').classList.toggle('show'); 
+        }
+
+        function openSettings() { 
+            alert('Settings panel opens'); 
+        }
+
+        function logoutUser() { 
+            document.getElementById('logoutModal').style.display='flex'; 
+        }
+
+        function confirmLogout() {
+            sessionStorage.clear();
+            window.location.href='Landing Page.html';
+        }
+
+        function cancelLogout() { 
+            document.getElementById('logoutModal').style.display='none'; 
+        }
+
+        function goToMainMenu() {
+            window.location.href = "main menu.html";
+        }
+
         // Initialize Charts
         function initializeCharts() {
             // Daily Trend Chart
@@ -778,279 +1234,288 @@
             window.completionChart.update();
         }
 
-            // PDF Generation Function
-            async function generatePDFReport() {
-                const loadingOverlay = document.getElementById('loadingOverlay');
-                loadingOverlay.classList.add('active');
+        // PDF Generation Function
+        async function generatePDFReport() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            loadingOverlay.classList.add('active');
+            
+            try {
+                // Use setTimeout to show loading animation for a moment
+                await new Promise(resolve => setTimeout(resolve, 1000));
                 
-                try {
-                    // Use setTimeout to show loading animation for a moment
-                    await new Promise(resolve => setTimeout(resolve, 1000));
-                    
-                    const { jsPDF } = window.jspdf;
-                    const pdf = new jsPDF('p', 'mm', 'a4');
-                    
-                    // Set PDF properties
-                    pdf.setProperties({
-                        title: 'Productivity Analytics Report - ProBoost',
-                        subject: 'Productivity Analysis',
-                        author: 'ProBoost System',
-                        keywords: 'productivity, analytics, report',
-                        creator: 'ProBoost Web Application'
-                    });
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                
+                // Set PDF properties
+                pdf.setProperties({
+                    title: 'Productivity Analytics Report - ProBoost',
+                    subject: 'Productivity Analysis',
+                    author: 'ProBoost System',
+                    keywords: 'productivity, analytics, report',
+                    creator: 'ProBoost Web Application'
+                });
 
-                    let yPosition = 20;
-                    const pageWidth = pdf.internal.pageSize.getWidth();
-                    const margin = 20;
-                    const contentWidth = pageWidth - (margin * 2);
+                let yPosition = 20;
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const margin = 20;
+                const contentWidth = pageWidth - (margin * 2)
+                // Cover Page
+                pdf.setFillColor(59, 130, 246);
+                pdf.rect(0, 0, pageWidth, 80, 'F');
+                
+                pdf.setTextColor(255, 255, 255);
+                pdf.setFontSize(24);
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('Productivity Analytics Report', pageWidth / 2, 40, { align: 'center' });
+                
+                pdf.setFontSize(16);
+                pdf.setFont('helvetica', 'normal');
+                pdf.text('ProBoost System', pageWidth / 2, 55, { align: 'center' });
+                
+                pdf.setTextColor(100, 100, 100);
+                pdf.setFontSize(12);
+                pdf.text(`Generated on: ${new Date().toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                })}`, pageWidth / 2, 70, { align: 'center' });
 
-                    // Cover Page
-                    pdf.setFillColor(59, 130, 246);
-                    pdf.rect(0, 0, pageWidth, 80, 'F');
-                    
-                    pdf.setTextColor(255, 255, 255);
-                    pdf.setFontSize(24);
-                    pdf.setFont('helvetica', 'bold');
-                    pdf.text('Productivity Analytics Report', pageWidth / 2, 40, { align: 'center' });
-                    
-                    pdf.setFontSize(16);
-                    pdf.setFont('helvetica', 'normal');
-                    pdf.text('ProBoost System', pageWidth / 2, 55, { align: 'center' });
-                    
-                    pdf.setTextColor(100, 100, 100);
-                    pdf.setFontSize(12);
-                    pdf.text(`Generated on: ${new Date().toLocaleDateString('en-US', { 
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric' 
-                    })}`, pageWidth / 2, 70, { align: 'center' });
+                // Add new page
+                pdf.addPage();
+                yPosition = 20;
 
-                    // Add new page
-                    pdf.addPage();
-                    yPosition = 20;
+                // Title
+                pdf.setTextColor(30, 58, 138);
+                pdf.setFontSize(18);
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('Executive Summary', margin, yPosition);
+                yPosition += 15;
 
-                    // Title
-                    pdf.setTextColor(30, 58, 138);
-                    pdf.setFontSize(18);
-                    pdf.setFont('helvetica', 'bold');
-                    pdf.text('Executive Summary', margin, yPosition);
-                    yPosition += 15;
+                // Overview Data
+                pdf.setFontSize(11);
+                pdf.setFont('helvetica', 'normal');
+                pdf.setTextColor(0, 0, 0);
+                
+                const overviewData = [
+                    { label: "Today's Task Completion", value: "3 tasks" },
+                    { label: "Today's Focus Time", value: "5 hours 10 minutes" },
+                    { label: "Total Task Completion", value: "10 tasks" },
+                    { label: "Total Focus Duration", value: "50 hours 4 minutes" }
+                ];
 
-                    // Overview Data
-                    pdf.setFontSize(11);
-                    pdf.setFont('helvetica', 'normal');
-                    pdf.setTextColor(0, 0, 0);
-                    
-                    const overviewData = [
-                        { label: "Today's Task Completion", value: "3 tasks" },
-                        { label: "Today's Focus Time", value: "5 hours 10 minutes" },
-                        { label: "Total Task Completion", value: "10 tasks" },
-                        { label: "Total Focus Duration", value: "50 hours 4 minutes" }
-                    ];
+                overviewData.forEach(item => {
+                    pdf.text(`${item.label}:`, margin, yPosition);
+                    pdf.text(item.value, margin + 80, yPosition);
+                    yPosition += 8;
+                });
 
-                    overviewData.forEach(item => {
-                        pdf.text(`${item.label}:`, margin, yPosition);
-                        pdf.text(item.value, margin + 80, yPosition);
-                        yPosition += 8;
-                    });
+                yPosition += 10;
 
-                    yPosition += 10;
+                // Key Performance Indicators Section
+                pdf.setFontSize(14);
+                pdf.setFont('helvetica', 'bold');
+                pdf.setTextColor(30, 58, 138);
+                pdf.text('Key Performance Indicators', margin, yPosition);
+                yPosition += 12;
 
-                    // Key Performance Indicators Section
-                    pdf.setFontSize(14);
-                    pdf.setFont('helvetica', 'bold');
-                    pdf.setTextColor(30, 58, 138);
-                    pdf.text('Key Performance Indicators', margin, yPosition);
-                    yPosition += 12;
+                pdf.setFontSize(10);
+                pdf.setFont('helvetica', 'normal');
+                pdf.setTextColor(0, 0, 0);
 
-                    pdf.setFontSize(10);
-                    pdf.setFont('helvetica', 'normal');
-                    pdf.setTextColor(0, 0, 0);
+                const kpis = [
+                    "✓ Productivity increased by 12% compared to last week",
+                    "✓ Best performance day: Tuesday (9.1 hours focused work)",
+                    "✓ Peak productivity hours: 4:00 AM - 11:00 AM & 2:00 PM - 4:00 PM",
+                    "✓ Current streak: 5 consecutive productive days",
+                    "✓ Task completion rate: 92% success rate",
+                    "✓ Average daily focus time: 7.1 hours"
+                ];
 
-                    const kpis = [
-                        "✓ Productivity increased by 12% compared to last week",
-                        "✓ Best performance day: Tuesday (9.1 hours focused work)",
-                        "✓ Peak productivity hours: 4:00 AM - 11:00 AM & 2:00 PM - 4:00 PM",
-                        "✓ Current streak: 5 consecutive productive days",
-                        "✓ Task completion rate: 92% success rate",
-                        "✓ Average daily focus time: 7.1 hours"
-                    ];
-
-                    kpis.forEach(kpi => {
-                        if (yPosition > 250) {
-                            pdf.addPage();
-                            yPosition = 20;
-                        }
-                        pdf.text(kpi, margin + 5, yPosition);
-                        yPosition += 8;
-                    });
-
-                    yPosition += 15;
-
-                    // Goal Progress Section
-                    pdf.setFontSize(14);
-                    pdf.setFont('helvetica', 'bold');
-                    pdf.setTextColor(30, 58, 138);
-                    pdf.text('Goal Progress Tracking', margin, yPosition);
-                    yPosition += 12;
-
-                    pdf.setFontSize(10);
-                    pdf.setFont('helvetica', 'normal');
-
-                    const goals = [
-                        { name: "Complete Ru/DD Assignment", progress: "65%", due: "Nov 4, 2025" },
-                        { name: "Learn New Framework", progress: "40%", due: "Nov 4, 2025" },
-                        { name: "Complete OOP Assignment", progress: "80%", due: "Nov 4, 2025" },
-                        { name: "Complete VRAR Assignment", progress: "25%", due: "Nov 4, 2025" },
-                        { name: "Team Project Completion", progress: "75%", due: "Dec 15, 2025" },
-                        { name: "Professional Certification", progress: "30%", due: "Mar 1, 2026" }
-                    ];
-
-                    goals.forEach(goal => {
-                        if (yPosition > 250) {
-                            pdf.addPage();
-                            yPosition = 20;
-                        }
-                        pdf.setTextColor(30, 58, 138);
-                        pdf.setFont('helvetica', 'bold');
-                        pdf.text(goal.name, margin, yPosition);
-                        
-                        pdf.setTextColor(16, 185, 129);
-                        pdf.text(goal.progress, pageWidth - margin - 20, yPosition, { align: 'right' });
-                        
-                        yPosition += 6;
-                        
-                        pdf.setTextColor(100, 100, 100);
-                        pdf.setFont('helvetica', 'normal');
-                        pdf.text(`Due: ${goal.due}`, margin, yPosition);
-                        
-                        yPosition += 10;
-                    });
-
-                    // Time Distribution Section
-                    if (yPosition > 200) {
+                kpis.forEach(kpi => {
+                    if (yPosition > 250) {
                         pdf.addPage();
                         yPosition = 20;
                     }
+                    pdf.text(kpi, margin + 5, yPosition);
+                    yPosition += 8;
+                });
 
-                    pdf.setFontSize(14);
-                    pdf.setFont('helvetica', 'bold');
-                    pdf.setTextColor(30, 58, 138);
-                    pdf.text('Time Distribution Analysis', margin, yPosition);
-                    yPosition += 12;
+                yPosition += 15;
 
-                    pdf.setFontSize(10);
-                    pdf.setFont('helvetica', 'normal');
-                    pdf.setTextColor(0, 0, 0);
+                // Goal Progress Section
+                pdf.setFontSize(14);
+                pdf.setFont('helvetica', 'bold');
+                pdf.setTextColor(30, 58, 138);
+                pdf.text('Goal Progress Tracking', margin, yPosition);
+                yPosition += 12;
 
-                    const timeDistribution = [
-                        { category: "Deep Work & Intelligence", percentage: "40%", hours: "13.8h" },
-                        { category: "Meetings & Collaboration", percentage: "30%", hours: "10.35h" },
-                        { category: "Planning & Strategy", percentage: "20%", hours: "6.9h" },
-                        { category: "Administrative Tasks", percentage: "10%", hours: "3.45h" }
-                    ];
+                pdf.setFontSize(10);
+                pdf.setFont('helvetica', 'normal');
 
-                    timeDistribution.forEach(item => {
-                        pdf.text(`${item.category}:`, margin, yPosition);
-                        pdf.text(item.percentage, margin + 70, yPosition);
-                        pdf.text(item.hours, pageWidth - margin - 20, yPosition, { align: 'right' });
-                        yPosition += 8;
-                    });
+                const goals = [
+                    { name: "Complete Ru/DD Assignment", progress: "65%", due: "Nov 4, 2025" },
+                    { name: "Learn New Framework", progress: "40%", due: "Nov 4, 2025" },
+                    { name: "Complete OOP Assignment", progress: "80%", due: "Nov 4, 2025" },
+                    { name: "Complete VRAR Assignment", progress: "25%", due: "Nov 4, 2025" },
+                    { name: "Team Project Completion", progress: "75%", due: "Dec 15, 2025" },
+                    { name: "Professional Certification", progress: "30%", due: "Mar 1, 2026" }
+                ];
 
-                    yPosition += 15;
-
-                    // Weekly Performance Section
-                    pdf.setFontSize(14);
-                    pdf.setFont('helvetica', 'bold');
-                    pdf.setTextColor(30, 58, 138);
-                    pdf.text('Weekly Performance Trends', margin, yPosition);
-                    yPosition += 12;
-
-                    pdf.setFontSize(10);
-                    pdf.setFont('helvetica', 'normal');
-                    pdf.setTextColor(0, 0, 0);
-
-                    const weeklyData = [
-                        { day: "Monday", hours: "5.2h", tasks: "8" },
-                        { day: "Tuesday", hours: "9.1h", tasks: "12" },
-                        { day: "Wednesday", hours: "6.8h", tasks: "9" },
-                        { day: "Thursday", hours: "7.5h", tasks: "10" },
-                        { day: "Friday", hours: "8.2h", tasks: "11" },
-                        { day: "Saturday", hours: "3.1h", tasks: "4" },
-                        { day: "Sunday", hours: "2.5h", tasks: "3" }
-                    ];
-
-                    weeklyData.forEach(day => {
-                        if (yPosition > 250) {
-                            pdf.addPage();
-                            yPosition = 20;
-                        }
-                        pdf.text(`${day.day}:`, margin, yPosition);
-                        pdf.text(`${day.hours} focused`, margin + 40, yPosition);
-                        pdf.text(`${day.tasks} tasks`, pageWidth - margin - 20, yPosition, { align: 'right' });
-                        yPosition += 8;
-                    });
-
-                    yPosition += 15;
-
-                    // Recommendations Section
-                    pdf.setFontSize(14);
-                    pdf.setFont('helvetica', 'bold');
-                    pdf.setTextColor(30, 58, 138);
-                    pdf.text('Strategic Recommendations', margin, yPosition);
-                    yPosition += 12;
-
-                    pdf.setFontSize(10);
-                    pdf.setFont('helvetica', 'normal');
-
-                    const recommendations = [
-                        "• Maintain Tuesday's high productivity momentum throughout the week by replicating successful routines",
-                        "• Schedule complex, high-priority tasks during peak performance hours (4:00 AM - 11:00 AM)",
-                        "• Consider reducing weekend work intensity to prevent burnout and maintain long-term productivity",
-                        "• Implement the 25-minute focus technique for tasks requiring deep concentration",
-                        "• Allocate specific time blocks for administrative tasks to minimize context switching",
-                        "• Review and adjust goal priorities based on current progress and upcoming deadlines",
-                        "• Incorporate short breaks between focused work sessions to maintain mental freshness"
-                    ];
-
-                    recommendations.forEach(rec => {
-                        if (yPosition > 250) {
-                            pdf.addPage();
-                            yPosition = 20;
-                        }
-                        pdf.text(rec, margin, yPosition, { maxWidth: contentWidth });
-                        yPosition += 12;
-                    });
-
-                    // Footer
-                    const pageCount = pdf.getNumberOfPages();
-                    for (let i = 1; i <= pageCount; i++) {
-                        pdf.setPage(i);
-                        pdf.setFontSize(8);
-                        pdf.setTextColor(100, 100, 100);
-                        pdf.text(`Page ${i} of ${pageCount}`, pageWidth / 2, 290, { align: 'center' });
-                        pdf.text('Confidential - ProBoost Productivity Analytics Report', pageWidth / 2, 295, { align: 'center' });
+                goals.forEach(goal => {
+                    if (yPosition > 250) {
+                        pdf.addPage();
+                        yPosition = 20;
                     }
-
-                    // Save PDF
-                    const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
-                    pdf.save(`proboost-productivity-report-${timestamp}.pdf`);
+                    pdf.setTextColor(30, 58, 138);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.text(goal.name, margin, yPosition);
                     
-                } catch (error) {
-                    console.error('PDF generation error:', error);
-                    alert('Error generating PDF report. Please try again.');
-                } finally {
-                    loadingOverlay.classList.remove('active');
+                    pdf.setTextColor(16, 185, 129);
+                    pdf.text(goal.progress, pageWidth - margin - 20, yPosition, { align: 'right' });
+                    
+                    yPosition += 6;
+                    
+                    pdf.setTextColor(100, 100, 100);
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.text(`Due: ${goal.due}`, margin, yPosition);
+                    
+                    yPosition += 10;
+                });
+
+                // Time Distribution Section
+                if (yPosition > 200) {
+                    pdf.addPage();
+                    yPosition = 20;
                 }
-            }
 
-            // Update download button click event
-            function downloadReport() {
-                generatePDFReport();
-            }
+                pdf.setFontSize(14);
+                pdf.setFont('helvetica', 'bold');
+                pdf.setTextColor(30, 58, 138);
+                pdf.text('Time Distribution Analysis', margin, yPosition);
+                yPosition += 12;
 
-        // Initialize charts when page loads
-        document.addEventListener('DOMContentLoaded', initializeCharts);
+                pdf.setFontSize(10);
+                pdf.setFont('helvetica', 'normal');
+                pdf.setTextColor(0, 0, 0);
+
+                const timeDistribution = [
+                    { category: "Deep Work & Intelligence", percentage: "40%", hours: "13.8h" },
+                    { category: "Meetings & Collaboration", percentage: "30%", hours: "10.35h" },
+                    { category: "Planning & Strategy", percentage: "20%", hours: "6.9h" },
+                    { category: "Administrative Tasks", percentage: "10%", hours: "3.45h" }
+                ];
+
+                timeDistribution.forEach(item => {
+                    pdf.text(`${item.category}:`, margin, yPosition);
+                    pdf.text(item.percentage, margin + 70, yPosition);
+                    pdf.text(item.hours, pageWidth - margin - 20, yPosition, { align: 'right' });
+                    yPosition += 8;
+                });
+
+                yPosition += 15;
+
+                // Weekly Performance Section
+                pdf.setFontSize(14);
+                pdf.setFont('helvetica', 'bold');
+                pdf.setTextColor(30, 58, 138);
+                pdf.text('Weekly Performance Trends', margin, yPosition);
+                yPosition += 12;
+
+                pdf.setFontSize(10);
+                pdf.setFont('helvetica', 'normal');
+                pdf.setTextColor(0, 0, 0);
+
+                const weeklyData = [
+                    { day: "Monday", hours: "5.2h", tasks: "8" },
+                    { day: "Tuesday", hours: "9.1h", tasks: "12" },
+                    { day: "Wednesday", hours: "6.8h", tasks: "9" },
+                    { day: "Thursday", hours: "7.5h", tasks: "10" },
+                    { day: "Friday", hours: "8.2h", tasks: "11" },
+                    { day: "Saturday", hours: "3.1h", tasks: "4" },
+                    { day: "Sunday", hours: "2.5h", tasks: "3" }
+                ];
+
+                weeklyData.forEach(day => {
+                    if (yPosition > 250) {
+                        pdf.addPage();
+                        yPosition = 20;
+                    }
+                    pdf.text(`${day.day}:`, margin, yPosition);
+                    pdf.text(`${day.hours} focused`, margin + 40, yPosition);
+                    pdf.text(`${day.tasks} tasks`, pageWidth - margin - 20, yPosition, { align: 'right' });
+                    yPosition += 8;
+                });
+
+                yPosition += 15;
+
+                // Recommendations Section
+                pdf.setFontSize(14);
+                pdf.setFont('helvetica', 'bold');
+                pdf.setTextColor(30, 58, 138);
+                pdf.text('Strategic Recommendations', margin, yPosition);
+                yPosition += 12;
+
+                pdf.setFontSize(10);
+                pdf.setFont('helvetica', 'normal');
+
+                const recommendations = [
+                    "• Maintain Tuesday's high productivity momentum throughout the week by replicating successful routines",
+                    "• Schedule complex, high-priority tasks during peak performance hours (4:00 AM - 11:00 AM)",
+                    "• Consider reducing weekend work intensity to prevent burnout and maintain long-term productivity",
+                    "• Implement the 25-minute focus technique for tasks requiring deep concentration",
+                    "• Allocate specific time blocks for administrative tasks to minimize context switching",
+                    "• Review and adjust goal priorities based on current progress and upcoming deadlines",
+                    "• Incorporate short breaks between focused work sessions to maintain mental freshness"
+                ];
+
+                recommendations.forEach(rec => {
+                    if (yPosition > 250) {
+                        pdf.addPage();
+                        yPosition = 20;
+                    }
+                    pdf.text(rec, margin, yPosition, { maxWidth: contentWidth });
+                    yPosition += 12;
+                });
+
+                // Footer
+                const pageCount = pdf.getNumberOfPages();
+                for (let i = 1; i <= pageCount; i++) {
+                    pdf.setPage(i);
+                    pdf.setFontSize(8);
+                    pdf.setTextColor(100, 100, 100);
+                    pdf.text(`Page ${i} of ${pageCount}`, pageWidth / 2, 290, { align: 'center' });
+                    pdf.text('Confidential - ProBoost Productivity Analytics Report', pageWidth / 2, 295, { align: 'center' });
+                }
+
+                // Save PDF
+                const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+                pdf.save(`proboost-productivity-report-${timestamp}.pdf`);
+                
+            } catch (error) {
+                console.error('PDF generation error:', error);
+                alert('Error generating PDF report. Please try again.');
+            } finally {
+                loadingOverlay.classList.remove('active');
+            }
+        }
+
+        // Update download button click event
+        function downloadReport() {
+            generatePDFReport();
+        }
+
+        // Close menus on outside click
+        window.onclick = function(event){
+            if(!event.target.closest('.user-profile') && !event.target.closest('.user-menu')) {
+                document.getElementById('userMenu').classList.remove('show');
+            }
+            if(!event.target.closest('#circularNav') && circularNavOpen) {
+                toggleCircularNav();
+            }
+            if(event.target===document.getElementById('logoutModal')) {
+                cancelLogout();
+            }
+        };
     </script>
 </body>
 </html>

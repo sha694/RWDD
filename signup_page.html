@@ -5,17 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ProBoost - Sign Up</title>
   <link rel="stylesheet" href="auth.css" />
-  <style>
-    .password-wrapper { position: relative; width: 100%; }
-    .password-wrapper input { width: 100%; padding-right: 40px; }
-    .toggle-password {
-      position: absolute; top: 50%; right: 10px;
-      transform: translateY(-50%); cursor: pointer;
-      font-size: 18px; color: #555;
-    }
-    .error-message { font-size: 12px; color: red; margin-top: 4px; display: none; }
-    .success-message { font-size: 14px; color: green; margin-top: 10px; display: none; }
-  </style>
 </head>
 <body>
   <header class="header">
@@ -32,7 +21,9 @@
 
     <div class="form-card">
       <h2>Create Your Account</h2>
-      <form id="signupForm" action="signup.php" method="POST">
+
+      <!-- ✅ FIX: Added 'name' and 'id' correctly -->
+      <form id="signupForm" action="signup.php" method="POST" novalidate>
         <input type="text" name="fullname" id="fullname" placeholder="Full Name" required />
 
         <input type="email" name="email" id="email" placeholder="Email (must be @gmail.com)" required />
@@ -71,55 +62,71 @@
   </footer>
 
   <script>
+    // Toggle password visibility
     function togglePassword(id, el) {
       const input = document.getElementById(id);
       input.type = input.type === "password" ? "text" : "password";
       el.textContent = input.type === "password" ? "🙈" : "🙉";
     }
 
+    // Email must end with @gmail.com
     function validateEmail(email) {
       return /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(email);
     }
 
+    // Password must include uppercase, lowercase, number, and symbol
     function validatePassword(password) {
-      return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/.test(password);
+      return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{6,}$/.test(password);
     }
 
+    // ✅ Fixed JS: proper validation flow
     document.getElementById("signupForm").addEventListener("submit", function (event) {
+      const fullname = document.getElementById("fullname").value.trim();
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value;
       const confirmPassword = document.getElementById("confirmPassword").value;
+
       let valid = true;
 
+      // Reset errors
+      document.getElementById("emailError").style.display = "none";
+      document.getElementById("passwordError").style.display = "none";
+      document.getElementById("confirmError").style.display = "none";
+
+      // Check for empty fields properly
+      if (fullname === "" || email === "" || password === "" || confirmPassword === "") {
+        alert("⚠️ Please fill in all required fields.");
+        valid = false;
+      }
+
+      // Validate email
       if (!validateEmail(email)) {
         document.getElementById("emailError").style.display = "block";
         valid = false;
-      } else {
-        document.getElementById("emailError").style.display = "none";
       }
 
+      // Validate password format
       if (!validatePassword(password)) {
         document.getElementById("passwordError").style.display = "block";
         valid = false;
-      } else {
-        document.getElementById("passwordError").style.display = "none";
       }
 
+      // Confirm password check
       if (password !== confirmPassword) {
         document.getElementById("confirmError").style.display = "block";
         valid = false;
-      } else {
-        document.getElementById("confirmError").style.display = "none";
       }
 
       if (!valid) {
-        event.preventDefault();
-      } else {
-        document.getElementById("signupSuccess").style.display = "block";
-        setTimeout(() => {
-          document.getElementById("signupSuccess").style.display = "none";
-        }, 2000);
+        event.preventDefault(); // Stop submission if invalid
+        return;
       }
+
+      // ✅ Success visual feedback
+      document.getElementById("signupSuccess").style.display = "block";
+      setTimeout(() => {
+        document.getElementById("signupSuccess").style.display = "none";
+      }, 3000);
     });
   </script>
 </body>

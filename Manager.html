@@ -7,49 +7,59 @@
   <link rel="stylesheet" href="manager.css" />
 </head>
 <body>
-
-   <!-- Top Navigation Bar
+  <!-- Top Navigation Bar (UNCHANGED) -->
   <header class="top-navbar">
     <div class="navbar-left">
       <div class="logo">
         <img src="Logo.png" alt="ProBoost Logo">
-        <span>ProBoost</span>
+        <span>ProBoost Manager</span>
       </div>
       <button class="nav-button home-btn" onclick="goToMainMenu()">Home</button>
       <div class="search-container">
         <input type="text" placeholder="Search..." class="search-input">
         <button class="search-btn" aria-label="Search">🔍</button>
       </div>
-    </div> -->
+    </div>
+    <div class="navbar-right">
+      <button class="icon-btn" title="Add New" aria-label="Add New">➕</button>
+      <button class="icon-btn" title="Notifications" aria-label="Notifications">🔔</button>
+      <div class="user-profile" onclick="toggleUserMenu()">
+        <div class="user-avatar" id="userAvatar">👤</div>
+        <span id="userNameDisplay">Manager</span>
+      </div>
+      <button class="icon-btn" title="Settings" onclick="showSection('userPage')" aria-label="Settings">⚙️</button>
+    </div>
+  </header>
 
-  <!-- Top Navigation Bar -->
-<header class="navbar">
-  <div class="logo">
-    <img src="Logo.png" alt="ProBoost Logo" />
-    <span>ProBoost Manager</span>
-  </div>
-</header>
-
-<div class="app">
-  <!-- Top bar (optional; if you still want the crumb row) -->
-  <div class="topbar">
-    <div class="crumb"></div><div class="crumb"></div><div class="crumb"></div><div class="crumb"></div>
-    <div style="margin-left:auto;display:flex;gap:8px">
-      <div class="crumb" style="width:28px"></div>
-      <div class="crumb" style="width:28px"></div>
-      <div class="crumb" style="width:28px"></div>
+  <!-- Circular Navigation FAB (UNCHANGED) -->
+  <div class="circular-nav" id="circularNav">
+    <div class="fab-main" onclick="toggleCircularNav()">
+      <div class="fab-icon">☰</div>
+    </div>
+    <div class="fab-options" id="fabOptions">
+      <div class="fab-option" onclick="navigateToSection('collaboration')" title="Team Collaboration">🤝</div>
+      <div class="fab-option" onclick="navigateToSection('time')" title="Time Tracking">⏳</div>
+      <div class="fab-option" onclick="navigateToSection('analytics')" title="Analytics">📊</div>
+      <div class="fab-option" onclick="navigateToSection('goalPage')" title="Goals">🎯</div>
+      <div class="fab-option" onclick="navigateToSection('taskPage')" title="Tasks">📝</div>
+      <div class="fab-option" onclick="navigateToSection('countdown')" title="Countdown">⏰</div>
+      <div class="fab-option logout-fab" onclick="logoutUser()" title="Logout">🚪</div>
     </div>
   </div>
-    
-    <!-- ===== User Settings Page ===== -->
-     <section id="userPage" class="page" data-title="User Settings">
-      <h1 class="h1">User Settings</h1>
-      
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- User Settings -->
+    <section id="userPage" class="section">
+      <div class="section-header">
+        <h1>👤 User Settings</h1>
+        <p>Manage your profile and preferences</p>
+      </div>
+
       <div class="settings-grid">
-        
-        <!-- Profile Management -->
-         <div class="panel">
-          <h3 style="margin-bottom:10px;color:#1565c0">Profile Management</h3>
+        <!-- Profile -->
+        <div class="panel">
+          <h3 style="margin-bottom:10px;color:#3498DB">Profile Management</h3>
           <form id="profileForm" class="form-container" style="margin:0">
             <div class="row-2">
               <div class="input-group">
@@ -61,7 +71,7 @@
                 <input id="email" name="email" type="email">
               </div>
             </div>
-            
+
             <div class="row-2">
               <div class="input-group">
                 <label for="jobTitle">Job title</label>
@@ -72,7 +82,7 @@
                 <input id="phone" name="phone" placeholder="+60 123 4567">
               </div>
             </div>
-            
+
             <div class="row-2" style="align-items:center">
               <div class="input-group">
                 <label>Avatar</label>
@@ -80,15 +90,15 @@
               </div>
               <div style="display:flex;gap:14px;align-items:center">
                 <img id="avatarPreview" alt="Avatar" style="width:64px;height:64px;border-radius:50%;background:#cbd5e1;object-fit:cover">
-                <button type="button" id="saveProfile">Save Profile</button>
+                <button type="button" id="saveProfile" class="btn-primary">Save Profile</button>
               </div>
             </div>
           </form>
         </div>
-        
+
         <!-- Preferences -->
-         <div class="panel">
-          <h3 style="margin-bottom:10px;color:#1565c0">Preferences</h3>
+        <div class="panel">
+          <h3 style="margin-bottom:10px;color:#3498DB">Preferences</h3>
           <div class="form-container" style="margin:0">
             <div class="row-2">
               <div class="input-group">
@@ -98,214 +108,202 @@
                   <option value="light">Light</option>
                   <option value="dark">Dark</option>
                 </select>
-          </div>
-          <div class="input-group">
-            <label for="lang">Language</label>
-            <select id="lang">
-              <option value="en">English</option>
-              <option value="bm">Malay</option>
-            </select>
-          </div>
-        </div>
-        
-        <div class="settings-list" style="margin-top:8px">
-          <div class="setting-item">
-            <span>Email notifications</span>
-            <label class="toggle">
-              <input id="notifEmail" type="checkbox" checked>
-              <span class="slider"></span>
-            </label>
-          </div>
-          <div class="setting-item">
-            <span>Push notifications</span>
-            <label class="toggle">
-              <input id="notifPush" type="checkbox">
-              <span class="slider"></span>
-            </label>
-          </div>
-          <div class="setting-item">
-            <span>Weekly summaries</span>
-            <label class="toggle">
-              <input id="weekly" type="checkbox" checked>
-              <span class="slider"></span>
-            </label>
+              </div>
+              <div class="input-group">
+                <label for="lang">Language</label>
+                <select id="lang">
+                  <option value="en">English</option>
+                  <option value="bm">Malay</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="settings-list" style="margin-top:8px">
+              <div class="setting-item">
+                <span>Email notifications</span>
+                <label class="toggle">
+                  <input id="notifEmail" type="checkbox" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="setting-item">
+                <span>Push notifications</span>
+                <label class="toggle">
+                  <input id="notifPush" type="checkbox">
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="setting-item">
+                <span>Weekly summaries</span>
+                <label class="toggle">
+                  <input id="weekly" type="checkbox" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <div style="margin-top:14px">
+              <button type="button" id="savePrefs" class="btn-primary">Save Preferences</button>
+            </div>
           </div>
         </div>
 
-        <div style="margin-top:14px">
-          <button type="button" id="savePrefs">Save Preferences</button>
+        <!-- Team Settings -->
+        <div class="panel">
+          <h3 style="margin-bottom:10px;color:#3498DB">Team Settings</h3>
+          <div class="form-container" style="margin:0">
+            <div class="row-2">
+              <div class="input-group">
+                <label for="role">Role</label>
+                <select id="role">
+                  <option>Member</option>
+                  <option>Manager</option>
+                </select>
+              </div>
+              <div class="input-group">
+                <label for="workspace">Workspace</label>
+                <select id="workspace">
+                  <option>Main</option>
+                  <option>Design</option>
+                  <option>Engineering</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="settings-list" style="margin-top:8px">
+              <div class="setting-item">
+                <span>Allow mentions (@name)</span>
+                <label class="toggle">
+                  <input id="mentions" type="checkbox" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="setting-item">
+                <span>Share my status</span>
+                <label class="toggle">
+                  <input id="shareStatus" type="checkbox">
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <div style="margin-top:14px">
+              <button type="button" id="saveTeam" class="btn-primary">Save Team Settings</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Data & Privacy -->
+        <div class="panel">
+          <h3 style="margin-bottom:10px;color:#3498DB">Data &amp; Privacy Control</h3>
+          <div class="form-container" style="margin:0">
+            <div class="settings-list">
+              <div class="setting-item">
+                <span>Two-factor authentication</span>
+                <label class="toggle">
+                  <input id="twoFA" type="checkbox">
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="setting-item">
+                <span>Use analytics to improve product</span>
+                <label class="toggle">
+                  <input id="analytics" type="checkbox" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+              <button type="button" id="downloadData" class="btn-primary">Download My Data</button>
+              <button type="button" class="delete-btn" id="deleteAccount">Delete Account</button>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- Team Settings -->
-    <div class="panel">
-      <h3 style="margin-bottom:10px;color:#1565c0">Team Settings</h3>
-      <div class="form-container" style="margin:0">
-        <div class="row-2">
-          <div class="input-group">
-            <label for="role">Role</label>
-            <select id="role">
-              <option>Member</option>
-              <option>Manager</option>
-            </select>
-          </div>
-          <div class="input-group">
-            <label for="workspace">Workspace</label>
-            <select id="workspace">
-              <option>Main</option>
-              <option>Design</option>
-              <option>Engineering</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="settings-list" style="margin-top:8px">
-          <div class="setting-item">
-            <span>Allow mentions (@name)</span>
-            <label class="toggle">
-              <input id="mentions" type="checkbox" checked>
-              <span class="slider"></span>
-            </label>
-          </div>
-          <div class="setting-item">
-            <span>Share my status</span>
-            <label class="toggle">
-              <input id="shareStatus" type="checkbox">
-              <span class="slider"></span>
-            </label>
-          </div>
-        </div>
-
-        <div style="margin-top:14px">
-          <button type="button" id="saveTeam">Save Team Settings</button>
-        </div>
+    <!-- Task Management -->
+    <section id="taskPage" class="section active">
+      <div class="section-header">
+        <h1>📝 Task Management</h1>
+        <p>Organize and track your team's tasks</p>
       </div>
-    </div>
 
-    <!-- Data & Privacy Control -->
-    <div class="panel">
-      <h3 style="margin-bottom:10px;color:#1565c0">Data &amp; Privacy Control</h3>
-      <div class="form-container" style="margin:0">
-        <div class="settings-list">
-          <div class="setting-item">
-            <span>Two-factor authentication</span>
-            <label class="toggle">
-              <input id="twoFA" type="checkbox">
-              <span class="slider"></span>
-            </label>
-          </div>
-          <div class="setting-item">
-            <span>Use analytics to improve product</span>
-            <label class="toggle">
-              <input id="analytics" type="checkbox" checked>
-              <span class="slider"></span>
-            </label>
-          </div>
-        </div>
-
-        <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
-          <button type="button" id="downloadData">Download My Data</button>
-          <button type="button" class="delete-btn" id="deleteAccount">Delete Account</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Toast messages (uses your existing CSS) -->
-  <div class="message-container" id="toasts"></div>
-</section>
-
-
-
-    <!-- ===== Task Management Page ===== -->
-    <section id="taskPage" class="page active">
-      <h1 class="h1">Task Management</h1>
-
-      <!-- Controls -->
-      <div class="controls">
-        <div class="btn" onclick="openTaskModal()">➕ Add Task</div>
+      <!-- Controls (wireframe: add left, sort right, search full row) -->
+      <div class="controls controls-wire">
+        <button class="btn" id="addTaskBtn" onclick="openTaskModal()">➕ Add Task</button>
         <div class="field">
-        <select id="sortSelect" onchange="sortBoard()">
-        <option selected disabled>Sort by</option>
-        <option value="priority">Priority</option>
-        <option value="deadline">Deadline</option>
-        <option value="assignee">Assignee</option>
-      </select>
-    </div>
-
-        <div class="field" style="grid-column:1 / -1">
+          <label class="field-label">Sort by :</label>
+          <select id="sortSelect" onchange="sortBoard()">
+            <option selected disabled>—</option>
+            <option value="priority">Priority</option>
+            <option value="deadline">Deadline</option>
+            <option value="assignee">Assignee</option>
+          </select>
+        </div>
+        <div class="field field-search">
           <input id="searchInput" placeholder="Search Tasks" oninput="filterBoard()" />
         </div>
       </div>
 
-      <!-- Kanban -->
-      <div class="kanban" id="kanban">
+      <!-- Kanban (4 equal columns) -->
+      <div class="kanban wire-kanban" id="kanban">
         <div class="col" data-status="upcoming">
           <div class="col-head"><span class="col-title">Upcoming</span><span>⋯</span></div>
           <div class="cards"></div>
-          <button class="add-card" onclick="openTaskModal('upcoming')">+ Add a card</button>
+          <button class="add-card" onclick="openTaskModal(null,'upcoming')">+ Add a card</button>
         </div>
         <div class="col" data-status="in-progress">
           <div class="col-head"><span class="col-title">In Progress</span><span>⋯</span></div>
           <div class="cards"></div>
-          <button class="add-card" onclick="openTaskModal('in-progress')">+ Add a card</button>
+          <button class="add-card" onclick="openTaskModal(null,'in-progress')">+ Add a card</button>
         </div>
         <div class="col" data-status="completed">
           <div class="col-head"><span class="col-title">Completed</span><span>⋯</span></div>
           <div class="cards"></div>
-          <button class="add-card" onclick="openTaskModal('completed')">+ Add a card</button>
+          <button class="add-card" onclick="openTaskModal(null,'completed')">+ Add a card</button>
         </div>
         <div class="col" data-status="pending">
           <div class="col-head"><span class="col-title">Pending</span><span>⋯</span></div>
           <div class="cards"></div>
-          <button class="add-card" onclick="openTaskModal('pending')">+ Add a card</button>
+          <button class="add-card" onclick="openTaskModal(null,'pending')">+ Add a card</button>
         </div>
       </div>
 
-      <!-- Calendar -->
-      <div class="calendar-wrap">
+      <!-- Calendar + Day list (side-by-side like wireframe) -->
+      <div class="calendar-wrap wire-cal">
         <div class="calendar">
           <header>
             <button class="ghost" onclick="prevMonth()">◀</button>
             <div id="calTitle" style="font-weight:700"></div>
             <button class="ghost" onclick="nextMonth()">▶</button>
           </header>
-
-          <script>
-          (function () {
-            var el = document.getElementById('calTitle');
-            if (el) {
-              var now = new Date();
-              el.textContent = now.toLocaleString(undefined, { month: 'long', year: 'numeric' });
-            }
-          })();
-          </script>
-
           <table>
-            <thead><tr><th>S</th><th>M</th><th>T</th><th>W</th><th>T</th><th>F</th><th>S</th></tr></thead>
+            <thead>
+              <tr><th>S</th><th>M</th><th>T</th><th>W</th><th>T</th><th>F</th><th>S</th></tr>
+            </thead>
             <tbody id="calBody"></tbody>
           </table>
         </div>
 
         <div class="daylist">
-          <div style="display:flex;align-items:center;gap:10px;justify-content:space-between">
-            <div id="dayTitle" style="font-weight:700">—</div>
+          <div class="daylist-head">
+            <div id="dayTitle" class="day-title">—</div>
             <span>⋯</span>
           </div>
-          <div id="dayItems" style="margin-top:10px;display:flex;flex-direction:column;gap:10px"></div>
+          <div id="dayItems" class="day-items"></div>
         </div>
       </div>
 
-      <!-- Overview -->
+      <!-- Overview (table like wireframe) -->
       <section class="overview">
-        <h2 class="h1" style="font-size:36px">Overview</h2>
-        <div class="bar" style="width:180px;margin:4px 6px 14px">Project Title</div>
-        <div class="table">
+        <h2 class="section-header" style="font-size:36px">Overview</h2>
+        <div class="table card-table">
           <table id="overviewTable">
             <thead>
               <tr>
-                <th>Tasks</th>
+                <th>Task</th>
                 <th>Status</th>
                 <th>Assignee</th>
                 <th>Deadline</th>
@@ -318,13 +316,14 @@
       </section>
     </section>
 
-    <!-- ===== Time Tracking Page ===== -->
+    <!-- Goal Plan -->
+    <section id="goalPage" class="section">
+      <div class="section-header">
+        <h1>🎯 Goal Plan</h1>
+        <p>Set and track personal and team goals</p>
+      </div>
 
-
-    <!-- ===== Goal Setting Page ===== -->
-    <section id="goalPage" class="page">
-      <h1 class="h1">Goal Plan</h1>
-
+      <!-- Top: Donut + lists pane -->
       <div class="goal-grid">
         <div class="panel">
           <div class="donut" id="donut">
@@ -336,7 +335,7 @@
           </div>
           <div id="donutSub" class="muted" style="text-align:center;margin-top:8px">—</div>
         </div>
-        <div class="panel">
+        <div class="panel list-pane">
           <div class="bar" style="height:38px;border-radius:10px;background:#cfd6df;margin-bottom:12px"></div>
           <div class="list">
             <div class="row"></div><div class="row"></div><div class="row"></div>
@@ -346,10 +345,11 @@
         </div>
       </div>
 
+      <!-- Personal & Team tables like wireframe -->
       <div class="goal-sections">
         <div class="goal-table">
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;font-weight:700;background:#f0f4f8">
-            Personal
+          <div class="goal-table-head">
+            <span>Personal</span>
             <div class="row">
               <button class="ghost" onclick="openGoalModal('personal')">+ New Goal</button>
               <button class="ghost">Sort ▾</button>
@@ -364,8 +364,8 @@
         </div>
 
         <div class="goal-table">
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;font-weight:700;background:#f0f4f8">
-            Team
+          <div class="goal-table-head">
+            <span>Team</span>
             <div class="row">
               <button class="ghost" onclick="openGoalModal('team')">+ New Goal</button>
               <button class="ghost">Sort ▾</button>
@@ -380,17 +380,17 @@
         </div>
       </div>
 
-      <!-- Progress Log -->
+      <!-- Progress Log (single big card like wireframe) -->
       <section class="progress-log">
-        <h2 class="h1" style="font-size:36px">Progress Log</h2>
+        <h2 class="section-header" style="font-size:36px">Progress Log</h2>
         <div class="log-card" id="progressItem">
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <div><strong id="plTitle">Learn New Software Skill</strong></div>
+          <div class="log-head">
+            <strong id="plTitle">Learn New Software Skill</strong>
             <button class="ghost" onclick="openProgressModal()">+ Update Progress</button>
           </div>
-          <div class="progress" style="margin:10px 0"><span id="plBar" style="width:60%"></span></div>
-          <div style="display:flex;gap:14px;align-items:center">
-            <div style="height:56px;width:56px;border-radius:50%;background:#cbd5e1"></div>
+          <div class="progress progress-lg"><span id="plBar" style="width:60%"></span></div>
+          <div class="log-foot">
+            <div class="log-avatar"></div>
             <div>
               <div id="plDate">Aug 16</div>
               <div id="plNote" class="muted">Watched lessons on tools</div>
@@ -399,69 +399,32 @@
         </div>
       </section>
     </section>
+  </main>
+
+  <!-- User Menu / Logout Modal (unchanged structure) -->
+  <div id="userMenu" class="user-menu">
+    <div class="user-info">
+      <div class="user-avatar-large">👤</div>
+      <div>
+        <div class="user-name" id="userNameMenu">Manager</div>
+        <div class="user-role" id="userEmailMenu">manager@example.com</div>
+      </div>
+    </div>
+    <a href="#" class="menu-item" onclick="showSection('userPage'); return false;">⚙️ Settings</a>
+    <a href="#" class="menu-item logout-item" onclick="logoutUser(); return false;">🚪 Logout</a>
   </div>
 
-  <!-- Circular Navigation FAB
-  <div class="circular-nav" id="circularNav">
-    <div class="fab-main" onclick="toggleCircularNav()">
-      <div class="fab-icon">☰</div>
+  <div id="logoutModal" class="modal">
+    <div class="modal-content">
+      <h3>Confirm Logout</h3>
+      <p>Are you sure you want to logout?</p>
+      <div class="modal-actions">
+        <button class="btn-primary" onclick="confirmLogout()">Yes, Logout</button>
+        <button class="btn-secondary" onclick="cancelLogout()">Cancel</button>
+      </div>
     </div>
-    <div class="fab-options" id="fabOptions">
-      <div class="fab-option" onclick="navigateToSection('userPage')" title="User Settings">👤</div>
-      <div class="fab-option" onclick="navigateToSection('collaboration')" title="Team Collaboration">🤝</div>
-      <div class="fab-option" onclick="navigateToSection('time')" title="Time Tracking">⏳</div>
-      <div class="fab-option" onclick="navigateToSection('analytics')" title="Analytics">📊</div>
-      <div class="fab-option" onclick="navigateToSection('goalPage')" title="Goal Setting">🎯</div>
-      <div class="fab-option" onclick="navigateToSection('taskPage')" title="Task Management">📝</div>
-      <div class="fab-option" onclick="navigateToSection('countdown')" title="Countdown">⏰</div>
-      <div class="fab-option logout-fab" onclick="logoutUser()" title="Logout">🚪</div>
-    </div>
-  </div> -->
-
-    <!-- Right side nav (dot menu) -->
-  <div class="menu-bar" title="Pages">
-    <button class="menu-dot" data-target="userPage" aria-label="User Settings"></button>
-    <button class="menu-dot" data-target="taskPage" aria-label="Task Management"></button>
-    <button class="menu-dot" data-target="timePage" aria-label="Time Tracking"></button>
-    <button class="menu-dot" data-target="goalPage" aria-label="Goal Setting"></button>
-    <button class="menu-dot" data-target="collaborationPage" aria-label="Collaboration"></button>
-    <button class="menu-dot" data-target="productivityPage" aria-label="Productivity Analysis"></button>
   </div>
 
-  <!-- Load behavior -->
   <script src="manager.js"></script>
-
-  
-  <!-- Modals (shared) -->
-  <div class="modal" id="taskModal"> … </div>
-  <div class="modal" id="goalModal"> … </div>
-  <div class="modal" id="progressModal"> … </div>
-
-<script>
-  /* Page switcher */
-  function showPage(id){
-    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    document.querySelectorAll('.menu-dot').forEach(d=>d.classList.remove('active'));
-    if(id==='taskPage') document.querySelectorAll('.menu-dot')[0].classList.add('active');
-    else document.querySelectorAll('.menu-dot')[1].classList.add('active');
-  }
-
-  //  // Close menus on outside click
-  //   window.onclick = function(event){
-  //     if(!event.target.closest('.user-profile') && !event.target.closest('.user-menu')) {
-  //       document.getElementById('userMenu').classList.remove('show');
-  //     }
-  //     if(!event.target.closest('#circularNav') && circularNavOpen) {
-  //       toggleCircularNav();
-  //     }
-  //     if(event.target===document.getElementById('logoutModal')) {
-  //       cancelLogout();
-  //     }
-  //   };
-  //   function goToMainMenu() {
-  //   window.location.href = "main menu.html";
-  // }
-</script>
 </body>
 </html>
