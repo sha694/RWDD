@@ -183,7 +183,12 @@
     }
 
     function navigateToSection(sectionId) { 
-      showSection(sectionId); 
+    if (sectionId === 'analytics') {
+        window.location.href = 'analytics.html';
+        return;
+    }
+    
+    showSection(sectionId); 
     }
 
     function toggleUserMenu() { 
@@ -218,7 +223,7 @@
       const container = document.getElementById(column+'-cards');
       const card = document.createElement('div'); 
       card.className='task-card';
-      card.innerHTML = <h4>${title}</h4><p>New task</p>;
+      card.innerHTML = '<h4>${title}</h4><p>New task</p>;'
       container.appendChild(card);
     }
 
@@ -262,7 +267,7 @@
       if(!text) return;
       const div=document.createElement('div'); 
       div.className='goal-item';
-      div.innerHTML=<span class="goal-status">📚</span><span class="goal-text">${text}</span>;
+      div.innerHTML='<span class="goal-status">📚</span><span class="goal-text">${text}</span>;'
       div.onclick=function(){ 
         const status = this.querySelector('.goal-status');
         if(status.textContent==='📚') {
@@ -283,7 +288,7 @@
       if(!text) return;
       const div=document.createElement('div'); 
       div.className='task-item';
-      div.innerHTML=<span class="task-status">⏳</span><span class="task-text">${text}</span>;
+      div.innerHTML='<span class="task-status">⏳</span><span class="task-text">${text}</span>;'
       div.onclick=function(){ 
         const status = this.querySelector('.task-status');
         if(status.textContent==='⏳') {
@@ -311,7 +316,7 @@
       const h=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
       const m=Math.floor((diff%(1000*60*60))/(1000*60));
       const s=Math.floor((diff%(1000*60))/1000);
-      el.innerHTML=${d}d ${h}h ${m}m ${s}s;
+      el.innerHTML='${d}d ${h}h ${m}m ${s}s;'
     }
 
     // Close menus on outside click
