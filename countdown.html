@@ -4,33 +4,430 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Memorial Countdown - ProBoost</title>
-    <link rel="stylesheet" href="countdown.css">
+    <link rel="stylesheet" href="user.css">
+    <style>
+        /* 保留所有原有的 Countdown CSS 样式 */
+        .countdown-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Filter Tabs */
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .filter-tab {
+            padding: 12px 24px;
+            border: none;
+            background: #f3f4f6;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #6b7280;
+        }
+
+        .filter-tab.active {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .filter-tab:hover:not(.active) {
+            background: #e5e7eb;
+        }
+
+        /* Add Button */
+        .add-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: auto;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .add-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Countdown Grid */
+        .countdown-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .countdown-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .countdown-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .countdown-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .countdown-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1e3a8a;
+            margin: 0;
+        }
+
+        .countdown-type {
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .type-countdown { background: #dbeafe; color: #1e40af; }
+        .type-anniversary { background: #fce7f3; color: #be185d; }
+        .type-holiday { background: #fef3c7; color: #d97706; }
+
+        .countdown-content {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .countdown-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #3b82f6;
+            display: block;
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+
+        .countdown-label {
+            font-size: 1rem;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .countdown-date {
+            text-align: center;
+            color: #9ca3af;
+            font-size: 0.9rem;
+            margin-top: 15px;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+        }
+
+        .edit-btn {
+            background: #fbbf24;
+            color: white;
+        }
+
+        .edit-btn:hover {
+            background: #f59e0b;
+            transform: scale(1.1);
+        }
+
+        .delete-btn {
+            background: #ef4444;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #dc2626;
+            transform: scale(1.1);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 500px;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-title {
+            color: #1e3a8a;
+            margin-bottom: 25px;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .type-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .type-option {
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .type-option.active {
+            border-color: #3b82f6;
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .btn-confirm {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-confirm:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        .btn-cancel {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            background: #4b5563;
+            transform: translateY(-2px);
+        }
+
+        /* Confirmation Modal */
+        .confirmation-text {
+            text-align: center;
+            color: #374151;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .filter-tabs {
+                flex-wrap: wrap;
+            }
+            
+            .countdown-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .countdown-number {
+                font-size: 2.5rem;
+            }
+            
+            .type-options {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <header class="navbar">
-        <div class="logo">
-            <img src="Logo.png" alt="ProBoost Logo">
-            <span>ProBoost</span>
+    <!-- 使用与 User Dashboard 相同的顶部导航栏 -->
+    <header class="top-navbar">
+        <div class="navbar-left">
+            <div class="logo">
+                <img src="Logo.png" alt="ProBoost Logo">
+                <span>ProBoost</span>
+            </div>
+            <button class="nav-button home-btn" onclick="goToUserDashboard()">Dashboard</button>
+            <div class="search-container">
+                <input type="text" placeholder="Search..." class="search-input">
+                <button class="search-btn" aria-label="Search">🔍</button>
+            </div>
         </div>
-        <nav class="nav-links">
-            <a href="user.html">🏠 Home</a>
-            <a href="collaboration.html">🤝 Collaboration</a>
-            <a href="time-tracking.html">⏳ Time Tracking</a>
-            <a href="analytics.html">📊 Analytics</a>
-            <a href="goals.html">🎯 Goals</a>
-            <a href="tasks.html">📝 Tasks</a>
-            <a href="#" class="active">⏰ Countdown</a>
-        </nav>
-        <div class="logout">
-            <a href="Landing Page.html">🚪 Logout</a>
+        
+        <div class="navbar-right">
+            <button class="icon-btn" title="Add New" aria-label="Add New">➕</button>
+            <button class="icon-btn" title="Notifications" aria-label="Notifications">🔔</button>
+            <div class="user-profile" onclick="toggleUserMenu()">
+                <div class="user-avatar" id="userAvatar">👤</div>
+                <span id="userNameDisplay">User</span>
+            </div>
+            <button class="icon-btn" title="Settings" onclick="openSettings()" aria-label="Settings">⚙</button>
         </div>
     </header>
 
-    <main class="container">
+    <!-- 使用与 User Dashboard 相同的圆形导航 -->
+    <div class="circular-nav" id="circularNav">
+        <div class="fab-main" onclick="toggleCircularNav()">
+            <div class="fab-icon">☰</div>
+        </div>
+        <div class="fab-options" id="fabOptions">
+            <div class="fab-option" onclick="navigateToSection('collaboration')" title="Team Collaboration">🤝</div>
+            <div class="fab-option" onclick="navigateToSection('time')" title="Time Tracking">⏳</div>
+            <div class="fab-option" onclick="navigateToSection('analytics')" title="Analytics">📊</div>
+            <div class="fab-option" onclick="navigateToSection('goals')" title="Goals">🎯</div>
+            <div class="fab-option" onclick="navigateToSection('tasks')" title="Tasks">📝</div>
+            <div class="fab-option active-fab" onclick="navigateToSection('countdown')" title="Countdown">⏰</div>
+            <div class="fab-option logout-fab" onclick="logoutUser()" title="Logout">🚪</div>
+        </div>
+    </div>
+
+    <!-- 用户菜单 -->
+    <div id="userMenu" class="user-menu">
+        <div class="user-info">
+            <div class="user-avatar-large">👤</div>
+            <div>
+                <div class="user-name" id="userNameMenu">User</div>
+                <div class="user-role" id="userEmailMenu">user@example.com</div>
+            </div>
+        </div>
+        <a href="#" class="menu-item" onclick="openSettings(); return false;">⚙ Settings</a>
+        <a href="#" class="menu-item logout-item" onclick="logoutUser(); return false;">🚪 Logout</a>
+    </div>
+
+    <!-- 退出确认模态框 -->
+    <div id="logoutModal" class="modal">
+        <div class="modal-content">
+            <h3>Confirm Logout</h3>
+            <p>Are you sure you want to logout?</p>
+            <div class="modal-actions">
+                <button class="btn-primary" onclick="confirmLogout()">Yes, Logout</button>
+                <button class="btn-secondary" onclick="cancelLogout()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主内容区域 -->
+    <main class="main-content">
         <section id="countdown" class="section active">
-            <h1>Memorial Countdown ⏰</h1>
-            <p>Track and manage your important dates and events</p>
+            <div class="section-header">
+                <h1>Memorial Countdown ⏰</h1>
+                <p>Track and manage your important dates and events</p>
+            </div>
 
             <div class="countdown-container">
                 <!-- Filter Tabs and Add Button -->
@@ -87,9 +484,7 @@
     <div class="modal" id="deleteModal">
         <div class="modal-content">
             <h3 class="modal-title">Confirm Delete</h3>
-            <p class="confirmation-text" id="deleteMessage">
-                Are you sure you want to delete this countdown? This action cannot be undone.
-            </p>
+            <p class="confirmation-text" id="deleteMessage">Are you sure you want to delete this countdown? This action cannot be undone.</p>
             <div class="modal-actions">
                 <button type="button" class="btn btn-cancel" onclick="closeDeleteModal()">Cancel</button>
                 <button type="button" class="btn btn-confirm" onclick="confirmDelete()">Delete</button>
@@ -98,6 +493,104 @@
     </div>
 
     <script>
+        
+        // User Authentication and Navigation Functions
+        let circularNavOpen = false;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            checkUserAuthentication();
+            displayUserInfo();
+            initializeCountdowns();
+        });
+
+        function checkUserAuthentication() {
+            const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
+            const userRole = sessionStorage.getItem('role');
+            const userEmail = sessionStorage.getItem('userEmail');
+            if (!isLoggedIn || userRole !== 'user' || !userEmail) {
+                alert('Access Denied! Please login as a user.');
+                window.location.href = 'Login page.html';
+            }
+        }
+
+        function displayUserInfo() {
+            const userEmail = sessionStorage.getItem('userEmail') || 'user@example.com';
+            const userName = userEmail.split('@')[0];
+            document.getElementById('userNameDisplay').textContent = userName;
+            document.getElementById('userNameMenu').textContent = userName;
+            document.getElementById('userEmailMenu').textContent = userEmail;
+        }
+
+        function toggleCircularNav() {
+            circularNavOpen = !circularNavOpen;
+            const nav = document.getElementById('circularNav');
+            nav.classList.toggle('open');
+            const fabMain = nav.querySelector('.fab-main');
+            fabMain.classList.toggle('rotated');
+        }
+
+        function navigateToSection(sectionId) { 
+            if (sectionId === 'countdown') {
+                return; // Already on Countdown page
+            }
+            
+            // Page mapping
+            const pageMap = {
+                'collaboration': 'collaboration.html',
+                'time': 'time-tracking.html', 
+                'analytics': 'analytics.html',
+                'goals': 'goals.html',
+                'tasks': 'tasks.html',
+                'countdown': 'countdown.html'
+            };
+            
+            const targetPage = pageMap[sectionId];
+            if (targetPage) {
+                window.location.href = targetPage;
+            } else {
+                console.warn(`No page mapping found for section: ${sectionId}`);
+            }
+        }
+
+        function toggleUserMenu() { 
+            document.getElementById('userMenu').classList.toggle('show'); 
+        }
+
+        function openSettings() { 
+            alert('Settings panel opens'); 
+        }
+
+        function logoutUser() { 
+            document.getElementById('logoutModal').style.display = 'flex'; 
+        }
+
+        function confirmLogout() {
+            sessionStorage.clear();
+            window.location.href = 'Landing Page.html';
+        }
+
+        function cancelLogout() { 
+            document.getElementById('logoutModal').style.display = 'none'; 
+        }
+
+        function goToUserDashboard() {
+            window.location.href = "user.html";
+        }
+
+        // Close menus on outside click
+        window.onclick = function(event) {
+            if (!event.target.closest('.user-profile') && !event.target.closest('.user-menu')) {
+                document.getElementById('userMenu').classList.remove('show');
+            }
+            if (!event.target.closest('#circularNav') && circularNavOpen) {
+                toggleCircularNav();
+            }
+            if (event.target === document.getElementById('logoutModal')) {
+                cancelLogout();
+            }
+        };
+
+        // Countdown Feature JavaScript
         let countdowns = [
             { id: 1, title: "National Day", date: "2025-08-31", type: "countdown", days: 9 },
             { id: 2, title: "Class Test", date: "2025-09-30", type: "countdown", days: 39 },
@@ -111,12 +604,14 @@
         let editingId = null;
         let deletingId = null;
 
+        // Initialize the page
         function initializeCountdowns() {
             renderCountdowns();
             updateCountdowns();
             setInterval(updateCountdowns, 1000);
         }
 
+        // Render countdowns based on filter
         function renderCountdowns() {
             const grid = document.getElementById('countdownGrid');
             const filteredCountdowns = currentFilter === 'all' 
@@ -131,7 +626,7 @@
                     </div>
                     <div class="countdown-content">
                         <span class="countdown-number">${item.days}</span>
-                        <span class="countdown-label">${item.days > 0 ? 'Days until' : 'Today!'}</span>
+                        <span class="countdown-label">${item.days > 0 ? 'Days ' + (item.date > new Date().toISOString().split('T')[0] ? 'until' : 'since') : 'Today!'}</span>
                     </div>
                     <div class="countdown-date">${formatDate(item.date)}</div>
                     <div class="action-buttons">
@@ -142,18 +637,125 @@
             `).join('');
         }
 
-        function filterCountdowns(type) {
-            currentFilter = type;
-            document.querySelectorAll('.filter-tab').forEach(btn => btn.classList.remove('active'));
-            document.querySelector(`.filter-tab[onclick="filterCountdowns('${type}')"]`).classList.add('active');
+        // Update countdown days
+        function updateCountdowns() {
+            countdowns.forEach(item => {
+                const today = new Date();
+                const targetDate = new Date(item.date);
+                const diffTime = targetDate - today;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                item.days = Math.abs(diffDays);
+            });
             renderCountdowns();
         }
 
-        function formatDate(date) {
-            return new Date(date).toLocaleDateString();
+        // Filter countdowns
+        function filterCountdowns(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            renderCountdowns();
         }
 
-        window.onload = initializeCountdowns;
+        // Modal functions
+        function openAddModal() {
+            document.getElementById('modalTitle').textContent = 'Add New Countdown';
+            document.getElementById('countdownForm').reset();
+            document.querySelectorAll('.type-option').forEach(opt => opt.classList.remove('active'));
+            document.getElementById('eventType').value = '';
+            editingId = null;
+            document.getElementById('countdownModal').classList.add('active');
+        }
+
+        function openEditModal(id) {
+            const item = countdowns.find(c => c.id === id);
+            if (item) {
+                document.getElementById('modalTitle').textContent = 'Edit Countdown';
+                document.getElementById('eventTitle').value = item.title;
+                document.getElementById('eventDate').value = item.date;
+                selectType(item.type);
+                editingId = id;
+                document.getElementById('countdownModal').classList.add('active');
+            }
+        }
+
+        function selectType(type) {
+            document.querySelectorAll('.type-option').forEach(opt => opt.classList.remove('active'));
+            document.querySelector(`.type-option[data-type="${type}"]`).classList.add('active');
+            document.getElementById('eventType').value = type;
+        }
+
+        function closeModal() {
+            document.getElementById('countdownModal').classList.remove('active');
+        }
+
+        function openDeleteModal(id) {
+            const item = countdowns.find(c => c.id === id);
+            if (item) {
+                document.getElementById('deleteMessage').textContent = 
+                    `Are you sure you want to delete "${item.title}"? This action cannot be undone.`;
+                deletingId = id;
+                document.getElementById('deleteModal').classList.add('active');
+            }
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('active');
+            deletingId = null;
+        }
+
+        function confirmDelete() {
+            if (deletingId) {
+                countdowns = countdowns.filter(item => item.id !== deletingId);
+                renderCountdowns();
+                closeDeleteModal();
+            }
+        }
+
+        // Form submission
+        document.getElementById('countdownForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const title = document.getElementById('eventTitle').value;
+            const date = document.getElementById('eventDate').value;
+            const type = document.getElementById('eventType').value;
+            
+            if (editingId) {
+                // Update existing countdown
+                const index = countdowns.findIndex(item => item.id === editingId);
+                if (index !== -1) {
+                    countdowns[index] = { ...countdowns[index], title, date, type };
+                }
+            } else {
+                // Add new countdown
+                const newId = Math.max(...countdowns.map(item => item.id)) + 1;
+                const today = new Date();
+                const targetDate = new Date(date);
+                const diffTime = targetDate - today;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                countdowns.push({
+                    id: newId,
+                    title,
+                    date,
+                    type,
+                    days: Math.abs(diffDays)
+                });
+            }
+            
+            renderCountdowns();
+            closeModal();
+        });
+
+        // Utility function
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        }
     </script>
 </body>
 </html>
