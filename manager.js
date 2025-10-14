@@ -1,398 +1,266 @@
+// manager.js
 (function () {
-  const PAGE_IDS = [
-    "userPage",
-    "taskPage",
-    "goalPage",
-  ];
+  /* ---------- tiny helpers ---------- */
+  const qs = (s, c = document) => c.querySelector(s);
+  const qsa = (s, c = document) => [...c.querySelectorAll(s)];
+  const setText = (sel, txt) => { const el = qs(sel); if (el) el.textContent = txt; };
 
-  function qs(sel, ctx = document) { return ctx.querySelector(sel); }
-  function qsa(sel, ctx = document) { return [...ctx.querySelectorAll(sel)]; }
-
+  // Expose one function that always shows EXACTLY one page.
   function showPage(id) {
-    // Guard: fall back to first available page
-    if (!PAGE_IDS.includes(id)) id = PAGE_IDS.find(x => qs("#" + x)) || PAGE_IDS[0];
-
-    // Toggle sections
-    qsa(".page").forEach(p => p.classList.remove("active"));
-    const active = qs("#" + id);
-    if (active) active.classList.add("active");
-
-    // Toggle active dot
-    qsa(".menu-dot").forEach(d => d.classList.remove("active"));
-    const activeDot = qsa(`.menu-dot[data-target="${id}"]`)[0];
-    if (activeDot) {
-      activeDot.classList.add("active");
-      activeDot.setAttribute("aria-current", "page");
-    }
-
-    // Title sync
-    const nice = active?.getAttribute("data-title") || active?.querySelector(".h1")?.textContent || "Manager";
-    document.title = `ProBoost – ${nice}`;
-
-    // Persist
+    qsa(".section, .page").forEach(s => s.classList.remove("active")); // hide all
+    qs("#" + id)?.classList.add("active");                               // show selected
+    // Save + set title
     localStorage.setItem("manager.activePage", id);
+    const title = qs("#" + id)?.getAttribute("data-title") || "Manager";
+    document.title = `ProBoost – ${title}`;
   }
 
-  function bindNav() {
-    qsa(".menu-dot").forEach(dot => {
-      const tgt = dot.getAttribute("data-target");
-      dot.addEventListener("click", () => showPage(tgt));
-    });
+  // Backward-compat for older HTML that calls showSection(...)
+  window.showPage = showPage;
+  window.showSection = showPage;
+
+  /* ---------- header actions (settings / user menu / logout) ---------- */
+  window.toggleUserMenu = () => qs("#userMenu")?.classList.toggle("show");
+  window.logoutUser = () => { qs("#logoutModal").style.display = "flex"; };
+  window.confirmLogout = () => { sessionStorage.clear(); window.location.href = "Landing Page.html"; };
+  window.cancelLogout = () => { qs("#logoutModal").style.display = "none"; };
+  window.goToMainMenu = () => { window.location.href = "main menu.html"; };
+
+  /* ---------- FAB ---------- */
+  let fabOpen = false;
+  window.toggleCircularNav = function () {
+    fabOpen = !fabOpen;
+    const nav = qs("#circularNav");
+    nav?.classList.toggle("open");
+    nav?.querySelector(".fab-main")?.classList.toggle("rotated");
+  };
+
+  // open a page from the circular nav and then close the menu
+window.navigateToSection = function (id) {
+  const target = document.getElementById(id);
+
+  if (target) {
+    showPage(id);                         // reuse your existing page switcher
+  } else {
+    // optional: avoid silent clicks for pages you haven't built yet
+    console.warn(`No section with id="${id}"`);
+    alert('This section is not available yet.');
   }
 
-  function ensurePagesExist() {
-    // Create minimal placeholders if a page section is missing.
-    PAGE_IDS.forEach(id => {
-      if (!qs("#" + id)) {
-        const sec = document.createElement("section");
-        sec.id = id;
-        sec.className = "page";
-        sec.setAttribute("data-title", id.replace(/Page$/, "").replace(/([A-Z])/g, " $1").trim());
-        sec.innerHTML = `
-          <h1 class="h1">${sec.getAttribute("data-title")}</h1>
-          <div class="panel" style="margin:16px 6px">
-            This page ("${id}") wasn't in the HTML, so I created a placeholder for you.
-          </div>`;
-        qs(".app").appendChild(sec);
-      }
-    });
-  }
+  // close the FAB menu / un-rotate the main button
+  const nav = document.getElementById('circularNav');
+  nav?.classList.remove('open');
+  nav?.querySelector('.fab-main')?.classList.remove('rotated');
+};
 
-  // === User Settings ===
-  function initUserSettingsPage() {
-    const page = qs("#userPage");
-    if (!page) return;        // nothing to do if that section doesn't exist
 
-    // lightweight toast (uses a container with id="toasts" if present)
-    const toastBox = qs("#toasts");
-    function toast(msg, type = "success") {
-      if (!toastBox) return;
-      const div = document.createElement("div");
-      div.className = "message " + (type === "error" ? "error" : "success");
-      div.textContent = msg;
-      toastBox.appendChild(div);
-      setTimeout(() => div.remove(), 2500);
-    }
-
-    // ----- Avatar preview -----
-    const avatar = qs("#avatar");
-    const preview = qs("#avatarPreview");
-    avatar?.addEventListener("change", (e) => {
-      const f = e.target.files?.[0];
-      if (!f) return;
-      const url = URL.createObjectURL(f);
-      if (preview) preview.src = url;
-    });
-
-    // ----- Save Profile -----
-    qs("#saveProfile")?.addEventListener("click", () => {
-      const data = {
-        fullName: qs("#fullName")?.value || "",
-        email: qs("#email")?.value || "",
-        jobTitle: qs("#jobTitle")?.value || "",
-        phone: qs("#phone")?.value || "",
-      };
-      localStorage.setItem("pb.profile", JSON.stringify(data));
-      toast("Profile saved");
-    });
-
-    // ----- Save Preferences -----
-    qs("#savePrefs")?.addEventListener("click", () => {
-      const data = {
-        theme: qs("#theme")?.value,
-        lang: qs("#lang")?.value,
-        notifEmail: !!qs("#notifEmail")?.checked,
-        notifPush: !!qs("#notifPush")?.checked,
-        weekly: !!qs("#weekly")?.checked,
-      };
-      localStorage.setItem("pb.prefs", JSON.stringify(data));
-      toast("Preferences saved");
-    });
-
-    // ----- Save Team -----
-    qs("#saveTeam")?.addEventListener("click", () => {
-      const data = {
-        role: qs("#role")?.value,
-        workspace: qs("#workspace")?.value,
-        mentions: !!qs("#mentions")?.checked,
-        shareStatus: !!qs("#shareStatus")?.checked,
-      };
-      localStorage.setItem("pb.team", JSON.stringify(data));
-      toast("Team settings saved");
-    });
-
-    // ----- Data export -----
-    qs("#downloadData")?.addEventListener("click", () => {
-      const bundle = {
-        profile: JSON.parse(localStorage.getItem("pb.profile") || "{}"),
-        prefs: JSON.parse(localStorage.getItem("pb.prefs") || "{}"),
-        team: JSON.parse(localStorage.getItem("pb.team") || "{}"),
-      };
-      const blob = new Blob([JSON.stringify(bundle, null, 2)], {
-        type: "application/json",
-      });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "proboost-my-data.json";
-      a.click();
-      toast("Data exported");
-    });
-
-    // ----- Delete account (local clean-up) -----
-    qs("#deleteAccount")?.addEventListener("click", () => {
-      if (
-        confirm(
-          "This will remove your saved settings on this browser. Continue?"
-        )
-      ) {
-        ["pb.profile", "pb.prefs", "pb.team"].forEach((k) =>
-          localStorage.removeItem(k)
-        );
-        toast("Account data deleted", "error");
-      }
-    });
-
-    // ----- Load saved values now (manager.js boot runs after DOMContentLoaded) -----
-    const p = JSON.parse(localStorage.getItem("pb.profile") || "{}");
-    if (p.fullName && qs("#fullName")) qs("#fullName").value = p.fullName;
-    if (p.email && qs("#email")) qs("#email").value = p.email;
-    if (p.jobTitle && qs("#jobTitle")) qs("#jobTitle").value = p.jobTitle;
-    if (p.phone && qs("#phone")) qs("#phone").value = p.phone;
-
-    const pr = JSON.parse(localStorage.getItem("pb.prefs") || "{}");
-    if (pr.theme && qs("#theme")) qs("#theme").value = pr.theme;
-    if (pr.lang && qs("#lang")) qs("#lang").value = pr.lang;
-    if (typeof pr.notifEmail === "boolean" && qs("#notifEmail"))
-      qs("#notifEmail").checked = pr.notifEmail;
-    if (typeof pr.notifPush === "boolean" && qs("#notifPush"))
-      qs("#notifPush").checked = pr.notifPush;
-    if (typeof pr.weekly === "boolean" && qs("#weekly"))
-      qs("#weekly").checked = pr.weekly;
-
-    const t = JSON.parse(localStorage.getItem("pb.team") || "{}");
-    if (t.role && qs("#role")) qs("#role").value = t.role;
-    if (t.workspace && qs("#workspace")) qs("#workspace").value = t.workspace;
-    if (typeof t.mentions === "boolean" && qs("#mentions"))
-      qs("#mentions").checked = t.mentions;
-    if (typeof t.shareStatus === "boolean" && qs("#shareStatus"))
-      qs("#shareStatus").checked = t.shareStatus;
-  }
-
-  // === Task Management == //
-  // Cards
-  function tasksSeed() {
-    return [
-      {id:1,title:'Task Title',desc:'Description',status:'upcoming',priority:'High',assignee:'Alex',deadline:dateStr(2),tags:['UI']},
-      {id:2,title:'Task Title',desc:'Description',status:'in-progress',priority:'Medium',assignee:'Sara',deadline:dateStr(4),tags:['API']},
-      {id:3,title:'Task Title',desc:'Description',status:'completed',priority:'Low',assignee:'Me',deadline:dateStr(-1),tags:['Docs']},
-      {id:4,title:'Task Title',desc:'Description',status:'pending',priority:'High',assignee:'Alex',deadline:dateStr(7),tags:['QA']}
+  /* ---------- minimal demo data so pages won’t look empty ---------- */
+  let tasks = JSON.parse(localStorage.getItem("managerTasks") || "[]");
+  if (!tasks.length) {
+    const iso = (o)=>{const d=new Date();d.setDate(d.getDate()+o);return d.toISOString().slice(0,10);};
+    tasks = [
+      {id:1,title:"Review Q1 Reports",desc:"Analyze metrics",status:"upcoming",priority:"High",assignee:"John",deadline:iso(2),tags:["reports"]},
+      {id:2,title:"Team Sync",desc:"Weekly standup",status:"in-progress",priority:"Medium",assignee:"Sarah",deadline:iso(4),tags:["meeting"]},
+      {id:3,title:"Project Planning",desc:"Q4 scope",status:"completed",priority:"Low",assignee:"Mike",deadline:iso(-1),tags:["planning"]},
+      {id:4,title:"Budget Review",desc:"Dept budget",status:"pending",priority:"High",assignee:"Alex",deadline:iso(7),tags:["finance"]},
     ];
+    localStorage.setItem("managerTasks", JSON.stringify(tasks));
   }
-  function dateStr(offset){ const d=new Date(); d.setDate(d.getDate()+offset); return d.toISOString().slice(0,10); }
 
-  // renderers only run if the relevant page exists
-  function initTaskPage(){
-    const page = qs("#taskPage"); if(!page) return;
-    const state = { tasks: tasksSeed(), calCurrent: new Date() };
+  /* ---------- simple renders so Task/Goals/Calendar show content ---------- */
+  function fmt(dateStr){
+    return new Date(dateStr).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  }
 
-    function renderBoard(){
-      qsa(".col .cards", page).forEach(c=>c.innerHTML='');
-      const term = (qs("#searchInput", page)?.value || "").toLowerCase();
-      state.tasks.forEach(t=>{
-        if(term && !(`${t.title} ${t.desc} ${t.assignee}`.toLowerCase().includes(term))) return;
-        const el = document.createElement('div'); el.className='card';
-        el.innerHTML = `
-          <div class="pill">${t.priority}</div>
-          <div style="font-weight:700">${t.title}</div>
-          <div class="muted">${t.desc||''}</div>
-          <div class="thumb"></div>
-          <div class="meta"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
-          <div class="card-foot">
-            <span>${t.assignee||'-'}</span>
-            <span class="pill">${t.deadline||'-'}</span>
-          </div>`;
-        const col = qs(`.col[data-status='${t.status}'] .cards`, page);
-        if(col) col.appendChild(el);
-      });
-      updateOverview(); markCalendar();
-    }
-
-    function updateOverview(){
-      const tb = qs('#overviewTable tbody', page);
-      if(!tb) return;
-      tb.innerHTML='';
-      state.tasks.slice(0,5).forEach(t=>{
-        const tr=document.createElement('tr');
-        tr.innerHTML = `<td>${t.title}</td><td><span class='pill'>${t.status}</span></td><td>${t.assignee||'-'}</td><td>${t.deadline||'-'}</td><td>${(t.tags||[]).join(', ')}</td>`;
-        tb.appendChild(tr);
-      });
-    }
-
-    // Calendar
-    function buildCalendar(){
-      const y = state.calCurrent.getFullYear();
-      const m = state.calCurrent.getMonth();
-      const first = new Date(y, m, 1);
-      const last  = new Date(y, m + 1, 0);
-      
-      const title = qs('#calTitle', page);
-      if (title) title.textContent = `${first.toLocaleString('default', { month: 'long' })} ${y}`;
-      
-      const body = qs('#calBody', page);
-      if (!body) return;
-      body.innerHTML = '';
-      
-      const startDow = first.getDay();
-      const lastDow  = last.getDay();   
-      
-      let day = 1;
-      
-      {
-        const tr = document.createElement('tr');
-        
-        if (startDow > 0) {
-          const pad = document.createElement('td');
-          pad.className = 'pad';
-          pad.colSpan = startDow;
-          tr.appendChild(pad);
-        }
-        
-        for (let c = startDow; c < 7 && day <= last.getDate(); c++) {
-          tr.appendChild(dayCell(new Date(y, m, day++)));
-        }
-        body.appendChild(tr);
-      }
-      
-      while (day + 6 <= last.getDate()) {
-        const tr = document.createElement('tr');
-        for (let c = 0; c < 7; c++) tr.appendChild(dayCell(new Date(y, m, day++)));
-        body.appendChild(tr);
-      }
-      
-      if (day <= last.getDate()) {
-        const tr = document.createElement('tr');
-        
-        let c = 0;
-        while (day <= last.getDate()) {
-          tr.appendChild(dayCell(new Date(y, m, day++)));
-          c++;
-        }
-        
-        const rightPad = 7 - c;
-        if (rightPad > 0) {
-          const pad = document.createElement('td');
-          pad.className = 'pad';
-          pad.colSpan = rightPad;
-          tr.appendChild(pad);
-        }
-        
-        body.appendChild(tr);
-      }
-      
-      markCalendar();
-      function dayCell(date){
-        const td = document.createElement('td');
-        td.textContent = date.getDate();
-        td.style.cursor = 'pointer';
-        td.dataset.date = date.toISOString().slice(0,10);
-        td.addEventListener('click', () => selectDay(date));
-        return td;
-      }
-    }
-
-    function selectDay(d){
-      const label = d.toLocaleDateString(undefined,{day:'numeric',month:'long',year:'numeric'});
-      const dayTitle = qs('#dayTitle', page); 
-      if(dayTitle) dayTitle.textContent = label;
-      // NEW: move selection to the clicked cell only
-      qsa('#calBody td', page).forEach(td => td.classList.remove('is-selected'));
-      const sel = qs(`#calBody td[data-date="${d.toISOString().slice(0,10)}"]`, page);
-      sel?.classList.add('is-selected');
-      
-      const cont = qs('#dayItems', page);
-      if(!cont) return;
-      cont.innerHTML='';
-      state.tasks
-      .filter(t => t.deadline === d.toISOString().slice(0,10))
-      .forEach(t=>{
-        const div=document.createElement('div');
-        div.className='panel'; 
-        div.style.padding='10px';
-        div.innerHTML = `<strong>${t.title}</strong><div class='muted'>${t.desc||''}</div>`;
-        cont.appendChild(div);
-      });
-    }
-
-    // wire controls
-    const prevBtn = qsa("button.ghost", qs(".calendar header", page))[0];
-    const nextBtn = qsa("button.ghost", qs(".calendar header", page))[1];
-    prevBtn?.addEventListener("click", () => { state.calCurrent.setMonth(state.calCurrent.getMonth()-1); buildCalendar(); });
-    nextBtn?.addEventListener("click", () => { state.calCurrent.setMonth(state.calCurrent.getMonth()+1); buildCalendar(); });
-
-    qs("#sortSelect", page)?.addEventListener("change", ()=>{
-      const by=qs("#sortSelect", page).value;
-      state.tasks.sort((a,b)=>{
-        if(by==='deadline') return (a.deadline||'').localeCompare(b.deadline||'');
-        if(by==='assignee') return (a.assignee||'').localeCompare(b.assignee||'');
-        const prio={High:0,Medium:1,Low:2}; return (prio[a.priority]??9)-(prio[b.priority]??9);
-      });
-      renderBoard();
+  function renderBoard(){
+    const cols = qsa(".col");
+    cols.forEach(c => c.querySelector(".cards").innerHTML = "");
+    const term = (qs("#searchInput")?.value || "").toLowerCase();
+    tasks.forEach(t=>{
+      const hay = `${t.title} ${t.desc} ${t.assignee} ${(t.tags||[]).join(" ")}`.toLowerCase();
+      if (term && !hay.includes(term)) return;
+      const el = document.createElement("div");
+      el.className = "card";
+      el.innerHTML = `
+        <h4>${t.title}</h4>
+        <p>${t.desc||""}</p>
+        <div class="thumb"></div>
+        <div class="meta">
+          <span class="pill priority-${t.priority.toLowerCase()}">${t.priority}</span>
+          <span class="dot"></span>
+          <span>${t.assignee}</span>
+        </div>
+        <div class="card-foot"><span>${fmt(t.deadline)}</span><span>⋯</span></div>`;
+      qs(`.col[data-status="${t.status}"] .cards`)?.appendChild(el);
     });
-    qs("#searchInput", page)?.addEventListener("input", renderBoard);
 
-    // boot
-    renderBoard(); buildCalendar();
-  }
-
-  function initGoalPage(){
-    const page = qs("#goalPage"); if(!page) return;
-    const goals = {
-      personal: [
-        {title:'Learn New Software Skill', type:'Skill', timeframe:'2 Months', outcome:'Course completion certificate (Adobe Illustrator)', status:'Active'},
-        {title:'Fitness Goal', type:'Health', timeframe:'3 Months', outcome:'Improve health and energy for work.', status:'Active'},
-        {title:'Productivity Habit', type:'Habit', timeframe:'Weekly', outcome:'Align weekly tasks with long-term goals', status:'Active'}
-      ],
-      team: [
-        {title:'Career Growth', type:'Development', timeframe:'1 Months', progress:50, status:'On Track'},
-        {title:'Skill Development', type:'Training', timeframe:'3 Months', progress:80, status:'On Track'},
-        {title:'Innovation & Creativity', type:'Culture', timeframe:'5 Months', progress:60, status:'At Risk'}
-      ]
-    };
-
-    function renderGoals(){
-      const pbody = qs('#personalGoals tbody', page); if(pbody){ pbody.innerHTML='';
-        goals.personal.forEach(g=>{
-          const tr=document.createElement('tr');
-          tr.innerHTML = `<td>${g.title}</td><td>${g.type}</td><td>${g.timeframe}</td><td>${g.outcome}</td><td>${g.status}</td>`;
-          pbody.appendChild(tr);
-        });
-      }
-      const tbody = qs('#teamGoals tbody', page); if(tbody){ tbody.innerHTML='';
-        goals.team.forEach(g=>{
-          const tr=document.createElement('tr');
-          tr.innerHTML = `<td>${g.title}</td><td>${g.type}</td><td>${g.timeframe}</td>
-            <td><div class='progress'><span style='width:${g.progress || 0}%'></span></div></td>
-            <td>${g.status}</td>`;
-          tbody.appendChild(tr);
-        });
-      }
-      const achieved = goals.personal.filter(x=>x.status==='Done').length + goals.team.filter(x=>x.progress===100).length;
-      const total = goals.personal.length + goals.team.length;
-      const donutLabel = qs('#donutLabel', page), donutSub = qs('#donutSub', page);
-      if(donutLabel) donutLabel.textContent = `${achieved}/${total} Goals Achieved`;
-      if(donutSub) donutSub.textContent = `${achieved}/${total} Goals Achieved`;
+    // overview table
+    const tbody = qs("#overviewTable tbody");
+    if (tbody){
+      tbody.innerHTML = "";
+      tasks.forEach(t=>{
+        tbody.insertAdjacentHTML("beforeend", `
+          <tr>
+            <td>${t.title}</td>
+            <td><span class="pill">${t.status}</span></td>
+            <td>${t.assignee}</td>
+            <td>${fmt(t.deadline)}</td>
+            <td>${(t.tags||[]).map(x=>`<span class="pill">${x}</span>`).join(" ")}</td>
+          </tr>`);
+      });
     }
-    renderGoals();
+
+    markCalendar();
   }
 
-  // ===== Boot
-  document.addEventListener("DOMContentLoaded", () => {
-    ensurePagesExist();
-    bindNav();
-    initTaskPage();
-    initGoalPage();
+  // Sort / filter hooks from HTML
+  window.sortBoard = function(){
+    const by = qs("#sortSelect")?.value;
+    if (!by) return;
+    tasks.sort((a,b)=>{
+      if(by==="deadline") return (a.deadline||"").localeCompare(b.deadline||"");
+      if(by==="assignee") return (a.assignee||"").localeCompare(b.assignee||"");
+      const pr = {High:0,Medium:1,Low:2};
+      return (pr[a.priority]??9) - (pr[b.priority]??9);
+    });
+    localStorage.setItem("managerTasks", JSON.stringify(tasks));
+    renderBoard();
+  };
+  window.filterBoard = renderBoard;
 
-    const stored = localStorage.getItem("manager.activePage");
-    showPage(stored || "taskPage");
+  /* ---------- calendar (month view + day list like wireframe) ---------- */
+  let calDate = new Date();
+  function buildCalendar(){
+    const y = calDate.getFullYear(), m = calDate.getMonth();
+    const first = new Date(y,m,1), last = new Date(y,m+1,0);
+    const start = first.getDay(), days = last.getDate();
+    setText("#calTitle", first.toLocaleString(undefined,{month:'long',year:'numeric'}));
+    const body = qs("#calBody"); if(!body) return;
+    body.innerHTML = "";
+    let d=1;
+    for(let i=0;i<6;i++){
+      const tr = document.createElement("tr");
+      for(let j=0;j<7;j++){
+        const td = document.createElement("td");
+        if(i===0 && j<start || d>days){ td.classList.add("pad"); }
+        else{
+          const cellDate = new Date(y,m,d);
+          const iso = cellDate.toISOString().slice(0,10);
+          td.textContent = d;
+          td.dataset.date = iso;
+          td.style.cursor = "pointer";
+          td.addEventListener("click", ()=>selectDay(cellDate));
+          // select today
+          const now = new Date();
+          if(d===now.getDate() && m===now.getMonth() && y===now.getFullYear()){
+            td.classList.add("is-selected");
+            selectDay(cellDate);
+          }
+          d++;
+        }
+        tr.appendChild(td);
+      }
+      body.appendChild(tr);
+      if(d>days) break;
+    }
+    markCalendar();
+  }
+  function markCalendar(){
+    qsa("#calBody td").forEach(td=>{
+      const ds = td.dataset.date;
+      if(!ds) return td.classList.remove("cal-mark");
+      const has = tasks.some(t=>t.deadline===ds);
+      td.classList.toggle("cal-mark", has);
+    });
+  }
+  function selectDay(date){
+    setText("#dayTitle", date.toLocaleDateString(undefined,{weekday:'long',year:'numeric',month:'long',day:'numeric'}));
+    qsa("#calBody td").forEach(td=>td.classList.remove("is-selected"));
+    qs(`#calBody td[data-date="${date.toISOString().slice(0,10)}"]`)?.classList.add("is-selected");
+    const box = qs("#dayItems"); if(!box) return;
+    box.innerHTML = "";
+    const list = tasks.filter(t=>t.deadline===date.toISOString().slice(0,10));
+    if(!list.length){ box.innerHTML = `<p class="muted">No tasks scheduled for this day</p>`; return; }
+    list.forEach(t=>{
+      const div = document.createElement("div");
+      div.className = "task-item";
+      div.innerHTML = `<div><strong>${t.title}</strong><div class="muted">${t.assignee} • ${t.priority}</div></div><span class="pill">${t.status}</span>`;
+      box.appendChild(div);
+    });
+  }
+  window.prevMonth = ()=>{ calDate.setMonth(calDate.getMonth()-1); buildCalendar(); };
+  window.nextMonth = ()=>{ calDate.setMonth(calDate.getMonth()+1); buildCalendar(); };
+
+  /* ---------- goal page (tables + donut) ---------- */
+  let goals = JSON.parse(localStorage.getItem("managerGoals") || "[]");
+  if (!goals.length){
+    goals = [
+      {id:101,title:"Increase Team Productivity",type:"team",timeframe:"Q4 2025",progress:60,status:"in-progress",target:"20% improvement"},
+      {id:102,title:"Leadership Training",type:"personal",timeframe:"Oct 2025",progress:40,status:"in-progress",target:"Certification"},
+      {id:103,title:"Ship v1.2",type:"team",timeframe:"Nov 2025",progress:100,status:"completed",target:"Release"},
+    ];
+    localStorage.setItem("managerGoals", JSON.stringify(goals));
+  }
+
+  function renderGoals(){
+    const pbody = qs("#personalGoals tbody");
+    const tbody = qs("#teamGoals tbody");
+    if (pbody) pbody.innerHTML = "";
+    if (tbody) tbody.innerHTML = "";
+
+    goals.filter(g=>g.type==="personal").forEach(g=>{
+      pbody?.insertAdjacentHTML("beforeend",
+        `<tr><td>${g.title}</td><td>${g.type}</td><td>${g.timeframe}</td><td>${g.target}</td><td><span class="pill">${g.status}</span></td></tr>`);
+    });
+    goals.filter(g=>g.type==="team").forEach(g=>{
+      tbody?.insertAdjacentHTML("beforeend",
+        `<tr><td>${g.title}</td><td>${g.type}</td><td>${g.timeframe}</td>
+         <td><div class="progress"><span style="width:${g.progress||0}%"></span></div><small>${g.progress||0}%</small></td>
+         <td><span class="pill">${g.status}</span></td></tr>`);
+    });
+
+    const achieved = goals.filter(g=>g.status==="completed").length;
+    const total = goals.length, pct = total? Math.round(achieved/total*100):0;
+    const donut = qs("#donut");
+    setText("#donutLabel", `${achieved}/${total} Goals Achieved`);
+    setText("#donutSub", `${pct}% Complete`);
+    if (donut){
+      donut.style.background = `
+        radial-gradient(closest-side, transparent 66%, rgba(255,255,255,.6) 67%, rgba(255,255,255,.6) 70%, transparent 71%),
+        conic-gradient(#3498DB 0% ${pct}%, rgba(180,215,241,.5) ${pct}% 100%)`;
+    }
+  }
+
+  // Minimal modal placeholders
+  window.openTaskModal = ()=>alert("Task modal (placeholder)");
+  window.openGoalModal = ()=>alert("Goal modal (placeholder)");
+  window.openProgressModal = ()=>alert("Progress modal (placeholder)");
+
+  /* ---------- init once DOM is ready ---------- */
+  document.addEventListener("DOMContentLoaded", () => {
+    // show ONLY the task page by default
+    const start = localStorage.getItem("manager.activePage") || "taskPage";
+    showPage(start === "userPage" ? "taskPage" : start);
+
+    // header profile labels
+    const email = sessionStorage.getItem("userEmail") || "manager@example.com";
+    const name = email.split("@")[0];
+    setText("#userNameDisplay", name);
+    setText("#userNameMenu", name);
+    setText("#userEmailMenu", email);
+
+    // initial renders
+    renderBoard();
+    buildCalendar();
+    renderGoals();
+
+    // close menus when clicking outside
+    window.addEventListener("click", (e)=>{
+      if(!e.target.closest(".user-profile") && !e.target.closest(".user-menu")){
+        qs("#userMenu")?.classList.remove("show");
+      }
+      const modal = qs("#logoutModal");
+      if(e.target===modal) modal.style.display = "none";
+    });
   });
 })();

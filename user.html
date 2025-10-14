@@ -28,7 +28,7 @@
         <div class="user-avatar" id="userAvatar">👤</div>
         <span id="userNameDisplay">User</span>
       </div>
-      <button class="icon-btn" title="Settings" onclick="openSettings()" aria-label="Settings">⚙️</button>
+      <button class="icon-btn" title="Settings" onclick="openSettings()" aria-label="Settings">⚙</button>
     </div>
   </header>
 
@@ -114,6 +114,50 @@
       </div>
     </section>
 
+    <!-- Goals Section -->
+<section id="goals" class="section">
+  <div class="section-header">
+    <h1>🎯 Goals</h1>
+    <p>Set and track your personal goals</p>
+  </div>
+  <div class="goals-container">
+    <div class="input-group">
+      <input type="text" id="newGoal" placeholder="Enter a new goal..." class="input-field">
+      <button class="btn-primary" onclick="addGoal()">Add Goal</button>
+    </div>
+    <div class="goals-list" id="goalList"></div>
+  </div>
+</section>
+
+  <!-- Tasks Section -->
+  <section id="tasks" class="section">
+    <div class="section-header">
+      <h1>📝 Tasks</h1>
+      <p>Manage your daily tasks</p>
+    </div>
+    <div class="tasks-container">
+      <div class="input-group">
+        <input type="text" id="newTask" placeholder="Enter a new task..." class="input-field">
+        <button class="btn-primary" onclick="addTask()">Add Task</button>
+      </div>
+      <div class="tasks-list" id="taskList"></div>
+    </div>
+  </section>
+
+  <!-- Countdown Section -->
+  <section id="countdown" class="section">
+    <div class="section-header">
+      <h1>⏰ Countdown</h1>
+      <p>Track important deadlines</p>
+    </div>
+    <div class="countdown-container">
+      <div class="countdown-display">
+        <h2>New Year 2026 Countdown</h2>
+        <div class="countdown-timer" id="countdown-timer"></div>
+      </div>
+    </div>
+  </section>
+
   <!-- User Menu -->
   <div id="userMenu" class="user-menu">
     <div class="user-info">
@@ -123,7 +167,7 @@
         <div class="user-role" id="userEmailMenu">user@example.com</div>
       </div>
     </div>
-    <a href="#" class="menu-item" onclick="openSettings(); return false;">⚙️ Settings</a>
+    <a href="#" class="menu-item" onclick="openSettings(); return false;">⚙ Settings</a>
     <a href="#" class="menu-item logout-item" onclick="logoutUser(); return false;">🚪 Logout</a>
   </div>
 
@@ -183,7 +227,12 @@
     }
 
     function navigateToSection(sectionId) { 
-      showSection(sectionId); 
+    if (sectionId === 'analytics') {
+        window.location.href = 'analytics.html';
+        return;
+    }
+    
+    showSection(sectionId); 
     }
 
     function toggleUserMenu() { 
@@ -262,7 +311,7 @@
       if(!text) return;
       const div=document.createElement('div'); 
       div.className='goal-item';
-      div.innerHTML=`<span class="goal-status">📚</span><span class="goal-text">${text}</span>`;
+      div.innerHTML = `<span class="goal-status">📚</span><span class="goal-text">${text}</span>`;
       div.onclick=function(){ 
         const status = this.querySelector('.goal-status');
         if(status.textContent==='📚') {
@@ -283,7 +332,7 @@
       if(!text) return;
       const div=document.createElement('div'); 
       div.className='task-item';
-      div.innerHTML=`<span class="task-status">⏳</span><span class="task-text">${text}</span>`;
+      div.innerHTML = `<span class="task-status">⏳</span><span class="task-text">${text}</span>`;
       div.onclick=function(){ 
         const status = this.querySelector('.task-status');
         if(status.textContent==='⏳') {
@@ -311,7 +360,7 @@
       const h=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
       const m=Math.floor((diff%(1000*60*60))/(1000*60));
       const s=Math.floor((diff%(1000*60))/1000);
-      el.innerHTML=`${d}d ${h}h ${m}m ${s}s`;
+      el.innerHTML = `${d}d ${h}h ${m}m ${s}s`;
     }
 
     // Close menus on outside click
@@ -326,10 +375,10 @@
         cancelLogout();
       }
     };
+
     function goToMainMenu() {
-    window.location.href = "main menu.html";
-  }
+      window.location.href = "main menu.html";
+    }
   </script>
 </body>
 </html>
-//sha123

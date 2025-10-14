@@ -6,6 +6,7 @@
     <title>Memorial Countdown - ProBoost</title>
     <link rel="stylesheet" href="user.css">
     <style>
+        /* 保留所有原有的 Countdown CSS 样式 */
         .countdown-container {
             max-width: 1200px;
             margin: 0 auto;
@@ -354,30 +355,79 @@
     </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <header class="navbar">
-        <div class="logo">
-            <img src="Logo.png" alt="ProBoost Logo">
-            <span>ProBoost</span>
+    <!-- 使用与 User Dashboard 相同的顶部导航栏 -->
+    <header class="top-navbar">
+        <div class="navbar-left">
+            <div class="logo">
+                <img src="Logo.png" alt="ProBoost Logo">
+                <span>ProBoost</span>
+            </div>
+            <button class="nav-button home-btn" onclick="goToUserDashboard()">Dashboard</button>
+            <div class="search-container">
+                <input type="text" placeholder="Search..." class="search-input">
+                <button class="search-btn" aria-label="Search">🔍</button>
+            </div>
         </div>
-        <nav class="nav-links">
-            <a href="user.html">🏠 Home</a>
-            <a href="collaboration.html">🤝 Collaboration</a>
-            <a href="time-tracking.html">⏳ Time Tracking</a>
-            <a href="analytics.html">📊 Analytics</a>
-            <a href="goals.html">🎯 Goals</a>
-            <a href="tasks.html">📝 Tasks</a>
-            <a href="#" class="active">⏰ Countdown</a>
-        </nav>
-        <div class="logout">
-            <a href="Landing Page.html">🚪 Logout</a>
+        
+        <div class="navbar-right">
+            <button class="icon-btn" title="Add New" aria-label="Add New">➕</button>
+            <button class="icon-btn" title="Notifications" aria-label="Notifications">🔔</button>
+            <div class="user-profile" onclick="toggleUserMenu()">
+                <div class="user-avatar" id="userAvatar">👤</div>
+                <span id="userNameDisplay">User</span>
+            </div>
+            <button class="icon-btn" title="Settings" onclick="openSettings()" aria-label="Settings">⚙</button>
         </div>
     </header>
 
-    <main class="container">
+    <!-- 使用与 User Dashboard 相同的圆形导航 -->
+    <div class="circular-nav" id="circularNav">
+        <div class="fab-main" onclick="toggleCircularNav()">
+            <div class="fab-icon">☰</div>
+        </div>
+        <div class="fab-options" id="fabOptions">
+            <div class="fab-option" onclick="navigateToSection('collaboration')" title="Team Collaboration">🤝</div>
+            <div class="fab-option" onclick="navigateToSection('time')" title="Time Tracking">⏳</div>
+            <div class="fab-option" onclick="navigateToSection('analytics')" title="Analytics">📊</div>
+            <div class="fab-option" onclick="navigateToSection('goals')" title="Goals">🎯</div>
+            <div class="fab-option" onclick="navigateToSection('tasks')" title="Tasks">📝</div>
+            <div class="fab-option active-fab" onclick="navigateToSection('countdown')" title="Countdown">⏰</div>
+            <div class="fab-option logout-fab" onclick="logoutUser()" title="Logout">🚪</div>
+        </div>
+    </div>
+
+    <!-- 用户菜单 -->
+    <div id="userMenu" class="user-menu">
+        <div class="user-info">
+            <div class="user-avatar-large">👤</div>
+            <div>
+                <div class="user-name" id="userNameMenu">User</div>
+                <div class="user-role" id="userEmailMenu">user@example.com</div>
+            </div>
+        </div>
+        <a href="#" class="menu-item" onclick="openSettings(); return false;">⚙ Settings</a>
+        <a href="#" class="menu-item logout-item" onclick="logoutUser(); return false;">🚪 Logout</a>
+    </div>
+
+    <!-- 退出确认模态框 -->
+    <div id="logoutModal" class="modal">
+        <div class="modal-content">
+            <h3>Confirm Logout</h3>
+            <p>Are you sure you want to logout?</p>
+            <div class="modal-actions">
+                <button class="btn-primary" onclick="confirmLogout()">Yes, Logout</button>
+                <button class="btn-secondary" onclick="cancelLogout()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主内容区域 -->
+    <main class="main-content">
         <section id="countdown" class="section active">
-            <h1>Memorial Countdown ⏰</h1>
-            <p>Track and manage your important dates and events</p>
+            <div class="section-header">
+                <h1>Memorial Countdown ⏰</h1>
+                <p>Track and manage your important dates and events</p>
+            </div>
 
             <div class="countdown-container">
                 <!-- Filter Tabs and Add Button -->
@@ -443,7 +493,104 @@
     </div>
 
     <script>
-        // Sample data
+        
+        // User Authentication and Navigation Functions
+        let circularNavOpen = false;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            checkUserAuthentication();
+            displayUserInfo();
+            initializeCountdowns();
+        });
+
+        function checkUserAuthentication() {
+            const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
+            const userRole = sessionStorage.getItem('role');
+            const userEmail = sessionStorage.getItem('userEmail');
+            if (!isLoggedIn || userRole !== 'user' || !userEmail) {
+                alert('Access Denied! Please login as a user.');
+                window.location.href = 'Login page.html';
+            }
+        }
+
+        function displayUserInfo() {
+            const userEmail = sessionStorage.getItem('userEmail') || 'user@example.com';
+            const userName = userEmail.split('@')[0];
+            document.getElementById('userNameDisplay').textContent = userName;
+            document.getElementById('userNameMenu').textContent = userName;
+            document.getElementById('userEmailMenu').textContent = userEmail;
+        }
+
+        function toggleCircularNav() {
+            circularNavOpen = !circularNavOpen;
+            const nav = document.getElementById('circularNav');
+            nav.classList.toggle('open');
+            const fabMain = nav.querySelector('.fab-main');
+            fabMain.classList.toggle('rotated');
+        }
+
+        function navigateToSection(sectionId) { 
+            if (sectionId === 'countdown') {
+                return; // Already on Countdown page
+            }
+            
+            // Page mapping
+            const pageMap = {
+                'collaboration': 'collaboration.html',
+                'time': 'time-tracking.html', 
+                'analytics': 'analytics.html',
+                'goals': 'goals.html',
+                'tasks': 'tasks.html',
+                'countdown': 'countdown.html'
+            };
+            
+            const targetPage = pageMap[sectionId];
+            if (targetPage) {
+                window.location.href = targetPage;
+            } else {
+                console.warn(`No page mapping found for section: ${sectionId}`);
+            }
+        }
+
+        function toggleUserMenu() { 
+            document.getElementById('userMenu').classList.toggle('show'); 
+        }
+
+        function openSettings() { 
+            alert('Settings panel opens'); 
+        }
+
+        function logoutUser() { 
+            document.getElementById('logoutModal').style.display = 'flex'; 
+        }
+
+        function confirmLogout() {
+            sessionStorage.clear();
+            window.location.href = 'Landing Page.html';
+        }
+
+        function cancelLogout() { 
+            document.getElementById('logoutModal').style.display = 'none'; 
+        }
+
+        function goToUserDashboard() {
+            window.location.href = "user.html";
+        }
+
+        // Close menus on outside click
+        window.onclick = function(event) {
+            if (!event.target.closest('.user-profile') && !event.target.closest('.user-menu')) {
+                document.getElementById('userMenu').classList.remove('show');
+            }
+            if (!event.target.closest('#circularNav') && circularNavOpen) {
+                toggleCircularNav();
+            }
+            if (event.target === document.getElementById('logoutModal')) {
+                cancelLogout();
+            }
+        };
+
+        // Countdown Feature JavaScript
         let countdowns = [
             { id: 1, title: "National Day", date: "2025-08-31", type: "countdown", days: 9 },
             { id: 2, title: "Class Test", date: "2025-09-30", type: "countdown", days: 39 },
@@ -609,9 +756,6 @@
                 day: 'numeric' 
             });
         }
-
-        // Initialize when page loads
-        document.addEventListener('DOMContentLoaded', initializeCountdowns);
     </script>
 </body>
 </html>

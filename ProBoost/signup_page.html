@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ProBoost - Sign Up</title>
+  <link rel="stylesheet" href="auth.css">
+  <style>
+    /* Small inline features only */
+    .password-wrapper { position: relative; width: 100%; }
+    .password-wrapper input { width: 100%; padding-right: 40px; }
+    .toggle-password {
+      position: absolute; top: 50%; right: 10px;
+      transform: translateY(-50%);
+      cursor: pointer; font-size: 18px; color: #555;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="logo">
+      <img src="Logo.png" alt="ProBoost Logo" class="logo-img">
+      <span>ProBoost</span>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <div class="side-image">
+      <img src="https://i.pinimg.com/736x/12/e9/af/12e9aff1764df39b155fffd23af8fd7a.jpg" alt="Left Side Image">
+    </div>
+
+    <div class="form-card">
+      <h2>Create Your Account</h2>
+      <form action="signup.php" method="POST" id="signupForm">
+        <input type="text" name="fullname" id="fullname" placeholder="Full Name" required>
+
+        <input type="email" name="email" id="email" placeholder="Email (must be @gmail.com)" required>
+        <div class="error-message" id="emailError">Invalid email format. Example: sha123@gmail.com</div>
+
+        <div class="password-wrapper">
+          <input type="password" name="password" id="password" placeholder="Create Password" required>
+          <span class="toggle-password" onclick="togglePassword('password', this)">🙈</span>
+        </div>
+        <div class="error-message" id="passwordError">Password must have uppercase, lowercase, number, and symbol.</div>
+
+        <div class="password-wrapper">
+          <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+          <span class="toggle-password" onclick="togglePassword('confirmPassword', this)">🙈</span>
+        </div>
+        <div class="error-message" id="confirmError">Passwords do not match.</div>
+
+        <button type="submit">Sign Up</button>
+        <p class="success-message" id="signupSuccess">✅ Account has been created successfully!</p>
+      </form>
+
+      <p class="switch-text">Already have an account? <a href="login_page.html">Login</a></p>
+    </div>
+
+    <div class="side-image">
+      <img src="https://i.pinimg.com/736x/8f/a8/78/8fa878e92dd17ba1c863adfb44f7c6a4.jpg" alt="Right Side Image">
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>© 2025 ProBoost. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // Toggle show/hide password
+    function togglePassword(id, el) {
+      const input = document.getElementById(id);
+      input.type = input.type === "password" ? "text" : "password";
+      el.textContent = input.type === "password" ? "🙈" : "🙉";
+    }
+
+    // Email validation
+    function validateEmail(email) {
+      return /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(email);
+    }
+
+    // Password validation — FIXED regex
+    function validatePassword(password) {
+      // must include at least 1 uppercase, 1 lowercase, 1 number, and 1 symbol, and be 8+ chars long
+      return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(password);
+    }
+
+    document.getElementById("signupForm").addEventListener("submit", function(event) {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
+
+      let valid = true;
+
+      if (!validateEmail(email)) {
+        document.getElementById("emailError").style.display = "block";
+        valid = false;
+      } else {
+        document.getElementById("emailError").style.display = "none";
+      }
+
+      if (!validatePassword(password)) {
+        document.getElementById("passwordError").style.display = "block";
+        valid = false;
+      } else {
+        document.getElementById("passwordError").style.display = "none";
+      }
+
+      if (password !== confirmPassword) {
+        document.getElementById("confirmError").style.display = "block";
+        valid = false;
+      } else {
+        document.getElementById("confirmError").style.display = "none";
+      }
+
+      if (!valid) {
+        event.preventDefault();
+      }
+    });
+  </script>
+</body>
+</html>
+//123
