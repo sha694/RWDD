@@ -92,29 +92,3 @@
 </body>
 </html>
 
-      // Prevent signing up with Admin's reserved email
-      if (email.toLowerCase() === "sha123@gmail.com") {
-        alert("⚠️ This email is reserved for the Admin. Please use another email.");
-        return;
-      }
-
-      if (users.some(u => u.email === email)) {
-        alert("⚠️ Email already exists. Please login instead.");
-        return;
-      }
-
-      const newUser = { email: email, password: password, role: "user" };
-      users.push(newUser);
-      localStorage.setItem("users", JSON.stringify(users));
-
-      document.getElementById("signupSuccess").style.display = "block";
-      document.getElementById("signupForm").reset();
-
-      setTimeout(() => {
-        window.location.href = "Login Page.html";
-      }, 1500);
-    });
-  </script>
-</body>
-</html>
-</html>
