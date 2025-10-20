@@ -7,7 +7,8 @@
   <link rel="stylesheet" href="manager.css" />
 </head>
 <body>
-  <!-- Top Navigation Bar (UNCHANGED) -->
+
+  <!-- Top Navigation Bar -->
   <header class="top-navbar">
     <div class="navbar-left">
       <div class="logo">
@@ -31,7 +32,7 @@
     </div>
   </header>
 
-  <!-- Circular Navigation FAB (UNCHANGED) -->
+  <!-- Circular Navigation FAB -->
   <div class="circular-nav" id="circularNav">
     <div class="fab-main" onclick="toggleCircularNav()">
       <div class="fab-icon">☰</div>
@@ -49,6 +50,7 @@
 
   <!-- Main Content -->
   <main class="main-content">
+
     <!-- User Settings -->
     <section id="userPage" class="section">
       <div class="section-header">
@@ -230,7 +232,7 @@
         <p>Organize and track your team's tasks</p>
       </div>
 
-      <!-- Controls (wireframe: add left, sort right, search full row) -->
+      <!-- Controls -->
       <div class="controls controls-wire">
         <button class="btn" id="addTaskBtn" onclick="openTaskModal()">➕ Add Task</button>
         <div class="field">
@@ -247,7 +249,7 @@
         </div>
       </div>
 
-      <!-- Kanban (4 equal columns) -->
+      <!-- Kanban -->
       <div class="kanban wire-kanban" id="kanban">
         <div class="col" data-status="upcoming">
           <div class="col-head"><span class="col-title">Upcoming</span><span>⋯</span></div>
@@ -271,7 +273,7 @@
         </div>
       </div>
 
-      <!-- Calendar + Day list (side-by-side like wireframe) -->
+      <!-- Calendar + Day list -->
       <div class="calendar-wrap wire-cal">
         <div class="calendar">
           <header>
@@ -296,7 +298,7 @@
         </div>
       </div>
 
-      <!-- Overview (table like wireframe) -->
+      <!-- Overview -->
       <section class="overview">
         <h2 class="section-header" style="font-size:36px">Overview</h2>
         <div class="table card-table">

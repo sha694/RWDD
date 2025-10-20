@@ -144,46 +144,50 @@
     clearMessages();
 
     if (!email) {
-      showError('loginEmailError', '❌ Email is required');
-      return;
+        showError('loginEmailError', '❌ Email is required');
+        return;
     }
 
     if (!password) {
-      showError('loginPasswordError', '❌ Password is required');
-      return;
+        showError('loginPasswordError', '❌ Password is required');
+        return;
     }
 
     const users = JSON.parse(localStorage.getItem("users")) || [];
     console.log('🔍 Available users:', users);
 
     const user = users.find(u => 
-      u.email.toLowerCase() === email.toLowerCase() && 
-      u.password === password
+        u.email.toLowerCase() === email.toLowerCase() && 
+        u.password === password
     );
 
     if (!user) {
-      showError('loginPasswordError', '❌ Invalid email or password!');
-      console.log('❌ Login failed for:', email);
-      return;
+        showError('loginPasswordError', '❌ Invalid email or password!');
+        console.log('❌ Login failed for:', email);
+        return;
     }
 
     console.log('✅ User found:', user);
 
-    // Save session
+    // Save session - include userType
     sessionStorage.setItem("isLoggedIn", "true");
     sessionStorage.setItem("role", user.role || "user");
+    sessionStorage.setItem("userType", user.userType || "user"); // Add userType
     sessionStorage.setItem("userEmail", user.email);
+    sessionStorage.setItem("fullname", user.fullname || "");
 
-    // Redirect based on role
+    // Redirect based on role AND userType
     if (user.role === "admin") {
-      showSuccess("✅ Admin login successful! Redirecting...");
-      setTimeout(() => { window.location.href = "Admin.html"; }, 1000);
+        showSuccess("✅ Admin login successful! Redirecting...");
+        setTimeout(() => { window.location.href = "Admin.html"; }, 1000);
+    } else if (user.userType === "manager") {
+        showSuccess("✅ Manager login successful! Redirecting...");
+        setTimeout(() => { window.location.href = "Manager.html"; }, 1000);
     } else {
-      showSuccess("✅ User login successful! Redirecting...");
-      setTimeout(() => { window.location.href = "User.html"; }, 1000);
+        showSuccess("✅ User login successful! Redirecting...");
+        setTimeout(() => { window.location.href = "User.html"; }, 1000);
     }
-  }
-
+}
   // ✅ Test accounts (remove in production)
   console.log("=== TEST ACCOUNTS ===");
   console.log("Admin: sha123@gmail.com / Admin123!");
