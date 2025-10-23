@@ -40,10 +40,10 @@
     <div class="fab-options" id="fabOptions">
       <div class="fab-option" onclick="navigateToSection('collaboration')" title="Team Collaboration">🤝</div>
       <div class="fab-option" onclick="navigateToSection('time')" title="Time Tracking">⏳</div>
-      <div class="fab-option" onclick="navigateToSection('analytics')" title="Analytics">📊</div>
+      <div class="fab-option" onclick="window.location.href='analytics.html'" title="Analytics">📊</div>
       <div class="fab-option" onclick="navigateToSection('goalPage')" title="Goals">🎯</div>
       <div class="fab-option" onclick="navigateToSection('taskPage')" title="Tasks">📝</div>
-      <div class="fab-option" onclick="navigateToSection('countdown')" title="Countdown">⏰</div>
+     <div class="fab-option" onclick="window.location.href='countdown.html'" title="Countdown">⏰</div>
       <div class="fab-option logout-fab" onclick="logoutUser()" title="Logout">🚪</div>
     </div>
   </div>
@@ -233,12 +233,11 @@
       </div>
 
       <!-- Controls -->
-      <div class="controls controls-wire">
+       <div class="controls controls-wire">
         <button class="btn" id="addTaskBtn" onclick="openTaskModal()">➕ Add Task</button>
         <div class="field">
-          <label class="field-label">Sort by :</label>
+          <label class="field-label">Sort by:</label>
           <select id="sortSelect" onchange="sortBoard()">
-            <option selected disabled>—</option>
             <option value="priority">Priority</option>
             <option value="deadline">Deadline</option>
             <option value="assignee">Assignee</option>
@@ -347,45 +346,44 @@
         </div>
       </div>
 
-      <!-- Personal & Team tables like wireframe -->
-      <div class="goal-sections">
-        <div class="goal-table">
-          <div class="goal-table-head">
-            <span>Personal</span>
-            <div class="row">
-              <button class="ghost" onclick="openGoalModal('personal')">+ New Goal</button>
-              <button class="ghost">Sort ▾</button>
-            </div>
+      <!-- Personal Goals Table -->
+      <div class="goal-table" style="margin-bottom: 30px;">
+        <div class="goal-table-head">
+          <span>Personal Goals</span>
+          <div class="row">
+            <button class="ghost" onclick="openGoalModal('personal')">+ New Goal</button>
+            <button class="ghost">Sort ▾</button>
           </div>
-          <table id="personalGoals">
-            <thead>
-              <tr><th>Goals</th><th>Type</th><th>Timeframe</th><th>Goal Outcome</th><th>Status</th></tr>
-            </thead>
-            <tbody></tbody>
-          </table>
         </div>
-
-        <div class="goal-table">
-          <div class="goal-table-head">
-            <span>Team</span>
-            <div class="row">
-              <button class="ghost" onclick="openGoalModal('team')">+ New Goal</button>
-              <button class="ghost">Sort ▾</button>
-            </div>
-          </div>
-          <table id="teamGoals">
-            <thead>
-              <tr><th>Goals</th><th>Type</th><th>Timeframe</th><th>Progress</th><th>Status</th></tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
+        <table id="personalGoals">
+          <thead>
+            <tr><th>Goals</th><th>Type</th><th>Timeframe</th><th>Achievement</th><th>Status</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
 
-      <!-- Progress Log (single big card like wireframe) -->
-      <section class="progress-log">
+      <!-- Team Goals Table -->
+      <div class="goal-table">
+        <div class="goal-table-head">
+          <span>Team Goals</span>
+          <div class="row">
+            <button class="ghost" onclick="openGoalModal('team')">+ New Goal</button>
+            <button class="ghost">Sort ▾</button>
+          </div>
+        </div>
+        <table id="teamGoals">
+          <thead>
+            <tr><th>Goals</th><th>Type</th><th>Timeframe</th><th>Achievement</th><th>Status</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <!-- Progress Log -->
+       <section class="progress-log">
         <h2 class="section-header" style="font-size:36px">Progress Log</h2>
-        <div class="log-card" id="progressItem">
+        <div class="progress-log-content" id="progressLogContent">
           <div class="log-head">
             <strong id="plTitle">Learn New Software Skill</strong>
             <button class="ghost" onclick="openProgressModal()">+ Update Progress</button>
