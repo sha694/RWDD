@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ProBoost - Login</title>
   <link rel="stylesheet" href="auth.css">
 </head>
 <body>
-  <!-- Header -->
   <header class="header">
     <div class="logo">
       <img src="Logo.png" alt="ProBoost Logo" class="logo-img">
@@ -15,180 +14,80 @@
     </div>
   </header>
 
-  <!-- Main Content -->
   <main class="main-container">
-    <!-- Left Image -->
     <div class="side-image">
       <img src="https://i.pinimg.com/736x/12/e9/af/12e9aff1764df39b155fffd23af8fd7a.jpg" alt="Decorative Left">
     </div>
 
-    <!-- Form Card -->
     <div class="form-card">
       <h2>Login</h2>
 
-      <!-- ✅ Connect to PHP -->
-      <form action="login.php" method="POST" id="loginForm">
-        <input type="email" name="email" id="loginEmail" placeholder="Email" required>
-
+      <form id="loginForm">
+        <input type="email" id="email" placeholder="Email" required>
         <div class="password-wrapper">
-          <input type="password" name="password" id="loginPassword" placeholder="Password" required>
-          <span class="toggle-password" onclick="togglePassword('loginPassword', this)">🙈</span>
+          <input type="password" id="password" placeholder="Password" required>
+          <span class="toggle-password" onclick="togglePassword()">🙈</span>
         </div>
 
         <button type="submit">Login</button>
       </form>
 
-      <p class="switch-text">Don't have an account? <a href="Sign up Page.html">Sign Up</a></p>
+      <p class="switch-text">Don’t have an account? <a href="signup.html">Sign Up</a></p>
+      <p id="message" style="color:red; text-align:center;"></p>
     </div>
 
-    <!-- Right Image -->
     <div class="side-image">
       <img src="https://i.pinimg.com/736x/8f/a8/78/8fa878e92dd17ba1c863adfb44f7c6a4.jpg" alt="Decorative Right">
     </div>
   </main>
 
-  <!-- Footer -->
   <footer class="footer">
     <p>© 2025 ProBoost. All rights reserved.</p>
   </footer>
 
-  <!-- ✅ JS for Toggle Password -->
   <script>
-    function togglePassword(id, el) {
-      const input = document.getElementById(id);
-      if (input.type === "password") {
-        input.type = "text";
-        el.textContent = "🙉";
+    // Toggle password visibility
+    function togglePassword() {
+      const input = document.getElementById('password');
+      const el = document.querySelector('.toggle-password');
+      if(input.type === 'password') {
+        input.type = 'text';
+        el.textContent = '🙉';
       } else {
-        input.type = "password";
-        el.textContent = "🙈";
+        input.type = 'password';
+        el.textContent = '🙈';
       }
     }
-  </script>
-</body>
-</html>
 
+    // Predefined accounts
+    const accounts = [
+      { email: "sha123@gmail.com", password: "Sha123!", role: "admin" },
+      { email: "sha1@gmail.com", password: "User123!", role: "user" }
+    ];
 
-  <!-- Scripts -->
-  <script>
-  // ✅ Clear session when visiting login page
-  window.addEventListener('DOMContentLoaded', () => {
-    sessionStorage.clear();
-    console.log('🔄 Session cleared on login page load');
-    initializeAdmin();
-  });
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
 
-  // ✅ Ensure Admin account exists
-  function initializeAdmin() {
-    let users = JSON.parse(localStorage.getItem("users")) || [];
-    const adminEmail = "sha123@gmail.com";
+      const user = accounts.find(u => u.email === email && u.password === password);
 
-    if (!users.find(u => u.email.toLowerCase() === adminEmail.toLowerCase())) {
-      users.push({
-        id: Date.now(),
-        userId: "U001",
-        email: adminEmail,
-        password: "Admin123!",
-        role: "admin",
-        createdAt: new Date().toISOString()
-      });
-      localStorage.setItem("users", JSON.stringify(users));
-      console.log("✅ Admin account created:", adminEmail);
-    } else {
-      console.log("✅ Admin account already exists");
-    }
-  }
+      if(user) {
+        // Store session data
+        sessionStorage.setItem('isLoggedIn', 'true');
+        sessionStorage.setItem('role', user.role);
+        sessionStorage.setItem('userEmail', user.email);
 
-  // ✅ Toggle password visibility
-  function togglePassword(id, el) {
-    const input = document.getElementById(id);
-    if (input.type === "password") {
-      input.type = "text";
-      el.textContent = "🙉";
-    } else {
-      input.type = "password";
-      el.textContent = "🙈";
-    }
-  }
-
-  // ✅ Show/Hide error & success messages
-  function showError(id, message = '', show = true) {
-    const el = document.getElementById(id);
-    if (message) el.textContent = message;
-    el.style.display = show ? 'block' : 'none';
-  }
-
-  function showSuccess(message) {
-    const el = document.getElementById('loginSuccess');
-    el.textContent = message;
-    el.style.display = 'block';
-  }
-
-  function hideSuccess() {
-    document.getElementById('loginSuccess').style.display = 'none';
-  }
-
-  function clearMessages() {
-    showError('loginEmailError', '', false);
-    showError('loginPasswordError', '', false);
-    hideSuccess();
-  }
-
-  // ✅ Login function
-  function login(event) {
-    event.preventDefault();
-
-    const email = document.getElementById('loginEmail').value.trim();
-    const password = document.getElementById('loginPassword').value;
-
-    clearMessages();
-
-    if (!email) {
-      showError('loginEmailError', '❌ Email is required');
-      return;
-    }
-
-    if (!password) {
-      showError('loginPasswordError', '❌ Password is required');
-      return;
-    }
-
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-    console.log('🔍 Available users:', users);
-
-    const user = users.find(u => 
-      u.email.toLowerCase() === email.toLowerCase() && 
-      u.password === password
-    );
-
-    if (!user) {
-      showError('loginPasswordError', '❌ Invalid email or password!');
-      console.log('❌ Login failed for:', email);
-      return;
-    }
-
-    console.log('✅ User found:', user);
-
-    // Save session
-    sessionStorage.setItem("isLoggedIn", "true");
-    sessionStorage.setItem("role", user.role || "user");
-    sessionStorage.setItem("userEmail", user.email);
-
-    // Redirect based on role
-    if (user.role === "admin") {
-      showSuccess("✅ Admin login successful! Redirecting...");
-      setTimeout(() => { window.location.href = "Admin.html"; }, 1000);
-    } else {
-      showSuccess("✅ User login successful! Redirecting...");
-      setTimeout(() => { window.location.href = "User.html"; }, 1000);
-    }
-  }
-
-  // ✅ Test accounts (remove in production)
-  console.log("=== TEST ACCOUNTS ===");
-  console.log("Admin: sha123@gmail.com / Admin123!");
-  console.log("Sign up to create user accounts.");
-  console.log("======================");
+        // Redirect
+        if(user.role === 'user') {
+          window.location.href = 'User.html';
+        } else {
+          alert('Admin login successful! You can redirect to Admin.html if needed.');
+        }
+      } else {
+        document.getElementById('message').textContent = '❌ Invalid email or password';
+      }
+    });
   </script>
 </body>
 </html>
